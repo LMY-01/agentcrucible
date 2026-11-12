@@ -115,6 +115,16 @@ def main(argv: list[str] | None = None) -> int:
     p_eval.add_argument("--max-tokens", type=int, default=120_000)
     p_eval.add_argument("--max-seconds", type=float, default=180.0)
     p_eval.add_argument("--out", default="")
+    p_eval.add_argument("--threshold", type=float, default=0.90,
+                        help="质量分及格线，低于它就返回非零退出码（CI 闸门）")
+    p_eval.add_argument("--report", dest="report", action="store_true", default=True,
+                        help="生成 HTML 对照报告（默认开）")
+    p_eval.add_argument("--no-report", dest="report", action="store_false")
+    p_eval.add_argument("--report-out", default="", help="报告输出路径")
+    p_eval.add_argument("--judge", dest="judge", action="store_true", default=True,
+                        help="失败任务用 LLM 做归因（默认开）")
+    p_eval.add_argument("--no-judge", dest="judge", action="store_false")
+    p_eval.add_argument("--judge-model", default="", help="归因用的模型，默认与评测模型相同")
     common(p_eval)
     p_eval.set_defaults(func=cmd_eval)
 
