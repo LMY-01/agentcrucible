@@ -6,6 +6,7 @@
 """
 from __future__ import annotations
 
+import argparse
 import json
 import os
 import re
@@ -106,7 +107,129 @@ def _check(checks: list[dict], answer: str, workspace: Path,
     return (not failures), failures
 
 
+def _report_data(agg: dict, args, details=None, error_types=None) -> dict:
+    """报告需要的全部现场。单轮和多轮共用，避免两份渲染逻辑走偏。"""
+    return {
+        "meta": {
+            "model": args.model,
+            "time": time.strftime("%Y-%m-%d %H:%M:%S"),
+            "tool_calls": agg.get("tool_calls", 0),
+            "tokens": sum(r.get("tokens", 0) for r in agg.get("rows") or []),
+            "repeat": agg.get("repeat", 1),
+        },
+        "score": agg["score"],
+        "tier_scores": agg.get("tier_scores") or {},
+        "latency": agg.get("latency") or {},
+        "cost": agg.get("cost") or {},
+        "fingerprint": agg.get("fingerprint"),
+        "stages": agg["stage_summary"],
+        "rows": details if details is not None else (agg.get("rows") or []),
+        "error_types": error_types or {},
+    }
+
+
+def _merge_repeats(paths: list[str], args) -> dict:
+    """把 N 轮结果合成一份：准确率给区间，延迟和成本合并样本。
+
+    为什么准确率必须给区间：同一份 prompt 同一套题，实测能差 0.05 以上。
+    报单点等于把噪声当结论。给出中位数和极差，读者自己判断「这算不算提升」。
+    """
+    runs = [json.loads(Path(p).read_text(encoding="utf-8")) for p in paths]
+    qualities = [r["score"]["quality"] for r in runs]
+    passed_list = [r["passed"] for r in runs]
+    all_rows = [row for r in runs for row in r["rows"] if not row.get("control")]
+    walls = [x["wall_s"] for x in all_rows]
+    ttfts = [x["ttft_ms"] for x in all_rows if x.get("ttft_ms")]
+    total_cost = sum(r["cost"]["total"] for r in runs)
+    n_task_runs = sum(r["tasks"] for r in runs) or 1
+
+    merged = dict(runs[0])
+    merged["repeat"] = len(runs)
+    merged["rows"] = runs[0]["rows"]          # 明细展示第一轮，够看
+    merged["tasks"] = runs[0]["tasks"]
+    merged["passed"] = int(round(sum(passed_list) / len(passed_list)))
+    merged["success_rate"] = round(merged["passed"] / merged["tasks"], 3) if merged["tasks"] else 0.0
+
+    q_sorted = sorted(qualities)
+    med = q_sorted[len(q_sorted) // 2] if len(q_sorted) % 2 else \
+        round((q_sorted[len(q_sorted) // 2 - 1] + q_sorted[len(q_sorted) // 2]) / 2, 3)
+    merged["score"] = {
+        **runs[0]["score"],
+        "quality": med,
+        "quality_range": [min(qualities), max(qualities)],
+        "quality_all": qualities,
+        "pass_all": passed_list,
+        "gate": "pass" if med >= runs[0]["score"]["threshold"] else "fail",
+    }
+    merged["latency"] = {
+        "ttft_ms_p50": pct(ttfts, 0.5),
+        "ttft_ms_p95": pct(ttfts, 0.95),
+        "wall_s_p50": round(pct(walls, 0.5), 1),
+        "wall_s_p95": round(pct(walls, 0.95), 1),
+        "wall_s_p99": round(pct(walls, 0.99), 1),
+        "wall_s_avg": round(sum(walls) / len(walls), 1) if walls else 0.0,
+        "wall_s_max": round(max(walls), 1) if walls else 0.0,
+        "samples": len(walls),
+        "note": f"{len(runs)} 轮合并采样，共 {len(walls)} 个任务样本",
+    }
+    merged["cost"] = {
+        **runs[0]["cost"],
+        "total": round(total_cost, 8),
+        "per_task": round(total_cost / n_task_runs, 8),
+    }
+    return merged
+
+
 def run_suite(args, tool_builder=None, predicates=None) -> int:
+    # 多轮：递归调自己 N 次（每轮独立 json），再合并。
+    # 不改主流程结构，避免把已经验证过的评测逻辑拆散。
+    repeat = int(getattr(args, "repeat", 1) or 1)
+    if repeat > 1:
+        stamp = int(time.time())
+        outs: list[str] = []
+        for r in range(repeat):
+            sub = argparse.Namespace(**vars(args))
+            sub.repeat = 1
+            sub.report = False
+            sub.out = os.path.join(str(args.runs), f"rep_{stamp}_{r}.json")
+            print(f"\n{'#' * 62}\n# 第 {r + 1}/{repeat} 轮\n{'#' * 62}")
+            run_suite(sub, tool_builder, predicates)
+            if Path(sub.out).exists():
+                outs.append(sub.out)
+        if not outs:
+            print("没有拿到任何一轮结果")
+            return 1
+        merged = _merge_repeats(outs, args)
+        agg = merged
+        score = agg["score"]
+        lat, cst = agg["latency"], agg["cost"]
+        print(f"\n{'=' * 62}\n{agg['repeat']} 轮汇总")
+        print(f"  准确率  质量分中位 {score['quality']:.3f}"
+              f"  区间 [{score['quality_range'][0]:.3f}, {score['quality_range'][1]:.3f}]"
+              f"  各轮 {[round(q, 3) for q in score['quality_all']]}")
+        print(f"  延迟    TTFT {lat['ttft_ms_p50'] / 1000:.1f}s(P50)"
+              f"   端到端 {lat['wall_s_p50']}s(P50) {lat['wall_s_p99']}s(P99)"
+              f"（{lat['samples']} 个样本）")
+        if cst["priced"]:
+            print(f"  成本    {money(cst['total'], cst['currency'])} 总计"
+                  f" / {money(cst['per_task'], cst['currency'])} 每任务（均值）")
+        else:
+            print(f"  成本    —（未取到单价）")
+        print(f"  闸门    {'✅ 可发布' if score['gate'] == 'pass' else '❌ 未达及格线'}")
+
+        out = args.out or os.path.join(str(args.runs), f"eval_{stamp}.json")
+        Path(out).write_text(json.dumps(agg, ensure_ascii=False, indent=2), encoding="utf-8")
+        report_path = ""
+        if getattr(args, "report", True):
+            report_path = getattr(args, "report_out", "") or os.path.join(
+                str(args.runs), f"report_{stamp}.html"
+            )
+            write_report(_report_data(agg, args), report_path)
+        print(f"\n合并结果 {out}")
+        if report_path:
+            print(f"对照报告 {report_path}")
+        return 0 if score["gate"] == "pass" else 1
+
     # 支持多份题集：--tasks gold.json,silver.json —— 两份一起跑，分账统计
     task_files = [Path(p.strip()) for p in str(args.tasks).split(",") if p.strip()]
     tasks: list[dict] = []
@@ -324,28 +447,17 @@ def run_suite(args, tool_builder=None, predicates=None) -> int:
             key = diag.get("error_type") or "other"
             error_types[key] = error_types.get(key, 0) + 1
 
+    agg["_details"] = details
+    agg["_error_types"] = error_types
+
     report_path = ""
     if getattr(args, "report", True):
-        report_data = {
-            "meta": {
-                "model": args.model,
-                "time": time.strftime("%Y-%m-%d %H:%M:%S"),
-                "tool_calls": agg["tool_calls"],
-                "tokens": sum(r["tokens"] for r in rows),
-            },
-            "score": score,
-            "tier_scores": agg["tier_scores"],
-            "latency": agg["latency"],
-            "cost": agg["cost"],
-            "fingerprint": fingerprint,
-            "stages": agg["stage_summary"],
-            "rows": details,
-            "error_types": error_types,
-        }
         report_path = getattr(args, "report_out", "") or os.path.join(
             str(out_root), f"report_{int(time.time())}.html"
         )
-        write_report(report_data, report_path)
+        write_report(_report_data(agg, args, details, error_types), report_path)
+    agg.pop("_details", None)
+    agg.pop("_error_types", None)
 
     out = args.out or os.path.join(str(out_root), f"eval_{int(time.time())}.json")
     Path(out).write_text(json.dumps(agg, ensure_ascii=False, indent=2), encoding="utf-8")

@@ -250,6 +250,7 @@ def cmd_eval(args) -> int:
         report_out=args.report_out,
         judge=not args.no_judge,
         judge_model="",
+        repeat=getattr(args, "repeat", 1),
     )
     return run_suite(ns, tool_builder=tool_builder, predicates=PREDICATES)
 
@@ -277,6 +278,8 @@ def main(argv: list[str] | None = None) -> int:
     e.add_argument("--report-out", default="")
     e.add_argument("--no-report", action="store_true")
     e.add_argument("--no-judge", action="store_true")
+    e.add_argument("--repeat", type=int, default=1,
+                   help="重复跑 N 轮，准确率取中位数并给区间，延迟/成本合并采样")
     common(e)
     e.set_defaults(func=cmd_eval)
 
