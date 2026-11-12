@@ -38,9 +38,14 @@ def answer(payload: dict) -> str:
 
 class GroundedBase(unittest.TestCase):
     def setUp(self):
-        self._p = patch("apps.kb_agent.app._store", return_value=FakeStore())
-        self._p.start()
-        self.addCleanup(self._p.stop)
+        # 两个模块各持有 _store 的引用，都要 patch：
+        # app.py 是 `from .kb_tools import _store`，patch app 改不到 kb_tools 那个名字
+        self._p1 = patch("apps.kb_agent.app._store", return_value=FakeStore())
+        self._p2 = patch("apps.kb_agent.kb_tools._store", return_value=FakeStore())
+        self._p1.start()
+        self._p2.start()
+        self.addCleanup(self._p1.stop)
+        self.addCleanup(self._p2.stop)
 
 
 class TestCitationsGrounded(GroundedBase):
