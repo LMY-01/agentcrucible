@@ -10,6 +10,7 @@ import argparse
 import json
 import os
 import re
+import statistics
 import time
 from pathlib import Path
 from typing import Any
@@ -177,6 +178,21 @@ def _merge_repeats(paths: list[str], args) -> dict:
         "total": round(total_cost, 8),
         "per_task": round(total_cost / n_task_runs, 8),
     }
+
+    # 分档分数也取中位。否则报告顶部是「三轮总分的中位」，下面的分档却是第一轮的，
+    # 两个口径混在一张表里，读者会以为白银集那行也代表三轮。
+    tiers: dict[str, dict] = {}
+    for tier in (runs[0].get("tier_scores") or {}):
+        qs = [r["tier_scores"][tier]["quality"] for r in runs
+              if tier in (r.get("tier_scores") or {})]
+        if qs:
+            tiers[tier] = {
+                **runs[0]["tier_scores"][tier],
+                "quality": round(statistics.median(qs), 3),
+                "quality_all": qs,
+            }
+    if tiers:
+        merged["tier_scores"] = tiers
     return merged
 
 
