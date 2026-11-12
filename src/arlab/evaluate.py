@@ -76,13 +76,17 @@ def _dig(data: Any, path: str) -> Any:
 
 
 def _check(checks: list[dict], answer: str, workspace: Path,
-           predicates: dict[str, Any] | None = None) -> tuple[bool, list[str]]:
+           predicates: dict[str, Any] | None = None,
+           context: dict[str, Any] | None = None) -> tuple[bool, list[str]]:
     """逐条断言。predicates 是应用层注册的自定义谓词，返回 None=通过，返回字符串=失败原因。
+
+    context 带运行时事实（status/steps/tokens），让谓词能区分「主动做对」和「被逼到墙角蒙对」。
 
     目前支持：answer_contains / answer_contains_any / json_field /
     file_exists / file_contains / predicate
     """
     failures: list[str] = []
+    ctx = context or {}
     for c in checks:
         kind = c.get("type")
         if kind == "predicate":
@@ -90,7 +94,7 @@ def _check(checks: list[dict], answer: str, workspace: Path,
             if fn is None:
                 failures.append(f"未注册的谓词 {c.get('name')!r}")
                 continue
-            reason = fn(answer, c)
+            reason = fn(answer, c, ctx)
             if reason:
                 failures.append(reason)
             continue
@@ -177,8 +181,12 @@ def run_suite(args, tool_builder=None, predicates=None) -> int:
         started = time.time()
         result = agent.run(task["prompt"])
         wall = round(time.time() - started, 2)
-        ok, failures = _check(task.get("checks", []), result.answer, workspace, predicates)
         summary = trace.summarize()
+        ok, failures = _check(
+            task.get("checks", []), result.answer, workspace, predicates,
+            context={"status": result.status, "reason": result.reason,
+                     "steps": summary["steps"], "tokens": summary["total_tokens"]},
+        )
         trace.close(ok=ok, failures=failures, answer=result.answer,
                     status=result.status, reason=result.reason, **summary)
 

@@ -56,7 +56,7 @@ def _citations(answer: str) -> tuple[dict | None, list[dict]]:
     return data, cites if isinstance(cites, list) else []
 
 
-def pred_citations_grounded(answer: str, spec: dict) -> str | None:
+def pred_citations_grounded(answer: str, spec: dict, ctx: dict | None = None) -> str | None:
     """每条引文必须在其 chunk 的原文里逐字存在，且至少一条。"""
     data, cites = _citations(answer)
     if data is None:
@@ -86,7 +86,7 @@ def pred_citations_grounded(answer: str, spec: dict) -> str | None:
     return None
 
 
-def pred_answer_covers(answer: str, spec: dict) -> str | None:
+def pred_answer_covers(answer: str, spec: dict, ctx: dict | None = None) -> str | None:
     """要点覆盖：must 里至少命中 min_hit 个。"""
     data, _ = _citations(answer)
     if data is None:
@@ -101,7 +101,7 @@ def pred_answer_covers(answer: str, spec: dict) -> str | None:
     return None
 
 
-def pred_not_refused(answer: str, spec: dict) -> str | None:
+def pred_not_refused(answer: str, spec: dict, ctx: dict | None = None) -> str | None:
     data, _ = _citations(answer)
     if data is None:
         return "答案不是可解析的 JSON"
@@ -110,8 +110,16 @@ def pred_not_refused(answer: str, spec: dict) -> str | None:
     return None
 
 
-def pred_states_missing(answer: str, spec: dict) -> str | None:
-    """资料里确实没有时：要么标 refused，要么在正文里说明缺失。"""
+def pred_states_missing(answer: str, spec: dict, ctx: dict | None = None) -> str | None:
+    """资料里确实没有时：要么标 refused，要么在正文里说明缺失。
+
+    关键：还要看它是**主动判断**出资料缺失，还是被预算逼到墙角才说没有。
+    后者是假阳性 —— 同一句话，前者说明策略对，后者说明它只是在收尾。
+    """
+    ctx = ctx or {}
+    if ctx.get("status") == "budget_exhausted":
+        return (f"拒答是被预算逼停后收尾的（原因 {ctx.get('reason')}），"
+                f"不是自己判断出资料缺失；token {ctx.get('tokens')} 步数 {ctx.get('steps')}")
     data, _ = _citations(answer)
     if data is None:
         return "答案不是可解析的 JSON"

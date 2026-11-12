@@ -116,6 +116,18 @@ class TestRefusalPredicates(GroundedBase):
         self.assertIsNotNone(reason, "编了数字却没被拦住")
         self.assertIn("没说明资料缺失", reason)
 
+    def test_forced_finish_does_not_count_as_refusal(self):
+        """被预算逼停后说「资料里没有」，不算拒答成功——它只是被逼到墙角。"""
+        ans = answer({"answer": "资料中没有相关资料", "refused": True, "citations": []})
+        ctx = {"status": "budget_exhausted", "reason": "tokens", "tokens": 56562, "steps": 7}
+        reason = pred_states_missing(ans, {}, ctx)
+        self.assertIsNotNone(reason, "预算逼停的收尾被误判成主动拒答")
+        self.assertIn("逼停", reason)
+
+    def test_normal_finish_still_passes(self):
+        ans = answer({"answer": "资料中没有相关资料", "refused": True, "citations": []})
+        self.assertIsNone(pred_states_missing(ans, {}, {"status": "ok", "tokens": 12000}))
+
 
 if __name__ == "__main__":
     unittest.main()
