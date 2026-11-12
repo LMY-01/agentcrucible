@@ -35,7 +35,8 @@
     "_meta": {
       "source": "1.微调__1.微调.md",
       "idx": 5
-    }
+    },
+    "expects_json": true
   },
   {
     "id": "silver_002",
@@ -73,7 +74,8 @@
     "_meta": {
       "source": "PagedAttention__readme.md",
       "idx": 0
-    }
+    },
+    "expects_json": true
   },
   {
     "id": "silver_003",
@@ -111,7 +113,8 @@
     "_meta": {
       "source": "大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读.md",
       "idx": 11
-    }
+    },
+    "expects_json": true
   },
   {
     "id": "silver_004",
@@ -149,7 +152,8 @@
     "_meta": {
       "source": "2.强化学习__2.强化学习.md",
       "idx": 51
-    }
+    },
+    "expects_json": true
   },
   {
     "id": "silver_005",
@@ -187,7 +191,8 @@
     "_meta": {
       "source": "readme.md",
       "idx": 5
-    }
+    },
+    "expects_json": true
   },
   {
     "id": "silver_006",
@@ -225,7 +230,8 @@
     "_meta": {
       "source": "1.llm概念__1.llm概念.md",
       "idx": 20
-    }
+    },
+    "expects_json": true
   },
   {
     "id": "silver_007",
@@ -263,7 +269,8 @@
     "_meta": {
       "source": "1.思维链（cot）__1.思维链（cot）.md",
       "idx": 8
-    }
+    },
+    "expects_json": true
   },
   {
     "id": "silver_008",
@@ -301,7 +308,8 @@
     "_meta": {
       "source": "1.微调__1.微调.md",
       "idx": 26
-    }
+    },
+    "expects_json": true
   },
   {
     "id": "silver_009",
@@ -339,7 +347,8 @@
     "_meta": {
       "source": "大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读.md",
       "idx": 7
-    }
+    },
+    "expects_json": true
   },
   {
     "id": "silver_010",
@@ -377,7 +386,8 @@
     "_meta": {
       "source": "1.llm概念__1.llm概念.md",
       "idx": 2
-    }
+    },
+    "expects_json": true
   },
   {
     "id": "silver_011",
@@ -415,7 +425,8 @@
     "_meta": {
       "source": "RAG_valuation.md",
       "idx": 0
-    }
+    },
+    "expects_json": true
   },
   {
     "id": "silver_012",
@@ -453,7 +464,8 @@
     "_meta": {
       "source": "self_rag.md",
       "idx": 0
-    }
+    },
+    "expects_json": true
   },
   {
     "id": "silver_013",
@@ -491,7 +503,8 @@
     "_meta": {
       "source": "VRAM_optimize.md",
       "idx": 0
-    }
+    },
+    "expects_json": true
   },
   {
     "id": "silver_014",
@@ -529,7 +542,8 @@
     "_meta": {
       "source": "RAG_fusion.md",
       "idx": 0
-    }
+    },
+    "expects_json": true
   },
   {
     "id": "silver_015",
@@ -567,7 +581,8 @@
     "_meta": {
       "source": "1.评测__1.评测.md",
       "idx": 0
-    }
+    },
+    "expects_json": true
   },
   {
     "id": "silver_016",
@@ -605,7 +620,8 @@
     "_meta": {
       "source": "2.强化学习__2.强化学习.md",
       "idx": 48
-    }
+    },
+    "expects_json": true
   },
   {
     "id": "silver_017",
@@ -643,7 +659,8 @@
     "_meta": {
       "source": "readme.md",
       "idx": 10
-    }
+    },
+    "expects_json": true
   },
   {
     "id": "silver_018",
@@ -681,7 +698,8 @@
     "_meta": {
       "source": "1.rlhf相关__1.rlhf相关.md",
       "idx": 2
-    }
+    },
+    "expects_json": true
   },
   {
     "id": "silver_019",
@@ -719,7 +737,8 @@
     "_meta": {
       "source": "大模型agent技术__大模型agent技术.md",
       "idx": 39
-    }
+    },
+    "expects_json": true
   },
   {
     "id": "silver_020",
@@ -757,7 +776,8 @@
     "_meta": {
       "source": "RAG_optimization_strategy.md",
       "idx": 3
-    }
+    },
+    "expects_json": true
   },
   {
     "id": "silver_021",
@@ -795,7 +815,8 @@
     "_meta": {
       "source": "1.rlhf相关__1.rlhf相关.md",
       "idx": 18
-    }
+    },
+    "expects_json": true
   },
   {
     "id": "silver_022",
@@ -833,7 +854,8 @@
     "_meta": {
       "source": "VRAM_optimize.md",
       "idx": 0
-    }
+    },
+    "expects_json": true
   },
   {
     "id": "silver_023",
@@ -871,7 +893,8 @@
     "_meta": {
       "source": "RAG_valuation.md",
       "idx": 0
-    }
+    },
+    "expects_json": true
   },
   {
     "id": "silver_024",
@@ -909,7 +932,8 @@
     "_meta": {
       "source": "vllm__readme.md",
       "idx": 2
-    }
+    },
+    "expects_json": true
   },
   {
     "id": "silver_025",
@@ -947,7 +971,8 @@
     "_meta": {
       "source": "readme.md",
       "idx": 10
-    }
+    },
+    "expects_json": true
   },
   {
     "id": "silver_026",
@@ -985,7 +1010,8 @@
     "_meta": {
       "source": "RAG_fusion.md",
       "idx": 0
-    }
+    },
+    "expects_json": true
   },
   {
     "id": "silver_027",
@@ -1023,7 +1049,8 @@
     "_meta": {
       "source": "2.预训练__2.预训练.md",
       "idx": 1
-    }
+    },
+    "expects_json": true
   },
   {
     "id": "silver_028",
@@ -1061,7 +1088,8 @@
     "_meta": {
       "source": "FasterTransformer__readme.md",
       "idx": 0
-    }
+    },
+    "expects_json": true
   },
   {
     "id": "silver_029",
@@ -1099,7 +1127,8 @@
     "_meta": {
       "source": "Doc_parser_trick__chatpdf.md",
       "idx": 0
-    }
+    },
+    "expects_json": true
   },
   {
     "id": "silver_030",
@@ -1137,7 +1166,8 @@
     "_meta": {
       "source": "LLMs_Inference_performance.md",
       "idx": 0
-    }
+    },
+    "expects_json": true
   },
   {
     "id": "silver_031",
@@ -1175,7 +1205,8 @@
     "_meta": {
       "source": "检索增强llm__检索增强llm.md",
       "idx": 4
-    }
+    },
+    "expects_json": true
   },
   {
     "id": "silver_032",
@@ -1213,7 +1244,8 @@
     "_meta": {
       "source": "RAG_optimization_strategy.md",
       "idx": 0
-    }
+    },
+    "expects_json": true
   },
   {
     "id": "silver_033",
@@ -1251,7 +1283,8 @@
     "_meta": {
       "source": "LLMs_inference_optimize.md",
       "idx": 29
-    }
+    },
+    "expects_json": true
   },
   {
     "id": "silver_034",
@@ -1289,7 +1322,8 @@
     "_meta": {
       "source": "KG-RAG__LLMs_Graph_RAG__readme.md",
       "idx": 0
-    }
+    },
+    "expects_json": true
   },
   {
     "id": "silver_035",
@@ -1327,7 +1361,8 @@
     "_meta": {
       "source": "readme.md",
       "idx": 0
-    }
+    },
+    "expects_json": true
   },
   {
     "id": "silver_036",
@@ -1365,7 +1400,8 @@
     "_meta": {
       "source": "大模型agent技术__大模型agent技术.md",
       "idx": 7
-    }
+    },
+    "expects_json": true
   },
   {
     "id": "silver_037",
@@ -1403,7 +1439,8 @@
     "_meta": {
       "source": "split_block.md",
       "idx": 0
-    }
+    },
+    "expects_json": true
   },
   {
     "id": "silver_038",
@@ -1441,7 +1478,8 @@
     "_meta": {
       "source": "readme.md",
       "idx": 0
-    }
+    },
+    "expects_json": true
   },
   {
     "id": "silver_039",
@@ -1479,7 +1517,8 @@
     "_meta": {
       "source": "检索增强llm__检索增强llm.md",
       "idx": 19
-    }
+    },
+    "expects_json": true
   },
   {
     "id": "silver_040",
@@ -1517,6 +1556,7 @@
     "_meta": {
       "source": "KG-RAG__LLMs_Graph_RAG__readme.md",
       "idx": 0
-    }
+    },
+    "expects_json": true
   }
 ]

@@ -169,7 +169,7 @@ class TestAnswerAndAggregate(unittest.TestCase):
         self.assertEqual(v.level, FAIL)
         self.assertIn("80", v.detail)
 
-    def test_always_eight_stages(self):
+    def test_always_all_stages(self):
         v = judge([ev_end()], {})
         self.assertEqual([x.stage for x in v], [s for s, _ in STAGES])
 

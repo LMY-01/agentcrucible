@@ -32,7 +32,8 @@
         "name": "citations_grounded"
       }
     ],
-    "tier": "gold"
+    "tier": "gold",
+    "expects_json": true
   },
   {
     "id": "g02_hyde_idea",
@@ -66,7 +67,8 @@
         "name": "citations_grounded"
       }
     ],
-    "tier": "gold"
+    "tier": "gold",
+    "expects_json": true
   },
   {
     "id": "g03_hyde_weak",
@@ -100,7 +102,8 @@
         "name": "citations_grounded"
       }
     ],
-    "tier": "gold"
+    "tier": "gold",
+    "expects_json": true
   },
   {
     "id": "g04_lora_core",
@@ -134,7 +137,8 @@
         "name": "citations_grounded"
       }
     ],
-    "tier": "gold"
+    "tier": "gold",
+    "expects_json": true
   },
   {
     "id": "g05_lora_init",
@@ -170,7 +174,8 @@
         "name": "citations_grounded"
       }
     ],
-    "tier": "gold"
+    "tier": "gold",
+    "expects_json": true
   },
   {
     "id": "g06_decoder_only",
@@ -206,7 +211,8 @@
         "name": "citations_grounded"
       }
     ],
-    "tier": "gold"
+    "tier": "gold",
+    "expects_json": true
   },
   {
     "id": "g07_paged_attention",
@@ -240,7 +246,8 @@
         "name": "citations_grounded"
       }
     ],
-    "tier": "gold"
+    "tier": "gold",
+    "expects_json": true
   },
   {
     "id": "g08_react",
@@ -285,7 +292,8 @@
         "name": "citations_grounded"
       }
     ],
-    "tier": "gold"
+    "tier": "gold",
+    "expects_json": true
   },
   {
     "id": "g09_refuse_version",
@@ -305,7 +313,8 @@
         "name": "states_missing"
       }
     ],
-    "tier": "gold"
+    "tier": "gold",
+    "expects_json": true
   },
   {
     "id": "g10_refuse_dim",
@@ -325,7 +334,8 @@
         "name": "states_missing"
       }
     ],
-    "tier": "gold"
+    "tier": "gold",
+    "expects_json": true
   },
   {
     "id": "g11_refuse_aime",
@@ -345,7 +355,8 @@
         "name": "states_missing"
       }
     ],
-    "tier": "gold"
+    "tier": "gold",
+    "expects_json": true
   },
   {
     "id": "g12_refuse_count",
@@ -365,6 +376,7 @@
         "name": "states_missing"
       }
     ],
-    "tier": "gold"
+    "tier": "gold",
+    "expects_json": true
   }
 ]

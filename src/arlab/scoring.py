@@ -14,7 +14,8 @@ from __future__ import annotations
 from .stages import FAIL, NA, PASS, WARN, Verdict
 
 STAGE_WEIGHTS: dict[str, float] = {
-    "answer": 0.40,        # 最终交付物仍然最重要
+    "answer": 0.35,        # 内容正确性，仍然是最高权重
+    "format": 0.05,        # 交付结构。内容全对但下游解析不了，也是 0 价值
     "tool_valid": 0.15,    # 调错工具是硬伤，直接决定这轮能不能用
     "args": 0.10,          # 参数不会写，等于工具不会用
     "explore": 0.10,       # 盲猜路径是可靠性问题，线上会放大

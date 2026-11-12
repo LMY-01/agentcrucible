@@ -23,6 +23,8 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
+from .jsonx import extract_json
+
 # 阶段顺序 = 漏斗顺序，改顺序等于改叙事
 STAGES = [
     ("explore", "探查"),
@@ -32,6 +34,7 @@ STAGES = [
     ("skill_recall", "技能召回"),
     ("efficiency", "执行效率"),
     ("termination", "终止决策"),
+    ("format", "输出格式"),
     ("answer", "答案正确"),
 ]
 
@@ -44,7 +47,6 @@ ERROR_STAGE = {
 }
 
 PASS, WARN, FAIL, NA = "pass", "warn", "fail", "na"
-
 
 @dataclass
 class Verdict:
@@ -231,10 +233,29 @@ def judge(events: list[dict], task: dict) -> list[Verdict]:
         verdicts.append(Verdict("termination", "终止决策", FAIL, f"异常结束: {status}",
                                 evidence=f"status={status}"))
 
-    # ---- 8. answer：最终交付物 ----
+    # ---- 8. format：交付物结构是否合规 ----
+    expects_json = bool(task.get("expects_json"))
+    raw_answer = end.get("answer") or ""
+    parsed = extract_json(raw_answer) if expects_json else None
+    if not expects_json:
+        verdicts.append(Verdict("format", "输出格式", NA, "任务未要求结构化输出"))
+    elif parsed is not None:
+        verdicts.append(Verdict("format", "输出格式", PASS, "答案是合法 JSON"))
+    else:
+        verdicts.append(Verdict(
+            "format", "输出格式", FAIL,
+            "要求 JSON 但答案不是可解析的 JSON——内容可能完全正确，下游却拿不到",
+            evidence="开头: " + " ".join(raw_answer.strip().split())[:70],
+        ))
+
+    # ---- 9. answer：内容正确性 ----
     failures = end.get("failures") or []
     if end.get("ok"):
         verdicts.append(Verdict("answer", "答案正确", PASS, "全部断言通过"))
+    elif expects_json and parsed is None:
+        # 格式不合规时内容没法机械判定；已经记在 format 阶段，不再重复扣分
+        verdicts.append(Verdict("answer", "答案正确", NA,
+                                "格式不合规导致内容无法判定（已记在输出格式阶段）"))
     else:
         verdicts.append(Verdict("answer", "答案正确", FAIL,
                                 "；".join(failures) or "断言未通过",

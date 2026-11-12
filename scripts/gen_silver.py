@@ -132,6 +132,7 @@ def build_task(item: dict, doc_chunk_ids: dict[str, set[str]], num: int) -> dict
         "reference_answer": f"答案应来自知识库中的 {item['chunk_id']} 或其后继块（{item['source']} 第 {item['idx']} 块）。",
         "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
         "require_explore": False,
+        "expects_json": True,
         "expected_skills": ["retrieval-qa"],
         "stage_limits": {"steps": 8, "tokens": 25000},
         "checks": [

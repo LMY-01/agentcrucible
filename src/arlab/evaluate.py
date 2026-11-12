@@ -17,6 +17,8 @@ from . import fingerprint as fp
 from .budget import Budget
 from .llm import LLM
 from .loop import Agent
+from .jsonx import dig as _dig
+from .jsonx import extract_json as _extract_json
 from .judge import diagnose as diagnose_failure
 from .report import write as write_report
 from .scoring import run_score
@@ -33,47 +35,8 @@ def _pad(text: str, width: int) -> str:
     return text + " " * max(0, width - shown)
 
 
-def _extract_json(text: str) -> dict | None:
-    """从模型输出里挖第一段可解析的 JSON 对象。
-
-    模型经常把 JSON 包在 ```json 块里，或者前面加一句"结果如下："，
-    所以不能直接 json.loads(全文)。先试代码块，再试括号平衡扫描。
-    """
-    fence = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", text, re.S)
-    if fence:
-        try:
-            return json.loads(fence.group(1))
-        except json.JSONDecodeError:
-            pass
-
-    start = text.find("{")
-    while start != -1:
-        depth = 0
-        for idx in range(start, len(text)):
-            if text[idx] == "{":
-                depth += 1
-            elif text[idx] == "}":
-                depth -= 1
-                if depth == 0:
-                    try:
-                        return json.loads(text[start : idx + 1])
-                    except json.JSONDecodeError:
-                        break
-        start = text.find("{", start + 1)
-    return None
-
-
-def _dig(data: Any, path: str) -> Any:
-    """按 a.b.c 取值，取不到返回 None。"""
-    cur: Any = data
-    for part in path.split("."):
-        if isinstance(cur, dict) and part in cur:
-            cur = cur[part]
-        elif isinstance(cur, list) and part.isdigit() and int(part) < len(cur):
-            cur = cur[int(part)]
-        else:
-            return None
-    return cur
+# _extract_json / _dig 已移到 arlab.jsonx（stages.py 也要用，不能成环）
+# 这里保留同名导入，测试和 app.py 继续用 _extract_json 即可。
 
 
 def _check(checks: list[dict], answer: str, workspace: Path,
