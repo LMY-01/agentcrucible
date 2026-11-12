@@ -15,6 +15,7 @@ from typing import Any
 
 from . import fingerprint as fp
 from .budget import Budget
+from .faults import FaultInjector
 from .llm import LLM
 from .loop import Agent
 from .jsonx import dig as _dig
@@ -138,6 +139,8 @@ def run_suite(args, tool_builder=None, predicates=None) -> int:
         builder = tool_builder or (lambda ws, sk: build_tools(ws, skill_loader=sk))
         for tool in builder(str(workspace), skills):
             registry.register(tool)
+        # 故障注入：挂在 registry 入口，对工具实现零侵入
+        registry.injector = FaultInjector.from_spec(task.get("inject_fault"))
 
         budget = Budget(
             max_steps=args.max_steps,
@@ -147,6 +150,8 @@ def run_suite(args, tool_builder=None, predicates=None) -> int:
         run_dir = new_run_dir(str(out_root), tag=f"eval-{task['id']}")
         trace = Trace(run_dir, meta={"task_id": task["id"], "prompt": task["prompt"],
                                      "model": args.model, "budget": budget.snapshot()})
+        if registry.injector is not None:
+            trace.emit("fault_injection", spec=registry.injector.describe())
         agent = Agent(LLM(base_url=args.base_url, model=args.model), registry,
                       skills=skills, budget=budget, trace=trace)
 

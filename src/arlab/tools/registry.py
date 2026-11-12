@@ -15,6 +15,8 @@ import time
 from dataclasses import dataclass, field
 from typing import Any, Callable
 
+from ..faults import FAULT
+
 READ, WRITE, NET = "read", "write", "net"
 
 
@@ -87,6 +89,7 @@ def validate(args: dict, schema: dict) -> list[str]:
 class Registry:
     tools: dict[str, Tool] = field(default_factory=dict)
     allow: set[str] = field(default_factory=lambda: {READ})
+    injector: Any = None  # FaultInjector；故障注入挂在调用入口，对工具实现零侵入
 
     def register(self, tool: Tool) -> "Registry":
         if tool.name in self.tools:
@@ -103,6 +106,16 @@ class Registry:
     def call(self, name: str, raw_args: str | None) -> ToolResult:
         """执行一次工具调用。任何失败都变成 ok=False 的结果，不向上抛。"""
         started = time.time()
+
+        # 故障注入：命中就当作上游失败，走真实的失败路径
+        if self.injector is not None:
+            injected = self.injector.intercept(name)
+            if injected:
+                return ToolResult(
+                    False, f"错误：{injected}", error=FAULT,
+                    duration_ms=int((time.time() - started) * 1000),
+                )
+
         tool = self.tools.get(name)
         if tool is None:
             return ToolResult(

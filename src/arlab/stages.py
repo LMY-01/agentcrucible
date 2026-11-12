@@ -28,6 +28,7 @@ from .jsonx import extract_json
 # 阶段顺序 = 漏斗顺序，改顺序等于改叙事
 STAGES = [
     ("explore", "探查"),
+    ("tool_path", "工具路径"),
     ("tool_valid", "工具有效性"),
     ("args", "参数合法性"),
     ("recovery", "错误恢复"),
@@ -135,6 +136,35 @@ def judge(events: list[dict], task: dict) -> list[Verdict]:
                     "完全盲猜：第一次读文件就假设了文件名，靠报错才纠正",
                     evidence=f"step{first['step']} read_file({arg}) -> {first.get('error')}",
                 ))
+
+    # ---- 工具路径合规：该调的调了没，不该调的有没有调 ----
+    called = [t.get("name") for t in tools]
+    required = task.get("required_tools") or []
+    forbidden = set(task.get("forbidden_tools") or [])
+    problems: list[str] = []
+    missing = [r for r in required if r not in called]
+    if missing:
+        problems.append(f"未调用必选工具 {missing}")
+    hit_forbidden = sorted({n for n in called if n in forbidden})
+    if hit_forbidden:
+        problems.append(f"调用了禁止工具 {hit_forbidden}")
+
+    # 降级检测：某次工具失败之后，才出现的禁止工具 —— 这就是「挂了就换别的凑」
+    fail_idx = next((i for i, t in enumerate(tools) if not t.get("ok")), None)
+    if fail_idx is not None and forbidden:
+        after = [t.get("name") for t in tools[fail_idx + 1 :]]
+        downgraded = sorted({n for n in after if n in forbidden})
+        if downgraded:
+            problems.append(f"工具失败后降级到 {downgraded}（明令禁止）")
+
+    if not required and not forbidden:
+        verdicts.append(Verdict("tool_path", "工具路径", NA, "任务未声明工具路径约束"))
+    elif problems:
+        verdicts.append(Verdict("tool_path", "工具路径", FAIL, "；".join(problems),
+                                evidence=f"实际调用链: {called}"))
+    else:
+        verdicts.append(Verdict("tool_path", "工具路径", PASS,
+                                "必选工具都调了，未使用禁止工具"))
 
     # ---- 2. tool_valid / 3. args：按错误码归类 ----
     bad_by_stage: dict[str, list[dict]] = {"tool_valid": [], "args": []}

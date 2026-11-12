@@ -17,6 +17,7 @@ STAGE_WEIGHTS: dict[str, float] = {
     "answer": 0.35,        # 内容正确性，仍然是最高权重
     "format": 0.05,        # 交付结构。内容全对但下游解析不了，也是 0 价值
     "tool_valid": 0.15,    # 调错工具是硬伤，直接决定这轮能不能用
+    "tool_path": 0.05,     # 路径合规。权重不高是因为它有一票否决权，见 task_score
     "args": 0.10,          # 参数不会写，等于工具不会用
     "explore": 0.10,       # 盲猜路径是可靠性问题，线上会放大
     "recovery": 0.10,      # 失败能不能自己爬出来
@@ -31,7 +32,16 @@ DEFAULT_THRESHOLD = 0.90
 
 
 def task_score(verdicts: list[Verdict]) -> tuple[float, list[str]]:
-    """一条任务的加权分。返回 (分数, 拉低分数的阶段名列表)。"""
+    """一条任务的加权分。返回 (分数, 拉低分数的阶段名列表)。
+
+    一票否决：工具路径违规直接 0 分，不管最终答案多正确。
+    这是「结果对不算对，路径合规才算过」在代码里的落点——
+    一个在检索接口挂掉后改去搜外网、然后蒙对答案的 agent，不能算通过。
+    """
+    for v in verdicts:
+        if v.stage == "tool_path" and v.level == FAIL:
+            return 0.0, [f"工具路径违规（一票否决）：{v.detail}"]
+
     total_w = 0.0
     acc = 0.0
     drag: list[tuple[float, str]] = []

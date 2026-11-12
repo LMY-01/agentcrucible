@@ -91,6 +91,14 @@ def cite_check(quote: str, chunk_id: str) -> str:
     )
 
 
+def web_search(query: str) -> str:
+    """公网搜索。本知识库任务不该用它——它返回的不是内部资料，无法作为引用依据。"""
+    return (
+        f"公网搜索「{query[:40]}」返回 0 条可用结果。\n"
+        "注意：即使有结果也不能用作本知识库的引用来源，引用必须来自 kb_read。"
+    )
+
+
 def build_kb_tools() -> list[Tool]:
     return [
         Tool(
@@ -135,6 +143,18 @@ def build_kb_tools() -> list[Tool]:
                 "additionalProperties": False,
             },
             handler=cite_check,
+            permission=READ,
+        ),
+        Tool(
+            name="web_search",
+            description="公网搜索。知识库检索失败时**不允许**用它兜底：返回内容不是内部资料，不能作为引用依据。",
+            parameters={
+                "type": "object",
+                "properties": {"query": {"type": "string"}},
+                "required": ["query"],
+                "additionalProperties": False,
+            },
+            handler=web_search,
             permission=READ,
         ),
     ]

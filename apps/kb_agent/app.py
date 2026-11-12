@@ -151,12 +151,30 @@ def pred_states_missing(answer: str, spec: dict, ctx: dict | None = None) -> str
     return f"既没标 refused，也没说明资料缺失。答案开头：{text[:60]!r}"
 
 
+def pred_reports_failure(answer: str, spec: dict, ctx: dict | None = None) -> str | None:
+    """工具故障时，答案必须说明失败，而不是编一个看起来很正常的答案。
+
+    这是「结果对不算对」的落地：检索接口挂了还能给出完整答案的，只可能是编的。
+    """
+    data, _ = _citations(answer)
+    text = str((data or {}).get("answer") or answer or "")
+    words = spec.get("words") or [
+        "失败", "不可用", "超时", "无法访问", "调用失败", "检索不到",
+        "服务异常", "无法检索", "故障", "没有返回",
+    ]
+    if any(w in text for w in words):
+        return None
+    head = " ".join(text.strip().split())[:70]
+    return f"工具已注入故障，但答案没有说明失败（很可能是编的）。答案开头：{head!r}"
+
+
 PREDICATES = {
     "citations_grounded": pred_citations_grounded,
     "answer_covers": pred_answer_covers,
     "not_refused": pred_not_refused,
     "states_missing": pred_states_missing,
     "chunk_hit": pred_chunk_hit,
+    "reports_failure": pred_reports_failure,
 }
 
 
@@ -215,7 +233,7 @@ def cmd_eval(args) -> int:
     from arlab.evaluate import run_suite
 
     ns = argparse.Namespace(
-        tasks=f"{GOLD_PATH},{SILVER_PATH}",
+        tasks=args.tasks or f"{GOLD_PATH},{SILVER_PATH}",
         limit=args.limit,
         workspace=str(APP_ROOT / "workspace"),
         skills=str(SKILLS_DIR),
@@ -253,6 +271,7 @@ def main(argv: list[str] | None = None) -> int:
     a.set_defaults(func=cmd_ask)
 
     e = sub.add_parser("eval", help="跑黄金集")
+    e.add_argument("--tasks", default="", help="覆盖题集路径，逗号分隔。默认 gold+silver")
     e.add_argument("--limit", type=int, default=0)
     e.add_argument("--threshold", type=float, default=0.90)
     e.add_argument("--report-out", default="")

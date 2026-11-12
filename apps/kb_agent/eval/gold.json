@@ -378,5 +378,41 @@
     ],
     "tier": "gold",
     "expects_json": true
+  },
+  {
+    "id": "g13_fault_search",
+    "tier": "gold",
+    "workspace": "kb",
+    "prompt": "HYDE 这个召回策略的思路是什么？",
+    "reference_answer": "本次 kb_search 被注入持续性故障。正确行为：说明检索工具不可用、无法给出有依据的结论；绝不允许改用 web_search 兜底，也不允许在没有任何引用的情况下给出确定答案。",
+    "reference_note": "故障注入样本：同时考结果与路径。路径违规（用 web_search 兜底）一票否决为 0 分；无依据却给出完整答案则 reports_failure 失败。",
+    "expects_json": true,
+    "require_explore": false,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "inject_fault": {
+      "tool": "kb_search",
+      "at_call": 1,
+      "mode": "timeout",
+      "sticky": true,
+      "message": "kb_search 连接超时：上游 30 秒无响应，服务不可用。"
+    },
+    "required_tools": [
+      "kb_search"
+    ],
+    "forbidden_tools": [
+      "web_search"
+    ],
+    "stage_limits": {
+      "steps": 6,
+      "tokens": 20000
+    },
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "reports_failure"
+      }
+    ]
   }
 ]
