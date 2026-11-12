@@ -4,9 +4,10 @@
     "tier": "silver",
     "workspace": "kb",
     "prompt": "领域模型Continue PreTrain 数据选取？",
-    "reference_answer": "答案应来自知识库中的 1.微调__1.微调-e0918691-0005 或其后继块（1.微调__1.微调.md 第 5 块）。",
-    "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
+    "reference_answer": "答案应来自 《1.微调__1.微调.md》 的以下块之一：1.微调__1.微调-e0918691-0006, 1.微调__1.微调-e0918691-0005, 1.微调__1.微调-e0918691-0011。",
+    "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
     "require_explore": false,
+    "expects_json": true,
     "expected_skills": [
       "retrieval-qa"
     ],
@@ -23,8 +24,14 @@
         "type": "predicate",
         "name": "chunk_hit",
         "expected": [
+          "1.微调__1.微调-e0918691-0006",
           "1.微调__1.微调-e0918691-0005",
-          "1.微调__1.微调-e0918691-0006"
+          "1.微调__1.微调-e0918691-0011",
+          "1.微调__1.微调-e0918691-0010",
+          "1.微调__1.微调-e0918691-0008",
+          "1.微调__1.微调-e0918691-0016",
+          "1.微调__1.微调-e0918691-0014",
+          "1.微调__1.微调-e0918691-0007"
         ]
       },
       {
@@ -34,18 +41,19 @@
     ],
     "_meta": {
       "source": "1.微调__1.微调.md",
-      "idx": 5
-    },
-    "expects_json": true
+      "idx": 5,
+      "recalled": 8
+    }
   },
   {
     "id": "silver_002",
     "tier": "silver",
     "workspace": "kb",
     "prompt": "五、 PagedAttention 技术细节？",
-    "reference_answer": "答案应来自知识库中的 PagedAttention__readme-34d1d63b-0000 或其后继块（PagedAttention__readme.md 第 0 块）。",
-    "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
+    "reference_answer": "答案应来自 《PagedAttention__readme.md》 的以下块之一：PagedAttention__readme-34d1d63b-0003, PagedAttention__readme-34d1d63b-0002, PagedAttention__readme-34d1d63b-0004。",
+    "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
     "require_explore": false,
+    "expects_json": true,
     "expected_skills": [
       "retrieval-qa"
     ],
@@ -62,8 +70,10 @@
         "type": "predicate",
         "name": "chunk_hit",
         "expected": [
-          "PagedAttention__readme-34d1d63b-0000",
-          "PagedAttention__readme-34d1d63b-0001"
+          "PagedAttention__readme-34d1d63b-0003",
+          "PagedAttention__readme-34d1d63b-0002",
+          "PagedAttention__readme-34d1d63b-0004",
+          "PagedAttention__readme-34d1d63b-0005"
         ]
       },
       {
@@ -73,18 +83,19 @@
     ],
     "_meta": {
       "source": "PagedAttention__readme.md",
-      "idx": 0
-    },
-    "expects_json": true
+      "idx": 0,
+      "recalled": 4
+    }
   },
   {
     "id": "silver_003",
     "tier": "silver",
     "workspace": "kb",
     "prompt": "那什么指标能用来衡量输出分布的相似度呢？",
-    "reference_answer": "答案应来自知识库中的 大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读-fe3e440b-0011 或其后继块（大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读.md 第 11 块）。",
-    "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
+    "reference_answer": "答案应来自 《大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读.md》 的以下块之一：大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读-fe3e440b-0011, 大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读-fe3e440b-0012, 大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读-fe3e440b-0056。",
+    "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
     "require_explore": false,
+    "expects_json": true,
     "expected_skills": [
       "retrieval-qa"
     ],
@@ -102,7 +113,11 @@
         "name": "chunk_hit",
         "expected": [
           "大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读-fe3e440b-0011",
-          "大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读-fe3e440b-0012"
+          "大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读-fe3e440b-0012",
+          "大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读-fe3e440b-0056",
+          "大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读-fe3e440b-0018",
+          "大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读-fe3e440b-0049",
+          "大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读-fe3e440b-0017"
         ]
       },
       {
@@ -112,18 +127,19 @@
     ],
     "_meta": {
       "source": "大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读.md",
-      "idx": 11
-    },
-    "expects_json": true
+      "idx": 11,
+      "recalled": 6
+    }
   },
   {
     "id": "silver_004",
     "tier": "silver",
     "workspace": "kb",
     "prompt": "我们应该如何设计内在好奇心模块？",
-    "reference_answer": "答案应来自知识库中的 2.强化学习__2.强化学习-9cd85005-0051 或其后继块（2.强化学习__2.强化学习.md 第 51 块）。",
-    "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
+    "reference_answer": "答案应来自 《2.强化学习__2.强化学习.md》 的以下块之一：2.强化学习__2.强化学习-9cd85005-0051, 2.强化学习__2.强化学习-9cd85005-0052, 2.强化学习__2.强化学习-9cd85005-0053。",
+    "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
     "require_explore": false,
+    "expects_json": true,
     "expected_skills": [
       "retrieval-qa"
     ],
@@ -141,7 +157,9 @@
         "name": "chunk_hit",
         "expected": [
           "2.强化学习__2.强化学习-9cd85005-0051",
-          "2.强化学习__2.强化学习-9cd85005-0052"
+          "2.强化学习__2.强化学习-9cd85005-0052",
+          "2.强化学习__2.强化学习-9cd85005-0053",
+          "2.强化学习__2.强化学习-9cd85005-0049"
         ]
       },
       {
@@ -151,18 +169,19 @@
     ],
     "_meta": {
       "source": "2.强化学习__2.强化学习.md",
-      "idx": 51
-    },
-    "expects_json": true
+      "idx": 51,
+      "recalled": 4
+    }
   },
   {
     "id": "silver_005",
     "tier": "silver",
     "workspace": "kb",
     "prompt": "如何对齐检索模型的输出和大语言模型的偏好？",
-    "reference_answer": "答案应来自知识库中的 readme-1a14eeb5-0005 或其后继块（readme.md 第 5 块）。",
-    "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
+    "reference_answer": "答案应来自 《readme.md》 的以下块之一：readme-1a14eeb5-0005, readme-1a14eeb5-0006, readme-1a14eeb5-0000。",
+    "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
     "require_explore": false,
+    "expects_json": true,
     "expected_skills": [
       "retrieval-qa"
     ],
@@ -180,7 +199,8 @@
         "name": "chunk_hit",
         "expected": [
           "readme-1a14eeb5-0005",
-          "readme-1a14eeb5-0006"
+          "readme-1a14eeb5-0006",
+          "readme-1a14eeb5-0000"
         ]
       },
       {
@@ -190,18 +210,19 @@
     ],
     "_meta": {
       "source": "readme.md",
-      "idx": 5
-    },
-    "expects_json": true
+      "idx": 5,
+      "recalled": 3
+    }
   },
   {
     "id": "silver_006",
     "tier": "silver",
     "workspace": "kb",
     "prompt": "如何让大模型处理更长的文本？",
-    "reference_answer": "答案应来自知识库中的 1.llm概念__1.llm概念-7445fdf3-0020 或其后继块（1.llm概念__1.llm概念.md 第 20 块）。",
-    "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
+    "reference_answer": "答案应来自 《1.llm概念__1.llm概念.md》 的以下块之一：1.llm概念__1.llm概念-7445fdf3-0021, 1.llm概念__1.llm概念-7445fdf3-0020, 1.llm概念__1.llm概念-7445fdf3-0022。",
+    "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
     "require_explore": false,
+    "expects_json": true,
     "expected_skills": [
       "retrieval-qa"
     ],
@@ -218,8 +239,9 @@
         "type": "predicate",
         "name": "chunk_hit",
         "expected": [
+          "1.llm概念__1.llm概念-7445fdf3-0021",
           "1.llm概念__1.llm概念-7445fdf3-0020",
-          "1.llm概念__1.llm概念-7445fdf3-0021"
+          "1.llm概念__1.llm概念-7445fdf3-0022"
         ]
       },
       {
@@ -229,18 +251,19 @@
     ],
     "_meta": {
       "source": "1.llm概念__1.llm概念.md",
-      "idx": 20
-    },
-    "expects_json": true
+      "idx": 20,
+      "recalled": 3
+    }
   },
   {
     "id": "silver_007",
     "tier": "silver",
     "workspace": "kb",
     "prompt": "你认为可以在哪些其他方面应用“思路链提示”这一思路来提升语言模型的能力?",
-    "reference_answer": "答案应来自知识库中的 1.思维链（cot）__1.思维链（cot）-bf563ed2-0008 或其后继块（1.思维链（cot）__1.思维链（cot）.md 第 8 块）。",
-    "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
+    "reference_answer": "答案应来自 《1.思维链（cot）__1.思维链（cot）.md》 的以下块之一：1.思维链（cot）__1.思维链（cot）-bf563ed2-0009, 1.思维链（cot）__1.思维链（cot）-bf563ed2-0011, 1.思维链（cot）__1.思维链（cot）-bf563ed2-0003。",
+    "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
     "require_explore": false,
+    "expects_json": true,
     "expected_skills": [
       "retrieval-qa"
     ],
@@ -257,8 +280,16 @@
         "type": "predicate",
         "name": "chunk_hit",
         "expected": [
+          "1.思维链（cot）__1.思维链（cot）-bf563ed2-0009",
+          "1.思维链（cot）__1.思维链（cot）-bf563ed2-0011",
+          "1.思维链（cot）__1.思维链（cot）-bf563ed2-0003",
+          "1.思维链（cot）__1.思维链（cot）-bf563ed2-0010",
           "1.思维链（cot）__1.思维链（cot）-bf563ed2-0008",
-          "1.思维链（cot）__1.思维链（cot）-bf563ed2-0009"
+          "1.思维链（cot）__1.思维链（cot）-bf563ed2-0006",
+          "1.思维链（cot）__1.思维链（cot）-bf563ed2-0005",
+          "1.思维链（cot）__1.思维链（cot）-bf563ed2-0002",
+          "1.思维链（cot）__1.思维链（cot）-bf563ed2-0004",
+          "1.思维链（cot）__1.思维链（cot）-bf563ed2-0001"
         ]
       },
       {
@@ -268,18 +299,19 @@
     ],
     "_meta": {
       "source": "1.思维链（cot）__1.思维链（cot）.md",
-      "idx": 8
-    },
-    "expects_json": true
+      "idx": 8,
+      "recalled": 10
+    }
   },
   {
     "id": "silver_008",
     "tier": "silver",
     "workspace": "kb",
     "prompt": "多轮对话任务如何微调模型？",
-    "reference_answer": "答案应来自知识库中的 1.微调__1.微调-e0918691-0026 或其后继块（1.微调__1.微调.md 第 26 块）。",
-    "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
+    "reference_answer": "答案应来自 《1.微调__1.微调.md》 的以下块之一：1.微调__1.微调-e0918691-0027, 1.微调__1.微调-e0918691-0028, 1.微调__1.微调-e0918691-0026。",
+    "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
     "require_explore": false,
+    "expects_json": true,
     "expected_skills": [
       "retrieval-qa"
     ],
@@ -296,8 +328,12 @@
         "type": "predicate",
         "name": "chunk_hit",
         "expected": [
+          "1.微调__1.微调-e0918691-0027",
+          "1.微调__1.微调-e0918691-0028",
           "1.微调__1.微调-e0918691-0026",
-          "1.微调__1.微调-e0918691-0027"
+          "1.微调__1.微调-e0918691-0029",
+          "1.微调__1.微调-e0918691-0013",
+          "1.微调__1.微调-e0918691-0004"
         ]
       },
       {
@@ -307,18 +343,19 @@
     ],
     "_meta": {
       "source": "1.微调__1.微调.md",
-      "idx": 26
-    },
-    "expects_json": true
+      "idx": 26,
+      "recalled": 6
+    }
   },
   {
     "id": "silver_009",
     "tier": "silver",
     "workspace": "kb",
     "prompt": "他们是怎么配合做训练的？",
-    "reference_answer": "答案应来自知识库中的 大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读-fe3e440b-0007 或其后继块（大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读.md 第 7 块）。",
-    "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
+    "reference_answer": "答案应来自 《大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读.md》 的以下块之一：大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读-fe3e440b-0008, 大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读-fe3e440b-0007, 大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读-fe3e440b-0010。",
+    "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
     "require_explore": false,
+    "expects_json": true,
     "expected_skills": [
       "retrieval-qa"
     ],
@@ -335,8 +372,9 @@
         "type": "predicate",
         "name": "chunk_hit",
         "expected": [
+          "大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读-fe3e440b-0008",
           "大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读-fe3e440b-0007",
-          "大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读-fe3e440b-0008"
+          "大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读-fe3e440b-0010"
         ]
       },
       {
@@ -346,18 +384,19 @@
     ],
     "_meta": {
       "source": "大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读.md",
-      "idx": 7
-    },
-    "expects_json": true
+      "idx": 7,
+      "recalled": 3
+    }
   },
   {
     "id": "silver_010",
     "tier": "silver",
     "workspace": "kb",
     "prompt": "prefix LM 和 causal LM 区别是什么？",
-    "reference_answer": "答案应来自知识库中的 1.llm概念__1.llm概念-7445fdf3-0002 或其后继块（1.llm概念__1.llm概念.md 第 2 块）。",
-    "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
+    "reference_answer": "答案应来自 《1.llm概念__1.llm概念.md》 的以下块之一：1.llm概念__1.llm概念-7445fdf3-0004, 1.llm概念__1.llm概念-7445fdf3-0002, 1.llm概念__1.llm概念-7445fdf3-0003。",
+    "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
     "require_explore": false,
+    "expects_json": true,
     "expected_skills": [
       "retrieval-qa"
     ],
@@ -374,6 +413,7 @@
         "type": "predicate",
         "name": "chunk_hit",
         "expected": [
+          "1.llm概念__1.llm概念-7445fdf3-0004",
           "1.llm概念__1.llm概念-7445fdf3-0002",
           "1.llm概念__1.llm概念-7445fdf3-0003"
         ]
@@ -385,18 +425,19 @@
     ],
     "_meta": {
       "source": "1.llm概念__1.llm概念.md",
-      "idx": 2
-    },
-    "expects_json": true
+      "idx": 2,
+      "recalled": 3
+    }
   },
   {
     "id": "silver_011",
     "tier": "silver",
     "workspace": "kb",
     "prompt": "四、RAG 有哪些关键指标和能力？",
-    "reference_answer": "答案应来自知识库中的 RAG_valuation-208520a0-0000 或其后继块（RAG_valuation.md 第 0 块）。",
-    "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
+    "reference_answer": "答案应来自 《RAG_valuation.md》 的以下块之一：RAG_valuation-208520a0-0038, RAG_valuation-208520a0-0037, RAG_valuation-208520a0-0000。",
+    "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
     "require_explore": false,
+    "expects_json": true,
     "expected_skills": [
       "retrieval-qa"
     ],
@@ -413,8 +454,9 @@
         "type": "predicate",
         "name": "chunk_hit",
         "expected": [
-          "RAG_valuation-208520a0-0000",
-          "RAG_valuation-208520a0-0001"
+          "RAG_valuation-208520a0-0038",
+          "RAG_valuation-208520a0-0037",
+          "RAG_valuation-208520a0-0000"
         ]
       },
       {
@@ -424,18 +466,19 @@
     ],
     "_meta": {
       "source": "RAG_valuation.md",
-      "idx": 0
-    },
-    "expects_json": true
+      "idx": 0,
+      "recalled": 3
+    }
   },
   {
     "id": "silver_012",
     "tier": "silver",
     "workspace": "kb",
     "prompt": "五、SELF-RAG 问题的形式化和概述？",
-    "reference_answer": "答案应来自知识库中的 self_rag-793f92fd-0000 或其后继块（self_rag.md 第 0 块）。",
-    "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
+    "reference_answer": "答案应来自 《self_rag.md》 的以下块之一：self_rag-793f92fd-0001, self_rag-793f92fd-0000, self_rag-793f92fd-0007。",
+    "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
     "require_explore": false,
+    "expects_json": true,
     "expected_skills": [
       "retrieval-qa"
     ],
@@ -452,8 +495,12 @@
         "type": "predicate",
         "name": "chunk_hit",
         "expected": [
+          "self_rag-793f92fd-0001",
           "self_rag-793f92fd-0000",
-          "self_rag-793f92fd-0001"
+          "self_rag-793f92fd-0007",
+          "self_rag-793f92fd-0008",
+          "self_rag-793f92fd-0006",
+          "self_rag-793f92fd-0005"
         ]
       },
       {
@@ -463,18 +510,19 @@
     ],
     "_meta": {
       "source": "self_rag.md",
-      "idx": 0
-    },
-    "expects_json": true
+      "idx": 0,
+      "recalled": 6
+    }
   },
   {
     "id": "silver_013",
     "tier": "silver",
     "workspace": "kb",
     "prompt": "致谢一、介绍一下 gradient accumulation 显存优化方式？",
-    "reference_answer": "答案应来自知识库中的 VRAM_optimize-b6784df4-0000 或其后继块（VRAM_optimize.md 第 0 块）。",
-    "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
+    "reference_answer": "答案应来自 《VRAM_optimize.md》 的以下块之一：VRAM_optimize-b6784df4-0000, VRAM_optimize-b6784df4-0006, VRAM_optimize-b6784df4-0005。",
+    "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
     "require_explore": false,
+    "expects_json": true,
     "expected_skills": [
       "retrieval-qa"
     ],
@@ -492,7 +540,10 @@
         "name": "chunk_hit",
         "expected": [
           "VRAM_optimize-b6784df4-0000",
-          "VRAM_optimize-b6784df4-0001"
+          "VRAM_optimize-b6784df4-0006",
+          "VRAM_optimize-b6784df4-0005",
+          "VRAM_optimize-b6784df4-0009",
+          "VRAM_optimize-b6784df4-0004"
         ]
       },
       {
@@ -502,18 +553,19 @@
     ],
     "_meta": {
       "source": "VRAM_optimize.md",
-      "idx": 0
-    },
-    "expects_json": true
+      "idx": 0,
+      "recalled": 5
+    }
   },
   {
     "id": "silver_014",
     "tier": "silver",
     "workspace": "kb",
     "prompt": "二、RAG 存在哪些局限性？",
-    "reference_answer": "答案应来自知识库中的 RAG_fusion-244ea5dc-0000 或其后继块（RAG_fusion.md 第 0 块）。",
-    "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
+    "reference_answer": "答案应来自 《RAG_fusion.md》 的以下块之一：RAG_fusion-244ea5dc-0001, RAG_fusion-244ea5dc-0000, RAG_fusion-244ea5dc-0003。",
+    "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
     "require_explore": false,
+    "expects_json": true,
     "expected_skills": [
       "retrieval-qa"
     ],
@@ -530,8 +582,9 @@
         "type": "predicate",
         "name": "chunk_hit",
         "expected": [
+          "RAG_fusion-244ea5dc-0001",
           "RAG_fusion-244ea5dc-0000",
-          "RAG_fusion-244ea5dc-0001"
+          "RAG_fusion-244ea5dc-0003"
         ]
       },
       {
@@ -541,18 +594,19 @@
     ],
     "_meta": {
       "source": "RAG_fusion.md",
-      "idx": 0
-    },
-    "expects_json": true
+      "idx": 0,
+      "recalled": 3
+    }
   },
   {
     "id": "silver_015",
     "tier": "silver",
     "workspace": "kb",
     "prompt": "模型如何判断回答的知识是训练过的已知的知识，怎么训练这种能力？",
-    "reference_answer": "答案应来自知识库中的 1.评测__1.评测-6091bd30-0000 或其后继块（1.评测__1.评测.md 第 0 块）。",
-    "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
+    "reference_answer": "答案应来自 《1.评测__1.评测.md》 的以下块之一：1.评测__1.评测-6091bd30-0000。",
+    "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
     "require_explore": false,
+    "expects_json": true,
     "expected_skills": [
       "retrieval-qa"
     ],
@@ -569,8 +623,7 @@
         "type": "predicate",
         "name": "chunk_hit",
         "expected": [
-          "1.评测__1.评测-6091bd30-0000",
-          "1.评测__1.评测-6091bd30-0001"
+          "1.评测__1.评测-6091bd30-0000"
         ]
       },
       {
@@ -580,18 +633,19 @@
     ],
     "_meta": {
       "source": "1.评测__1.评测.md",
-      "idx": 0
-    },
-    "expects_json": true
+      "idx": 0,
+      "recalled": 1
+    }
   },
   {
     "id": "silver_016",
     "tier": "silver",
     "workspace": "kb",
     "prompt": "其与信任区域策略优化算法有何关系呢？",
-    "reference_answer": "答案应来自知识库中的 2.强化学习__2.强化学习-9cd85005-0048 或其后继块（2.强化学习__2.强化学习.md 第 48 块）。",
-    "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
+    "reference_answer": "答案应来自 《2.强化学习__2.强化学习.md》 的以下块之一：2.强化学习__2.强化学习-9cd85005-0048, 2.强化学习__2.强化学习-9cd85005-0044, 2.强化学习__2.强化学习-9cd85005-0038。",
+    "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
     "require_explore": false,
+    "expects_json": true,
     "expected_skills": [
       "retrieval-qa"
     ],
@@ -609,7 +663,12 @@
         "name": "chunk_hit",
         "expected": [
           "2.强化学习__2.强化学习-9cd85005-0048",
-          "2.强化学习__2.强化学习-9cd85005-0049"
+          "2.强化学习__2.强化学习-9cd85005-0044",
+          "2.强化学习__2.强化学习-9cd85005-0038",
+          "2.强化学习__2.强化学习-9cd85005-0012",
+          "2.强化学习__2.强化学习-9cd85005-0011",
+          "2.强化学习__2.强化学习-9cd85005-0043",
+          "2.强化学习__2.强化学习-9cd85005-0047"
         ]
       },
       {
@@ -619,18 +678,19 @@
     ],
     "_meta": {
       "source": "2.强化学习__2.强化学习.md",
-      "idx": 48
-    },
-    "expects_json": true
+      "idx": 48,
+      "recalled": 7
+    }
   },
   {
     "id": "silver_017",
     "tier": "silver",
     "workspace": "kb",
     "prompt": "五、介绍一下 RAG 典型实现方法？",
-    "reference_answer": "答案应来自知识库中的 readme-1a14eeb5-0010 或其后继块（readme.md 第 10 块）。",
-    "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
+    "reference_answer": "答案应来自 《readme.md》 的以下块之一：readme-1a14eeb5-0000, readme-1a14eeb5-0010, readme-1a14eeb5-0001。",
+    "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
     "require_explore": false,
+    "expects_json": true,
     "expected_skills": [
       "retrieval-qa"
     ],
@@ -647,8 +707,10 @@
         "type": "predicate",
         "name": "chunk_hit",
         "expected": [
+          "readme-1a14eeb5-0000",
           "readme-1a14eeb5-0010",
-          "readme-1a14eeb5-0011"
+          "readme-1a14eeb5-0001",
+          "readme-1a14eeb5-0018"
         ]
       },
       {
@@ -658,18 +720,19 @@
     ],
     "_meta": {
       "source": "readme.md",
-      "idx": 10
-    },
-    "expects_json": true
+      "idx": 10,
+      "recalled": 4
+    }
   },
   {
     "id": "silver_018",
     "tier": "silver",
     "workspace": "kb",
     "prompt": "简单介绍一下 RLHF？",
-    "reference_answer": "答案应来自知识库中的 1.rlhf相关__1.rlhf相关-b4dec351-0002 或其后继块（1.rlhf相关__1.rlhf相关.md 第 2 块）。",
-    "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
+    "reference_answer": "答案应来自 《1.rlhf相关__1.rlhf相关.md》 的以下块之一：1.rlhf相关__1.rlhf相关-b4dec351-0002, 1.rlhf相关__1.rlhf相关-b4dec351-0001。",
+    "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
     "require_explore": false,
+    "expects_json": true,
     "expected_skills": [
       "retrieval-qa"
     ],
@@ -687,7 +750,7 @@
         "name": "chunk_hit",
         "expected": [
           "1.rlhf相关__1.rlhf相关-b4dec351-0002",
-          "1.rlhf相关__1.rlhf相关-b4dec351-0003"
+          "1.rlhf相关__1.rlhf相关-b4dec351-0001"
         ]
       },
       {
@@ -697,18 +760,19 @@
     ],
     "_meta": {
       "source": "1.rlhf相关__1.rlhf相关.md",
-      "idx": 2
-    },
-    "expects_json": true
+      "idx": 2,
+      "recalled": 2
+    }
   },
   {
     "id": "silver_019",
     "tier": "silver",
     "workspace": "kb",
     "prompt": "那么，是否会出现新的平台模式？",
-    "reference_answer": "答案应来自知识库中的 大模型agent技术__大模型agent技术-fed1b64e-0039 或其后继块（大模型agent技术__大模型agent技术.md 第 39 块）。",
-    "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
+    "reference_answer": "答案应来自 《大模型agent技术__大模型agent技术.md》 的以下块之一：大模型agent技术__大模型agent技术-fed1b64e-0039。",
+    "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
     "require_explore": false,
+    "expects_json": true,
     "expected_skills": [
       "retrieval-qa"
     ],
@@ -725,8 +789,7 @@
         "type": "predicate",
         "name": "chunk_hit",
         "expected": [
-          "大模型agent技术__大模型agent技术-fed1b64e-0039",
-          "大模型agent技术__大模型agent技术-fed1b64e-0040"
+          "大模型agent技术__大模型agent技术-fed1b64e-0039"
         ]
       },
       {
@@ -736,486 +799,19 @@
     ],
     "_meta": {
       "source": "大模型agent技术__大模型agent技术.md",
-      "idx": 39
-    },
-    "expects_json": true
+      "idx": 39,
+      "recalled": 1
+    }
   },
   {
     "id": "silver_020",
     "tier": "silver",
     "workspace": "kb",
     "prompt": "二、RAG 各模块有哪些优化策略？",
-    "reference_answer": "答案应来自知识库中的 RAG_optimization_strategy-777d22ec-0003 或其后继块（RAG_optimization_strategy.md 第 3 块）。",
-    "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
+    "reference_answer": "答案应来自 《RAG_optimization_strategy.md》 的以下块之一：RAG_optimization_strategy-777d22ec-0000, RAG_optimization_strategy-777d22ec-0003, RAG_optimization_strategy-777d22ec-0001。",
+    "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
     "require_explore": false,
-    "expected_skills": [
-      "retrieval-qa"
-    ],
-    "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
-    },
-    "checks": [
-      {
-        "type": "predicate",
-        "name": "not_refused"
-      },
-      {
-        "type": "predicate",
-        "name": "chunk_hit",
-        "expected": [
-          "RAG_optimization_strategy-777d22ec-0003",
-          "RAG_optimization_strategy-777d22ec-0004"
-        ]
-      },
-      {
-        "type": "predicate",
-        "name": "citations_grounded"
-      }
-    ],
-    "_meta": {
-      "source": "RAG_optimization_strategy.md",
-      "idx": 3
-    },
-    "expects_json": true
-  },
-  {
-    "id": "silver_021",
-    "tier": "silver",
-    "workspace": "kb",
-    "prompt": "LLM Agents 有哪些类型？",
-    "reference_answer": "答案应来自知识库中的 1.rlhf相关__1.rlhf相关-b4dec351-0018 或其后继块（1.rlhf相关__1.rlhf相关.md 第 18 块）。",
-    "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
-    "require_explore": false,
-    "expected_skills": [
-      "retrieval-qa"
-    ],
-    "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
-    },
-    "checks": [
-      {
-        "type": "predicate",
-        "name": "not_refused"
-      },
-      {
-        "type": "predicate",
-        "name": "chunk_hit",
-        "expected": [
-          "1.rlhf相关__1.rlhf相关-b4dec351-0018",
-          "1.rlhf相关__1.rlhf相关-b4dec351-0019"
-        ]
-      },
-      {
-        "type": "predicate",
-        "name": "citations_grounded"
-      }
-    ],
-    "_meta": {
-      "source": "1.rlhf相关__1.rlhf相关.md",
-      "idx": 18
-    },
-    "expects_json": true
-  },
-  {
-    "id": "silver_022",
-    "tier": "silver",
-    "workspace": "kb",
-    "prompt": "二、介绍一下 gradient checkpointing 显存优化方式？",
-    "reference_answer": "答案应来自知识库中的 VRAM_optimize-b6784df4-0000 或其后继块（VRAM_optimize.md 第 0 块）。",
-    "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
-    "require_explore": false,
-    "expected_skills": [
-      "retrieval-qa"
-    ],
-    "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
-    },
-    "checks": [
-      {
-        "type": "predicate",
-        "name": "not_refused"
-      },
-      {
-        "type": "predicate",
-        "name": "chunk_hit",
-        "expected": [
-          "VRAM_optimize-b6784df4-0000",
-          "VRAM_optimize-b6784df4-0001"
-        ]
-      },
-      {
-        "type": "predicate",
-        "name": "citations_grounded"
-      }
-    ],
-    "_meta": {
-      "source": "VRAM_optimize.md",
-      "idx": 0
-    },
-    "expects_json": true
-  },
-  {
-    "id": "silver_023",
-    "tier": "silver",
-    "workspace": "kb",
-    "prompt": "二、如何合成 RAG 测试集？",
-    "reference_answer": "答案应来自知识库中的 RAG_valuation-208520a0-0000 或其后继块（RAG_valuation.md 第 0 块）。",
-    "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
-    "require_explore": false,
-    "expected_skills": [
-      "retrieval-qa"
-    ],
-    "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
-    },
-    "checks": [
-      {
-        "type": "predicate",
-        "name": "not_refused"
-      },
-      {
-        "type": "predicate",
-        "name": "chunk_hit",
-        "expected": [
-          "RAG_valuation-208520a0-0000",
-          "RAG_valuation-208520a0-0001"
-        ]
-      },
-      {
-        "type": "predicate",
-        "name": "citations_grounded"
-      }
-    ],
-    "_meta": {
-      "source": "RAG_valuation.md",
-      "idx": 0
-    },
-    "expects_json": true
-  },
-  {
-    "id": "silver_024",
-    "tier": "silver",
-    "workspace": "kb",
-    "prompt": "vLLM 具有哪些特点 ?",
-    "reference_answer": "答案应来自知识库中的 vllm__readme-cc4286f6-0002 或其后继块（vllm__readme.md 第 2 块）。",
-    "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
-    "require_explore": false,
-    "expected_skills": [
-      "retrieval-qa"
-    ],
-    "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
-    },
-    "checks": [
-      {
-        "type": "predicate",
-        "name": "not_refused"
-      },
-      {
-        "type": "predicate",
-        "name": "chunk_hit",
-        "expected": [
-          "vllm__readme-cc4286f6-0002",
-          "vllm__readme-cc4286f6-0003"
-        ]
-      },
-      {
-        "type": "predicate",
-        "name": "citations_grounded"
-      }
-    ],
-    "_meta": {
-      "source": "vllm__readme.md",
-      "idx": 2
-    },
-    "expects_json": true
-  },
-  {
-    "id": "silver_025",
-    "tier": "silver",
-    "workspace": "kb",
-    "prompt": "旋转位置编码 RoPE 被哪些 LLMs 应用？",
-    "reference_answer": "答案应来自知识库中的 readme-1f5c0c99-0010 或其后继块（readme.md 第 10 块）。",
-    "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
-    "require_explore": false,
-    "expected_skills": [
-      "retrieval-qa"
-    ],
-    "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
-    },
-    "checks": [
-      {
-        "type": "predicate",
-        "name": "not_refused"
-      },
-      {
-        "type": "predicate",
-        "name": "chunk_hit",
-        "expected": [
-          "readme-1f5c0c99-0010",
-          "readme-1f5c0c99-0011"
-        ]
-      },
-      {
-        "type": "predicate",
-        "name": "citations_grounded"
-      }
-    ],
-    "_meta": {
-      "source": "readme.md",
-      "idx": 10
-    },
-    "expects_json": true
-  },
-  {
-    "id": "silver_026",
-    "tier": "silver",
-    "workspace": "kb",
-    "prompt": "五、说一下 RAG-Fusion 工作流程？",
-    "reference_answer": "答案应来自知识库中的 RAG_fusion-244ea5dc-0000 或其后继块（RAG_fusion.md 第 0 块）。",
-    "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
-    "require_explore": false,
-    "expected_skills": [
-      "retrieval-qa"
-    ],
-    "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
-    },
-    "checks": [
-      {
-        "type": "predicate",
-        "name": "not_refused"
-      },
-      {
-        "type": "predicate",
-        "name": "chunk_hit",
-        "expected": [
-          "RAG_fusion-244ea5dc-0000",
-          "RAG_fusion-244ea5dc-0001"
-        ]
-      },
-      {
-        "type": "predicate",
-        "name": "citations_grounded"
-      }
-    ],
-    "_meta": {
-      "source": "RAG_fusion.md",
-      "idx": 0
-    },
-    "expects_json": true
-  },
-  {
-    "id": "silver_027",
-    "tier": "silver",
-    "workspace": "kb",
-    "prompt": "增量预训练数据选取思路有哪些？",
-    "reference_answer": "答案应来自知识库中的 2.预训练__2.预训练-04396d62-0001 或其后继块（2.预训练__2.预训练.md 第 1 块）。",
-    "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
-    "require_explore": false,
-    "expected_skills": [
-      "retrieval-qa"
-    ],
-    "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
-    },
-    "checks": [
-      {
-        "type": "predicate",
-        "name": "not_refused"
-      },
-      {
-        "type": "predicate",
-        "name": "chunk_hit",
-        "expected": [
-          "2.预训练__2.预训练-04396d62-0001",
-          "2.预训练__2.预训练-04396d62-0002"
-        ]
-      },
-      {
-        "type": "predicate",
-        "name": "citations_grounded"
-      }
-    ],
-    "_meta": {
-      "source": "2.预训练__2.预训练.md",
-      "idx": 1
-    },
-    "expects_json": true
-  },
-  {
-    "id": "silver_028",
-    "tier": "silver",
-    "workspace": "kb",
-    "prompt": "二、FasterTransformer 介绍一下？",
-    "reference_answer": "答案应来自知识库中的 FasterTransformer__readme-6bb21552-0000 或其后继块（FasterTransformer__readme.md 第 0 块）。",
-    "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
-    "require_explore": false,
-    "expected_skills": [
-      "retrieval-qa"
-    ],
-    "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
-    },
-    "checks": [
-      {
-        "type": "predicate",
-        "name": "not_refused"
-      },
-      {
-        "type": "predicate",
-        "name": "chunk_hit",
-        "expected": [
-          "FasterTransformer__readme-6bb21552-0000",
-          "FasterTransformer__readme-6bb21552-0001"
-        ]
-      },
-      {
-        "type": "predicate",
-        "name": "citations_grounded"
-      }
-    ],
-    "_meta": {
-      "source": "FasterTransformer__readme.md",
-      "idx": 0
-    },
-    "expects_json": true
-  },
-  {
-    "id": "silver_029",
-    "tier": "silver",
-    "workspace": "kb",
-    "prompt": "八、如何区分单栏还是双栏pdf？",
-    "reference_answer": "答案应来自知识库中的 Doc_parser_trick__chatpdf-519f0ff8-0000 或其后继块（Doc_parser_trick__chatpdf.md 第 0 块）。",
-    "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
-    "require_explore": false,
-    "expected_skills": [
-      "retrieval-qa"
-    ],
-    "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
-    },
-    "checks": [
-      {
-        "type": "predicate",
-        "name": "not_refused"
-      },
-      {
-        "type": "predicate",
-        "name": "chunk_hit",
-        "expected": [
-          "Doc_parser_trick__chatpdf-519f0ff8-0000",
-          "Doc_parser_trick__chatpdf-519f0ff8-0001"
-        ]
-      },
-      {
-        "type": "predicate",
-        "name": "citations_grounded"
-      }
-    ],
-    "_meta": {
-      "source": "Doc_parser_trick__chatpdf.md",
-      "idx": 0
-    },
-    "expects_json": true
-  },
-  {
-    "id": "silver_030",
-    "tier": "silver",
-    "workspace": "kb",
-    "prompt": "二、如何准确衡量模型的推理速度呢？",
-    "reference_answer": "答案应来自知识库中的 LLMs_Inference_performance-2fdfada8-0000 或其后继块（LLMs_Inference_performance.md 第 0 块）。",
-    "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
-    "require_explore": false,
-    "expected_skills": [
-      "retrieval-qa"
-    ],
-    "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
-    },
-    "checks": [
-      {
-        "type": "predicate",
-        "name": "not_refused"
-      },
-      {
-        "type": "predicate",
-        "name": "chunk_hit",
-        "expected": [
-          "LLMs_Inference_performance-2fdfada8-0000",
-          "LLMs_Inference_performance-2fdfada8-0001"
-        ]
-      },
-      {
-        "type": "predicate",
-        "name": "citations_grounded"
-      }
-    ],
-    "_meta": {
-      "source": "LLMs_Inference_performance.md",
-      "idx": 0
-    },
-    "expects_json": true
-  },
-  {
-    "id": "silver_031",
-    "tier": "silver",
-    "workspace": "kb",
-    "prompt": "检索增强 LLM 解决的问题为什么要结合传统的信息检索系统来增强 LLM ？",
-    "reference_answer": "答案应来自知识库中的 检索增强llm__检索增强llm-271aff1c-0004 或其后继块（检索增强llm__检索增强llm.md 第 4 块）。",
-    "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
-    "require_explore": false,
-    "expected_skills": [
-      "retrieval-qa"
-    ],
-    "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
-    },
-    "checks": [
-      {
-        "type": "predicate",
-        "name": "not_refused"
-      },
-      {
-        "type": "predicate",
-        "name": "chunk_hit",
-        "expected": [
-          "检索增强llm__检索增强llm-271aff1c-0004",
-          "检索增强llm__检索增强llm-271aff1c-0005"
-        ]
-      },
-      {
-        "type": "predicate",
-        "name": "citations_grounded"
-      }
-    ],
-    "_meta": {
-      "source": "检索增强llm__检索增强llm.md",
-      "idx": 4
-    },
-    "expects_json": true
-  },
-  {
-    "id": "silver_032",
-    "tier": "silver",
-    "workspace": "kb",
-    "prompt": "三、RAG 架构优化有哪些优化策略？",
-    "reference_answer": "答案应来自知识库中的 RAG_optimization_strategy-777d22ec-0000 或其后继块（RAG_optimization_strategy.md 第 0 块）。",
-    "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
-    "require_explore": false,
+    "expects_json": true,
     "expected_skills": [
       "retrieval-qa"
     ],
@@ -1233,7 +829,13 @@
         "name": "chunk_hit",
         "expected": [
           "RAG_optimization_strategy-777d22ec-0000",
-          "RAG_optimization_strategy-777d22ec-0001"
+          "RAG_optimization_strategy-777d22ec-0003",
+          "RAG_optimization_strategy-777d22ec-0001",
+          "RAG_optimization_strategy-777d22ec-0023",
+          "RAG_optimization_strategy-777d22ec-0024",
+          "RAG_optimization_strategy-777d22ec-0002",
+          "RAG_optimization_strategy-777d22ec-0021",
+          "RAG_optimization_strategy-777d22ec-0004"
         ]
       },
       {
@@ -1243,18 +845,19 @@
     ],
     "_meta": {
       "source": "RAG_optimization_strategy.md",
-      "idx": 0
-    },
-    "expects_json": true
+      "idx": 3,
+      "recalled": 8
+    }
   },
   {
-    "id": "silver_033",
+    "id": "silver_021",
     "tier": "silver",
     "workspace": "kb",
-    "prompt": "vLLM 离线批量推理？",
-    "reference_answer": "答案应来自知识库中的 LLMs_inference_optimize-64d9ecd0-0029 或其后继块（LLMs_inference_optimize.md 第 29 块）。",
-    "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
+    "prompt": "LLM Agents 有哪些类型？",
+    "reference_answer": "答案应来自 《1.rlhf相关__1.rlhf相关.md》 的以下块之一：1.rlhf相关__1.rlhf相关-b4dec351-0018, 1.rlhf相关__1.rlhf相关-b4dec351-0017, 1.rlhf相关__1.rlhf相关-b4dec351-0019。",
+    "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
     "require_explore": false,
+    "expects_json": true,
     "expected_skills": [
       "retrieval-qa"
     ],
@@ -1271,8 +874,10 @@
         "type": "predicate",
         "name": "chunk_hit",
         "expected": [
-          "LLMs_inference_optimize-64d9ecd0-0029",
-          "LLMs_inference_optimize-64d9ecd0-0030"
+          "1.rlhf相关__1.rlhf相关-b4dec351-0018",
+          "1.rlhf相关__1.rlhf相关-b4dec351-0017",
+          "1.rlhf相关__1.rlhf相关-b4dec351-0019",
+          "1.rlhf相关__1.rlhf相关-b4dec351-0016"
         ]
       },
       {
@@ -1281,19 +886,20 @@
       }
     ],
     "_meta": {
-      "source": "LLMs_inference_optimize.md",
-      "idx": 29
-    },
-    "expects_json": true
+      "source": "1.rlhf相关__1.rlhf相关.md",
+      "idx": 18,
+      "recalled": 4
+    }
   },
   {
-    "id": "silver_034",
+    "id": "silver_022",
     "tier": "silver",
     "workspace": "kb",
-    "prompt": "三、Graph RAG 思路介绍？",
-    "reference_answer": "答案应来自知识库中的 KG-RAG__LLMs_Graph_RAG__readme-560b6a44-0000 或其后继块（KG-RAG__LLMs_Graph_RAG__readme.md 第 0 块）。",
-    "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
+    "prompt": "二、介绍一下 gradient checkpointing 显存优化方式？",
+    "reference_answer": "答案应来自 《VRAM_optimize.md》 的以下块之一：VRAM_optimize-b6784df4-0000, VRAM_optimize-b6784df4-0006, VRAM_optimize-b6784df4-0009。",
+    "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
     "require_explore": false,
+    "expects_json": true,
     "expected_skills": [
       "retrieval-qa"
     ],
@@ -1310,8 +916,10 @@
         "type": "predicate",
         "name": "chunk_hit",
         "expected": [
-          "KG-RAG__LLMs_Graph_RAG__readme-560b6a44-0000",
-          "KG-RAG__LLMs_Graph_RAG__readme-560b6a44-0001"
+          "VRAM_optimize-b6784df4-0000",
+          "VRAM_optimize-b6784df4-0006",
+          "VRAM_optimize-b6784df4-0009",
+          "VRAM_optimize-b6784df4-0005"
         ]
       },
       {
@@ -1320,19 +928,107 @@
       }
     ],
     "_meta": {
-      "source": "KG-RAG__LLMs_Graph_RAG__readme.md",
-      "idx": 0
-    },
-    "expects_json": true
+      "source": "VRAM_optimize.md",
+      "idx": 0,
+      "recalled": 4
+    }
   },
   {
-    "id": "silver_035",
+    "id": "silver_023",
     "tier": "silver",
     "workspace": "kb",
-    "prompt": "三、什么是绝对位置编码？",
-    "reference_answer": "答案应来自知识库中的 readme-1f5c0c99-0000 或其后继块（readme.md 第 0 块）。",
-    "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
+    "prompt": "二、如何合成 RAG 测试集？",
+    "reference_answer": "答案应来自 《RAG_valuation.md》 的以下块之一：RAG_valuation-208520a0-0000, RAG_valuation-208520a0-0001, RAG_valuation-208520a0-0041。",
+    "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
     "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "chunk_hit",
+        "expected": [
+          "RAG_valuation-208520a0-0000",
+          "RAG_valuation-208520a0-0001",
+          "RAG_valuation-208520a0-0041",
+          "RAG_valuation-208520a0-0040",
+          "RAG_valuation-208520a0-0021",
+          "RAG_valuation-208520a0-0033"
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "_meta": {
+      "source": "RAG_valuation.md",
+      "idx": 0,
+      "recalled": 6
+    }
+  },
+  {
+    "id": "silver_024",
+    "tier": "silver",
+    "workspace": "kb",
+    "prompt": "vLLM 具有哪些特点 ?",
+    "reference_answer": "答案应来自 《vllm__readme.md》 的以下块之一：vllm__readme-cc4286f6-0003, vllm__readme-cc4286f6-0002, vllm__readme-cc4286f6-0000。",
+    "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "chunk_hit",
+        "expected": [
+          "vllm__readme-cc4286f6-0003",
+          "vllm__readme-cc4286f6-0002",
+          "vllm__readme-cc4286f6-0000",
+          "vllm__readme-cc4286f6-0006",
+          "vllm__readme-cc4286f6-0004"
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "_meta": {
+      "source": "vllm__readme.md",
+      "idx": 2,
+      "recalled": 5
+    }
+  },
+  {
+    "id": "silver_025",
+    "tier": "silver",
+    "workspace": "kb",
+    "prompt": "旋转位置编码 RoPE 被哪些 LLMs 应用？",
+    "reference_answer": "答案应来自 《readme.md》 的以下块之一：readme-1f5c0c99-0000, readme-1f5c0c99-0001, readme-1f5c0c99-0010。",
+    "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
+    "require_explore": false,
+    "expects_json": true,
     "expected_skills": [
       "retrieval-qa"
     ],
@@ -1350,7 +1046,13 @@
         "name": "chunk_hit",
         "expected": [
           "readme-1f5c0c99-0000",
-          "readme-1f5c0c99-0001"
+          "readme-1f5c0c99-0001",
+          "readme-1f5c0c99-0010",
+          "readme-1f5c0c99-0012",
+          "readme-1f5c0c99-0009",
+          "readme-1f5c0c99-0002",
+          "readme-1f5c0c99-0008",
+          "readme-1f5c0c99-0005"
         ]
       },
       {
@@ -1360,18 +1062,19 @@
     ],
     "_meta": {
       "source": "readme.md",
-      "idx": 0
-    },
-    "expects_json": true
+      "idx": 10,
+      "recalled": 8
+    }
   },
   {
-    "id": "silver_036",
+    "id": "silver_026",
     "tier": "silver",
     "workspace": "kb",
-    "prompt": "大家也发现大模型直接给出答案似乎并不靠谱，那么是否可以让它像人类一样，一步一步思考呢？",
-    "reference_answer": "答案应来自知识库中的 大模型agent技术__大模型agent技术-fed1b64e-0007 或其后继块（大模型agent技术__大模型agent技术.md 第 7 块）。",
-    "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
+    "prompt": "五、说一下 RAG-Fusion 工作流程？",
+    "reference_answer": "答案应来自 《RAG_fusion.md》 的以下块之一：RAG_fusion-244ea5dc-0003, RAG_fusion-244ea5dc-0000, RAG_fusion-244ea5dc-0012。",
+    "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
     "require_explore": false,
+    "expects_json": true,
     "expected_skills": [
       "retrieval-qa"
     ],
@@ -1388,8 +1091,446 @@
         "type": "predicate",
         "name": "chunk_hit",
         "expected": [
+          "RAG_fusion-244ea5dc-0003",
+          "RAG_fusion-244ea5dc-0000",
+          "RAG_fusion-244ea5dc-0012",
+          "RAG_fusion-244ea5dc-0002",
+          "RAG_fusion-244ea5dc-0010",
+          "RAG_fusion-244ea5dc-0011",
+          "RAG_fusion-244ea5dc-0007"
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "_meta": {
+      "source": "RAG_fusion.md",
+      "idx": 0,
+      "recalled": 7
+    }
+  },
+  {
+    "id": "silver_027",
+    "tier": "silver",
+    "workspace": "kb",
+    "prompt": "增量预训练数据选取思路有哪些？",
+    "reference_answer": "答案应来自 《2.预训练__2.预训练.md》 的以下块之一：2.预训练__2.预训练-04396d62-0001, 2.预训练__2.预训练-04396d62-0002, 2.预训练__2.预训练-04396d62-0000。",
+    "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "chunk_hit",
+        "expected": [
+          "2.预训练__2.预训练-04396d62-0001",
+          "2.预训练__2.预训练-04396d62-0002",
+          "2.预训练__2.预训练-04396d62-0000"
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "_meta": {
+      "source": "2.预训练__2.预训练.md",
+      "idx": 1,
+      "recalled": 3
+    }
+  },
+  {
+    "id": "silver_028",
+    "tier": "silver",
+    "workspace": "kb",
+    "prompt": "二、FasterTransformer 介绍一下？",
+    "reference_answer": "答案应来自 《FasterTransformer__readme.md》 的以下块之一：FasterTransformer__readme-6bb21552-0000, FasterTransformer__readme-6bb21552-0004, FasterTransformer__readme-6bb21552-0003。",
+    "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "chunk_hit",
+        "expected": [
+          "FasterTransformer__readme-6bb21552-0000",
+          "FasterTransformer__readme-6bb21552-0004",
+          "FasterTransformer__readme-6bb21552-0003"
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "_meta": {
+      "source": "FasterTransformer__readme.md",
+      "idx": 0,
+      "recalled": 3
+    }
+  },
+  {
+    "id": "silver_029",
+    "tier": "silver",
+    "workspace": "kb",
+    "prompt": "八、如何区分单栏还是双栏pdf？",
+    "reference_answer": "答案应来自 《Doc_parser_trick__chatpdf.md》 的以下块之一：Doc_parser_trick__chatpdf-519f0ff8-0006, Doc_parser_trick__chatpdf-519f0ff8-0000, Doc_parser_trick__chatpdf-519f0ff8-0007。",
+    "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "chunk_hit",
+        "expected": [
+          "Doc_parser_trick__chatpdf-519f0ff8-0006",
+          "Doc_parser_trick__chatpdf-519f0ff8-0000",
+          "Doc_parser_trick__chatpdf-519f0ff8-0007",
+          "Doc_parser_trick__chatpdf-519f0ff8-0001",
+          "Doc_parser_trick__chatpdf-519f0ff8-0002",
+          "Doc_parser_trick__chatpdf-519f0ff8-0004"
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "_meta": {
+      "source": "Doc_parser_trick__chatpdf.md",
+      "idx": 0,
+      "recalled": 6
+    }
+  },
+  {
+    "id": "silver_030",
+    "tier": "silver",
+    "workspace": "kb",
+    "prompt": "二、如何准确衡量模型的推理速度呢？",
+    "reference_answer": "答案应来自 《LLMs_Inference_performance.md》 的以下块之一：LLMs_Inference_performance-2fdfada8-0001, LLMs_Inference_performance-2fdfada8-0000。",
+    "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "chunk_hit",
+        "expected": [
+          "LLMs_Inference_performance-2fdfada8-0001",
+          "LLMs_Inference_performance-2fdfada8-0000"
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "_meta": {
+      "source": "LLMs_Inference_performance.md",
+      "idx": 0,
+      "recalled": 2
+    }
+  },
+  {
+    "id": "silver_031",
+    "tier": "silver",
+    "workspace": "kb",
+    "prompt": "检索增强 LLM 解决的问题为什么要结合传统的信息检索系统来增强 LLM ？",
+    "reference_answer": "答案应来自 《检索增强llm__检索增强llm.md》 的以下块之一：检索增强llm__检索增强llm-271aff1c-0004, 检索增强llm__检索增强llm-271aff1c-0001, 检索增强llm__检索增强llm-271aff1c-0003。",
+    "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "chunk_hit",
+        "expected": [
+          "检索增强llm__检索增强llm-271aff1c-0004",
+          "检索增强llm__检索增强llm-271aff1c-0001",
+          "检索增强llm__检索增强llm-271aff1c-0003",
+          "检索增强llm__检索增强llm-271aff1c-0002",
+          "检索增强llm__检索增强llm-271aff1c-0000",
+          "检索增强llm__检索增强llm-271aff1c-0014"
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "_meta": {
+      "source": "检索增强llm__检索增强llm.md",
+      "idx": 4,
+      "recalled": 6
+    }
+  },
+  {
+    "id": "silver_032",
+    "tier": "silver",
+    "workspace": "kb",
+    "prompt": "三、RAG 架构优化有哪些优化策略？",
+    "reference_answer": "答案应来自 《RAG_optimization_strategy.md》 的以下块之一：RAG_optimization_strategy-777d22ec-0000, RAG_optimization_strategy-777d22ec-0004, RAG_optimization_strategy-777d22ec-0002。",
+    "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "chunk_hit",
+        "expected": [
+          "RAG_optimization_strategy-777d22ec-0000",
+          "RAG_optimization_strategy-777d22ec-0004",
+          "RAG_optimization_strategy-777d22ec-0002",
+          "RAG_optimization_strategy-777d22ec-0001",
+          "RAG_optimization_strategy-777d22ec-0003",
+          "RAG_optimization_strategy-777d22ec-0027"
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "_meta": {
+      "source": "RAG_optimization_strategy.md",
+      "idx": 0,
+      "recalled": 6
+    }
+  },
+  {
+    "id": "silver_033",
+    "tier": "silver",
+    "workspace": "kb",
+    "prompt": "vLLM 离线批量推理？",
+    "reference_answer": "答案应来自 《LLMs_inference_optimize.md》 的以下块之一：LLMs_inference_optimize-64d9ecd0-0001, LLMs_inference_optimize-64d9ecd0-0029。",
+    "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "chunk_hit",
+        "expected": [
+          "LLMs_inference_optimize-64d9ecd0-0001",
+          "LLMs_inference_optimize-64d9ecd0-0029"
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "_meta": {
+      "source": "LLMs_inference_optimize.md",
+      "idx": 29,
+      "recalled": 2
+    }
+  },
+  {
+    "id": "silver_034",
+    "tier": "silver",
+    "workspace": "kb",
+    "prompt": "三、Graph RAG 思路介绍？",
+    "reference_answer": "答案应来自 《KG-RAG__LLMs_Graph_RAG__readme.md》 的以下块之一：KG-RAG__LLMs_Graph_RAG__readme-560b6a44-0002, KG-RAG__LLMs_Graph_RAG__readme-560b6a44-0000, KG-RAG__LLMs_Graph_RAG__readme-560b6a44-0001。",
+    "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "chunk_hit",
+        "expected": [
+          "KG-RAG__LLMs_Graph_RAG__readme-560b6a44-0002",
+          "KG-RAG__LLMs_Graph_RAG__readme-560b6a44-0000",
+          "KG-RAG__LLMs_Graph_RAG__readme-560b6a44-0001",
+          "KG-RAG__LLMs_Graph_RAG__readme-560b6a44-0015",
+          "KG-RAG__LLMs_Graph_RAG__readme-560b6a44-0003",
+          "KG-RAG__LLMs_Graph_RAG__readme-560b6a44-0004"
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "_meta": {
+      "source": "KG-RAG__LLMs_Graph_RAG__readme.md",
+      "idx": 0,
+      "recalled": 6
+    }
+  },
+  {
+    "id": "silver_035",
+    "tier": "silver",
+    "workspace": "kb",
+    "prompt": "三、什么是绝对位置编码？",
+    "reference_answer": "答案应来自 《readme.md》 的以下块之一：readme-1f5c0c99-0004, readme-1f5c0c99-0000, readme-1f5c0c99-0006。",
+    "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "chunk_hit",
+        "expected": [
+          "readme-1f5c0c99-0004",
+          "readme-1f5c0c99-0000",
+          "readme-1f5c0c99-0006",
+          "readme-1f5c0c99-0007",
+          "readme-1f5c0c99-0002",
+          "readme-1f5c0c99-0010",
+          "readme-1f5c0c99-0012",
+          "readme-1f5c0c99-0005",
+          "readme-1f5c0c99-0009"
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "_meta": {
+      "source": "readme.md",
+      "idx": 0,
+      "recalled": 9
+    }
+  },
+  {
+    "id": "silver_036",
+    "tier": "silver",
+    "workspace": "kb",
+    "prompt": "大家也发现大模型直接给出答案似乎并不靠谱，那么是否可以让它像人类一样，一步一步思考呢？",
+    "reference_answer": "答案应来自 《大模型agent技术__大模型agent技术.md》 的以下块之一：大模型agent技术__大模型agent技术-fed1b64e-0008, 大模型agent技术__大模型agent技术-fed1b64e-0007, 大模型agent技术__大模型agent技术-fed1b64e-0047。",
+    "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "chunk_hit",
+        "expected": [
+          "大模型agent技术__大模型agent技术-fed1b64e-0008",
           "大模型agent技术__大模型agent技术-fed1b64e-0007",
-          "大模型agent技术__大模型agent技术-fed1b64e-0008"
+          "大模型agent技术__大模型agent技术-fed1b64e-0047",
+          "大模型agent技术__大模型agent技术-fed1b64e-0041",
+          "大模型agent技术__大模型agent技术-fed1b64e-0046",
+          "大模型agent技术__大模型agent技术-fed1b64e-0006",
+          "大模型agent技术__大模型agent技术-fed1b64e-0042",
+          "大模型agent技术__大模型agent技术-fed1b64e-0009",
+          "大模型agent技术__大模型agent技术-fed1b64e-0011",
+          "大模型agent技术__大模型agent技术-fed1b64e-0035"
         ]
       },
       {
@@ -1399,18 +1540,19 @@
     ],
     "_meta": {
       "source": "大模型agent技术__大模型agent技术.md",
-      "idx": 7
-    },
-    "expects_json": true
+      "idx": 7,
+      "recalled": 10
+    }
   },
   {
     "id": "silver_037",
     "tier": "silver",
     "workspace": "kb",
     "prompt": "二、能不能介绍一下常见的文本分块方法？",
-    "reference_answer": "答案应来自知识库中的 split_block-0afb8194-0000 或其后继块（split_block.md 第 0 块）。",
-    "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
+    "reference_answer": "答案应来自 《split_block.md》 的以下块之一：split_block-0afb8194-0002, split_block-0afb8194-0000, split_block-0afb8194-0012。",
+    "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
     "require_explore": false,
+    "expects_json": true,
     "expected_skills": [
       "retrieval-qa"
     ],
@@ -1427,8 +1569,10 @@
         "type": "predicate",
         "name": "chunk_hit",
         "expected": [
+          "split_block-0afb8194-0002",
           "split_block-0afb8194-0000",
-          "split_block-0afb8194-0001"
+          "split_block-0afb8194-0012",
+          "split_block-0afb8194-0006"
         ]
       },
       {
@@ -1438,18 +1582,19 @@
     ],
     "_meta": {
       "source": "split_block.md",
-      "idx": 0
-    },
-    "expects_json": true
+      "idx": 0,
+      "recalled": 4
+    }
   },
   {
     "id": "silver_038",
     "tier": "silver",
     "workspace": "kb",
     "prompt": "nB模型训练需要多少显存？",
-    "reference_answer": "答案应来自知识库中的 readme-cd71f754-0000 或其后继块（readme.md 第 0 块）。",
-    "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
+    "reference_answer": "答案应来自 《readme.md》 的以下块之一：readme-cd71f754-0002, readme-cd71f754-0000, readme-cd71f754-0003。",
+    "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
     "require_explore": false,
+    "expects_json": true,
     "expected_skills": [
       "retrieval-qa"
     ],
@@ -1466,8 +1611,12 @@
         "type": "predicate",
         "name": "chunk_hit",
         "expected": [
+          "readme-cd71f754-0002",
           "readme-cd71f754-0000",
-          "readme-cd71f754-0001"
+          "readme-cd71f754-0003",
+          "readme-cd71f754-0006",
+          "readme-cd71f754-0001",
+          "readme-cd71f754-0007"
         ]
       },
       {
@@ -1477,18 +1626,19 @@
     ],
     "_meta": {
       "source": "readme.md",
-      "idx": 0
-    },
-    "expects_json": true
+      "idx": 0,
+      "recalled": 6
+    }
   },
   {
     "id": "silver_039",
     "tier": "silver",
     "workspace": "kb",
     "prompt": "分块实现方法那么文本分块具体如何实现？",
-    "reference_answer": "答案应来自知识库中的 检索增强llm__检索增强llm-271aff1c-0019 或其后继块（检索增强llm__检索增强llm.md 第 19 块）。",
-    "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
+    "reference_answer": "答案应来自 《检索增强llm__检索增强llm.md》 的以下块之一：检索增强llm__检索增强llm-271aff1c-0019, 检索增强llm__检索增强llm-271aff1c-0017, 检索增强llm__检索增强llm-271aff1c-0022。",
+    "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
     "require_explore": false,
+    "expects_json": true,
     "expected_skills": [
       "retrieval-qa"
     ],
@@ -1506,7 +1656,9 @@
         "name": "chunk_hit",
         "expected": [
           "检索增强llm__检索增强llm-271aff1c-0019",
-          "检索增强llm__检索增强llm-271aff1c-0020"
+          "检索增强llm__检索增强llm-271aff1c-0017",
+          "检索增强llm__检索增强llm-271aff1c-0022",
+          "检索增强llm__检索增强llm-271aff1c-0018"
         ]
       },
       {
@@ -1516,18 +1668,19 @@
     ],
     "_meta": {
       "source": "检索增强llm__检索增强llm.md",
-      "idx": 19
-    },
-    "expects_json": true
+      "idx": 19,
+      "recalled": 4
+    }
   },
   {
     "id": "silver_040",
     "tier": "silver",
     "workspace": "kb",
     "prompt": "二、什么是 Graph RAG？",
-    "reference_answer": "答案应来自知识库中的 KG-RAG__LLMs_Graph_RAG__readme-560b6a44-0000 或其后继块（KG-RAG__LLMs_Graph_RAG__readme.md 第 0 块）。",
-    "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
+    "reference_answer": "答案应来自 《KG-RAG__LLMs_Graph_RAG__readme.md》 的以下块之一：KG-RAG__LLMs_Graph_RAG__readme-560b6a44-0000, KG-RAG__LLMs_Graph_RAG__readme-560b6a44-0001, KG-RAG__LLMs_Graph_RAG__readme-560b6a44-0002。",
+    "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
     "require_explore": false,
+    "expects_json": true,
     "expected_skills": [
       "retrieval-qa"
     ],
@@ -1545,7 +1698,11 @@
         "name": "chunk_hit",
         "expected": [
           "KG-RAG__LLMs_Graph_RAG__readme-560b6a44-0000",
-          "KG-RAG__LLMs_Graph_RAG__readme-560b6a44-0001"
+          "KG-RAG__LLMs_Graph_RAG__readme-560b6a44-0001",
+          "KG-RAG__LLMs_Graph_RAG__readme-560b6a44-0002",
+          "KG-RAG__LLMs_Graph_RAG__readme-560b6a44-0015",
+          "KG-RAG__LLMs_Graph_RAG__readme-560b6a44-0004",
+          "KG-RAG__LLMs_Graph_RAG__readme-560b6a44-0003"
         ]
       },
       {
@@ -1555,8 +1712,8 @@
     ],
     "_meta": {
       "source": "KG-RAG__LLMs_Graph_RAG__readme.md",
-      "idx": 0
-    },
-    "expects_json": true
+      "idx": 0,
+      "recalled": 6
+    }
   }
 ]

@@ -35,6 +35,9 @@ class Tool:
     parameters: dict
     handler: Callable[..., str]
     permission: str = READ
+    # 终止型工具：调用即结束本轮，参数本身就是最终交付物。
+    # 用工具而不是 prompt 约束输出格式——schema 校验是硬的，提示词是软的。
+    terminal: bool = False
 
     def openai_schema(self) -> dict:
         return {

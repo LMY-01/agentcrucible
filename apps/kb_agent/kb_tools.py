@@ -99,6 +99,11 @@ def web_search(query: str) -> str:
     )
 
 
+def submit_answer(answer: str, citations: list, refused: bool) -> str:
+    """终止型工具：参数就是交付物，handler 不会被真正使用。"""
+    return "已提交"
+
+
 def build_kb_tools() -> list[Tool]:
     return [
         Tool(
@@ -156,5 +161,29 @@ def build_kb_tools() -> list[Tool]:
             },
             handler=web_search,
             permission=READ,
+        ),
+        Tool(
+            name="submit_answer",
+            description=(
+                "提交最终答案。这是唯一被接受的交付方式——不要直接输出文本答案，必须调用本工具。"
+                "answer 写结论正文并用 [1][2] 标出处；citations 每项含 chunk_id 和 quote（原文逐字复制）；"
+                "资料里查不到时必须把 refused 设为 true。"
+            ),
+            parameters={
+                "type": "object",
+                "properties": {
+                    "answer": {"type": "string", "description": "结论正文，分点写"},
+                    "citations": {
+                        "type": "array",
+                        "description": "引用列表，每项是 {chunk_id, quote}，quote 必须与原文逐字一致",
+                    },
+                    "refused": {"type": "boolean", "description": "资料查不到时为 true"},
+                },
+                "required": ["answer", "citations", "refused"],
+                "additionalProperties": False,
+            },
+            handler=submit_answer,
+            permission=READ,
+            terminal=True,
         ),
     ]

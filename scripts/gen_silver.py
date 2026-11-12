@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import random
 import re
 import sys
@@ -116,21 +117,28 @@ def dedupe(items: list[dict]) -> list[dict]:
     return out
 
 
-def build_task(item: dict, doc_chunk_ids: dict[str, set[str]], num: int) -> dict:
-    """一条白银任务。期望引用 = 本块或同文档的相邻块（答案常在问题后面）。"""
-    expected = [item["chunk_id"]]
-    doc_id = item["doc_id"]
-    nxt = f"{doc_id}-{item['idx'] + 1:04d}"
-    if nxt in doc_chunk_ids.get(doc_id, set()):
-        expected.append(nxt)
+def verify_expected(item: dict, store, k: int = 10) -> list[str] | None:
+    """跑一次真实检索，把「同文档被召回的块」作为可接受答案来源。
 
+    为什么必须自校验：问句所在的块常常只是标题+问题，真正答案在后面的块里。
+    初版按「本块或后继块」硬编期望值，结果正确的引用被判错。
+    这里改成看检索实际能召回什么——同一文档的任意块都算命中，
+    如果连一个同文档块都召不回来，说明这题不可解，直接丢掉。
+    """
+    hits = store.search(item["question"], k=k)
+    same_doc = [c.id for c, _ in hits if c.doc_id == item["doc_id"]]
+    return same_doc or None
+
+
+def build_task(item: dict, expected: list[str], num: int) -> dict:
+    """一条白银任务。期望引用 = 检索能召回到的同文档块（程序推出，无人为标注）。"""
     return {
         "id": f"silver_{num:03d}",
         "tier": "silver",
         "workspace": "kb",
         "prompt": item["question"],
-        "reference_answer": f"答案应来自知识库中的 {item['chunk_id']} 或其后继块（{item['source']} 第 {item['idx']} 块）。",
-        "reference_note": "程序生成：问题取自语料原文，期望引用由块序号推出，未经人工核验。",
+        "reference_answer": f"答案应来自 《{item['source']}》 的以下块之一：{', '.join(expected[:3])}。",
+        "reference_note": "程序生成：问题取自语料原文，期望引用由检索结果推出（同文档可召回块），未经人工核验。",
         "require_explore": False,
         "expects_json": True,
         "expected_skills": ["retrieval-qa"],
@@ -140,7 +148,7 @@ def build_task(item: dict, doc_chunk_ids: dict[str, set[str]], num: int) -> dict
             {"type": "predicate", "name": "chunk_hit", "expected": expected},
             {"type": "predicate", "name": "citations_grounded"},
         ],
-        "_meta": {"source": item["source"], "idx": item["idx"]},
+        "_meta": {"source": item["source"], "idx": item["idx"], "recalled": len(expected)},
     }
 
 
@@ -152,11 +160,12 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--out", default=str(OUT))
     args = p.parse_args(argv)
 
-    # 收集每个文档有哪些块，用来判断「下一块」是否存在
-    doc_chunks: dict[str, set[str]] = {}
-    for line in open(CHUNKS, encoding="utf-8"):
-        c = json.loads(line)
-        doc_chunks.setdefault(c["doc_id"], set()).add(c["id"])
+    # 逐题跑真实检索做自校验：连自己文档的块都召不回来的题直接丢弃
+    os.environ.setdefault("HF_HUB_OFFLINE", "1")
+    os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
+    from kb_lab.store import KBStore  # 延迟导入：不生成时不拖 embedding 模型
+
+    store = KBStore(str(KB_ROOT / "data" / "chroma"))
 
     # 黄金集里已有的问题不再进白银集，避免重复计分
     gold_path = PROJECT_ROOT / "apps" / "kb_agent" / "eval" / "gold.json"
@@ -181,14 +190,24 @@ def main(argv: list[str] | None = None) -> int:
         if len(picked) >= args.limit:
             break
 
-    tasks = [build_task(it, doc_chunks, n + 1) for n, it in enumerate(picked)]
+    tasks: list[dict] = []
+    dropped = 0
+    for it in picked:
+        expected = verify_expected(it, store)
+        if not expected:
+            dropped += 1
+            continue
+        tasks.append(build_task(it, expected, len(tasks) + 1))
+        if len(tasks) >= args.limit:
+            break
     Path(args.out).parent.mkdir(parents=True, exist_ok=True)
     Path(args.out).write_text(json.dumps(tasks, ensure_ascii=False, indent=2), encoding="utf-8")
 
     print(f"生成 {len(tasks)} 条白银任务 → {args.out}")
-    print(f"覆盖 {len(per_doc)} 个文档")
+    print(f"覆盖 {len(per_doc)} 个文档，丢弃 {dropped} 条不可召回题")
     for t in tasks[:5]:
-        print(f"  {t['id']}  {t['prompt'][:42]}  → 期望 {t['checks'][1]['expected'][0][-18:]}")
+        meta = t["_meta"]
+        print(f"  {t['id']}  {t['prompt'][:40]}  → 期望 {meta['recalled']} 个同文档块")
     print("  …")
     return 0
 

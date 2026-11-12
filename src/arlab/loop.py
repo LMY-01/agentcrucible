@@ -180,6 +180,19 @@ class Agent:
             )
             for call in tool_calls:
                 result = self._exec_tool_call(call, step)
+
+                # 终止型工具：参数通过 schema 校验后直接作为最终交付物。
+                # 格式由 runtime 保证，不依赖模型记不记得住提示词。
+                fn = call.get("function") or {}
+                spec = self.registry.tools.get(fn.get("name") or "")
+                if spec is not None and spec.terminal and result.ok:
+                    return AgentResult(
+                        answer=fn.get("arguments") or "{}",
+                        status="ok",
+                        steps=step,
+                        usage=usage,
+                    )
+
                 body = result.content
                 if len(body) > MAX_TOOL_RESULT_CHARS:
                     body = body[:MAX_TOOL_RESULT_CHARS] + "\n...[结果过长已截断]"
