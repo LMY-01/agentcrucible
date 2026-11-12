@@ -123,7 +123,7 @@ class TestScoring(unittest.TestCase):
     def test_drag_lists_offenders(self):
         vs = [V("answer", FAIL), V("efficiency", PASS)]
         _, drag = task_score(vs)
-        self.assertEqual(drag, ["answer"])
+        self.assertEqual(drag, ["答案正确"])
 
     def test_run_score_gate(self):
         good = [V(s, PASS) for s in STAGE_WEIGHTS]
