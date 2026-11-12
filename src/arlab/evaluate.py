@@ -22,7 +22,10 @@ from .jsonx import dig as _dig
 from .jsonx import extract_json as _extract_json
 from .judge import diagnose as diagnose_failure
 from .report import write as write_report
+from .pricing import human as money
+from .pricing import load as load_pricing
 from .scoring import run_score
+from .trace import pct
 from .skills import SkillLoader
 from .stages import FAIL, NA, STAGES, WARN, aggregate, judge, load_events, to_dict
 from .tools.builtin import build_tools
@@ -125,7 +128,10 @@ def run_suite(args, tool_builder=None, predicates=None) -> int:
     fingerprint = None
     details = []  # 给报告用的完整现场，包含输入材料和标准答案
     judge_llm = LLM(base_url=args.base_url, model=getattr(args, "judge_model", None) or args.model)
-    print(f"评测 {len(tasks)} 条任务，模型 {args.model}，权限 {sorted(allow)}\n")
+    price = load_pricing(args.model, judge_llm.base_url, judge_llm.api_key)
+    print(f"评测 {len(tasks)} 条任务，模型 {args.model}，权限 {sorted(allow)}")
+    print(f"计价 {'已启用' if price.known else '未取到单价（成本将显示为 —）'}"
+          f"  prompt {price.prompt_per_token:.8f}/tok  completion {price.completion_per_token:.8f}/tok\n")
 
     for idx, task in enumerate(tasks, 1):
         workspace = Path(args.workspace) / task.get("workspace", "sandbox")
@@ -153,7 +159,7 @@ def run_suite(args, tool_builder=None, predicates=None) -> int:
         if registry.injector is not None:
             trace.emit("fault_injection", spec=registry.injector.describe())
         agent = Agent(LLM(base_url=args.base_url, model=args.model), registry,
-                      skills=skills, budget=budget, trace=trace)
+                      skills=skills, budget=budget, trace=trace, pricing=price)
 
         # 输入指纹：记录「这次跑的是哪一版 prompt / 技能 / 题集」
         if fingerprint is None:
@@ -199,6 +205,8 @@ def run_suite(args, tool_builder=None, predicates=None) -> int:
                 "tool_failed": summary["tool_failed"],
                 "tokens": summary["total_tokens"],
                 "wall_s": wall,
+                "ttft_ms": summary["ttft_ms_p50"],
+                "cost": summary["cost"],
                 "failures": failures,
                 "stages": to_dict(verdicts),
                 "control": is_control,
@@ -265,6 +273,28 @@ def run_suite(args, tool_builder=None, predicates=None) -> int:
     agg["stage_summary"] = aggregate(all_verdicts)
     agg["fingerprint"] = fingerprint
 
+    # ---- 三硬指标：准确率 / 延迟 / 成本 ----
+    walls = [r["wall_s"] for r in scored_rows]
+    ttfts = [r["ttft_ms"] for r in scored_rows if r.get("ttft_ms")]
+    total_cost = sum(r.get("cost", 0.0) for r in scored_rows)
+    agg["latency"] = {
+        "ttft_ms_p50": pct(ttfts, 0.5),
+        "ttft_ms_p95": pct(ttfts, 0.95),
+        "wall_s_p50": round(pct(walls, 0.5), 1),
+        "wall_s_p95": round(pct(walls, 0.95), 1),
+        "wall_s_p99": round(pct(walls, 0.99), 1),
+        "wall_s_avg": round(sum(walls) / len(walls), 1) if walls else 0.0,
+        "wall_s_max": round(max(walls), 1) if walls else 0.0,
+        "note": "任务级百分位；严格 P99 需 --repeat 多轮采样",
+    }
+    agg["cost"] = {
+        "total": round(total_cost, 8),
+        "per_task": round(total_cost / len(scored_rows), 8) if scored_rows else 0.0,
+        "currency": price.currency if price else "USD",
+        "priced": bool(price and price.known),
+        "prompt_tokens": sum(r["tokens"] for r in scored_rows),
+    }
+
     # ---- 质量分：最后才算，前两件事（找问题、给建议）都不该依赖它 ----
     score = run_score(all_verdicts, threshold=getattr(args, "threshold", 0.90))
     agg["score"] = score
@@ -305,6 +335,8 @@ def run_suite(args, tool_builder=None, predicates=None) -> int:
             },
             "score": score,
             "tier_scores": agg["tier_scores"],
+            "latency": agg["latency"],
+            "cost": agg["cost"],
             "fingerprint": fingerprint,
             "stages": agg["stage_summary"],
             "rows": details,
@@ -353,7 +385,19 @@ def run_suite(args, tool_builder=None, predicates=None) -> int:
             print(f"{_pad(names.get(tier, tier), 14)}{n:>5}{sc['quality']:>9.3f}{flag:>8}")
         print("-" * 62)
     gate = "✅ 可发布" if score["gate"] == "pass" else "❌ 未达及格线"
-    print(f"质量分 {score['quality']:.3f} / 及格线 {score['threshold']:.2f}   {gate}")
+    lat, cst = agg["latency"], agg["cost"]
+    print(f"\n{'三硬指标':<8}{'—' * 52}")
+    print(f"  准确率  质量分 {score['quality']:.3f}   通过 {passed}/{total}"
+          f"   闸门 {score['gate']}")
+    print(f"  延迟    TTFT {lat['ttft_ms_p50'] / 1000:.1f}s(P50) {lat['ttft_ms_p95'] / 1000:.1f}s(P95)"
+          f"   端到端 {lat['wall_s_p50']}s(P50) {lat['wall_s_p99']}s(P99) 最慢 {lat['wall_s_max']}s")
+    if cst["priced"]:
+        print(f"  成本    {money(cst['total'], cst['currency'])} 总计"
+              f" / {money(cst['per_task'], cst['currency'])} 每任务"
+              f"   共 {cst['prompt_tokens']} token")
+    else:
+        print(f"  成本    —（未取到单价）共 {cst['prompt_tokens']} token")
+    print(f"\n质量分 {score['quality']:.3f} / 及格线 {score['threshold']:.2f}   {gate}")
     if score["drag_counter"]:
         print("主要失分环节：" + "、".join(f"{k}×{v}" for k, v in score["drag_counter"].items()))
     if error_types:

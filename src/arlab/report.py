@@ -14,6 +14,7 @@ import os
 from datetime import datetime
 
 from .judge import ERROR_TYPES
+from .pricing import human as money
 
 CSS = """
 :root{
@@ -235,6 +236,14 @@ def render(data: dict) -> str:
 
     cards = "".join(_card(r) for r in rows)
     tier_board = _tier_board(data.get("tier_scores") or {}, score["threshold"])
+    lat = data.get("latency") or {}
+    cst = data.get("cost") or {}
+    ttft_s = (lat.get("ttft_ms_p50") or 0) / 1000
+    ttft95 = (lat.get("ttft_ms_p95") or 0) / 1000
+    cost_cell = (money(cst.get("per_task", 0), cst.get("currency", "USD"))
+                 if cst.get("priced") else "—")
+    cost_note = (f"总计 {money(cst.get('total', 0), cst.get('currency', 'USD'))}"
+                 if cst.get("priced") else "未取到单价")
     fp = data.get("fingerprint") or {}
     fp_line = (f"输入指纹 {fp.get('combined', '未记录')} · "
                f"prompt {fp.get('system', {}).get('hash', '?')} · "
@@ -249,14 +258,18 @@ def render(data: dict) -> str:
 {total} 条任务 · 工具调用 {meta.get('tool_calls', 0)} 次 · 总 token {meta.get('tokens', 0)}</div>
 
 <div class="board">
-  <div class="kpi"><div class="k">质量分</div><div class="v {q_cls}">{q:.3f}</div>
-    <div class="muted" style="font-size:11.5px">及格线 {score['threshold']:.2f}</div></div>
+  <div class="kpi"><div class="k">准确率 · 质量分</div><div class="v {q_cls}">{q:.3f}</div>
+    <div class="muted" style="font-size:11.5px">及格线 {score['threshold']:.2f} · 通过 {passed}/{total}</div></div>
+  <div class="kpi"><div class="k">延迟 · 首字 TTFT</div><div class="v">{ttft_s:.1f}s</div>
+    <div class="muted" style="font-size:11.5px">P95 {ttft95:.1f}s</div></div>
+  <div class="kpi"><div class="k">延迟 · 端到端</div><div class="v">{lat.get('wall_s_p50', 0)}s</div>
+    <div class="muted" style="font-size:11.5px">P99 {lat.get('wall_s_p99', 0)}s · 最慢 {lat.get('wall_s_max', 0)}s</div></div>
+  <div class="kpi"><div class="k">成本 · 每任务</div><div class="v">{cost_cell}</div>
+    <div class="muted" style="font-size:11.5px">{_esc(cost_note)}</div></div>
   <div class="kpi"><div class="k">上线闸门</div>
     <div class="v"><span class="gate {gate_cls}">{gate_txt}</span></div></div>
-  <div class="kpi"><div class="k">通过</div><div class="v">{passed}/{total}</div></div>
-  <div class="kpi"><div class="k">最低单任务分</div><div class="v">{score['worst']:.3f}</div></div>
   <div class="kpi"><div class="k">主要失分环节</div>
-    <div class="v" style="font-size:14px;font-weight:500">{_esc(drag_line)}</div></div>
+    <div class="v" style="font-size:13px;font-weight:500">{_esc(drag_line)}</div></div>
 </div>
 
 {tier_board}

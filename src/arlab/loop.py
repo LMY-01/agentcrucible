@@ -67,6 +67,7 @@ class Agent:
         budget: Budget | None = None,
         trace: Trace | None = None,
         extra_system: str = "",
+        pricing=None,
     ) -> None:
         self.llm = llm
         self.registry = registry
@@ -74,6 +75,7 @@ class Agent:
         self.budget = budget or Budget()
         self.trace = trace
         self.extra_system = extra_system
+        self.pricing = pricing  # Pricing 或 None；用于把 token 折成钱
 
     # ---- prompt ----------------------------------------------------
     def _system_prompt(self) -> str:
@@ -147,6 +149,11 @@ class Agent:
                     latency_ms=reply.latency_ms,
                     finish_reason=reply.raw_finish_reason,
                     tools_offered=[t["function"]["name"] for t in tools],
+                    ttft_ms=reply.ttft_ms,
+                    reasoning_tokens=reply.reasoning_tokens,
+                    cost=(self.pricing.cost(reply.usage.prompt_tokens,
+                                            reply.usage.completion_tokens)
+                          if self.pricing else 0.0),
                 )
 
             msg = reply.message
