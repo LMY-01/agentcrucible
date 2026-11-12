@@ -75,11 +75,25 @@ def _dig(data: Any, path: str) -> Any:
     return cur
 
 
-def _check(checks: list[dict], answer: str, workspace: Path) -> tuple[bool, list[str]]:
-    """逐条断言。目前支持三种：answer_contains / file_exists / file_contains。"""
+def _check(checks: list[dict], answer: str, workspace: Path,
+           predicates: dict[str, Any] | None = None) -> tuple[bool, list[str]]:
+    """逐条断言。predicates 是应用层注册的自定义谓词，返回 None=通过，返回字符串=失败原因。
+
+    目前支持：answer_contains / answer_contains_any / json_field /
+    file_exists / file_contains / predicate
+    """
     failures: list[str] = []
     for c in checks:
         kind = c.get("type")
+        if kind == "predicate":
+            fn = (predicates or {}).get(c.get("name", ""))
+            if fn is None:
+                failures.append(f"未注册的谓词 {c.get('name')!r}")
+                continue
+            reason = fn(answer, c)
+            if reason:
+                failures.append(reason)
+            continue
         if kind == "answer_contains":
             need = c["value"]
             if need.lower() not in answer.lower():
@@ -120,7 +134,7 @@ def _check(checks: list[dict], answer: str, workspace: Path) -> tuple[bool, list
     return (not failures), failures
 
 
-def run_suite(args) -> int:
+def run_suite(args, tool_builder=None, predicates=None) -> int:
     tasks_path = Path(args.tasks)
     tasks = json.loads(tasks_path.read_text(encoding="utf-8"))
     if args.limit:
@@ -145,7 +159,8 @@ def run_suite(args) -> int:
             target.write_text(content, encoding="utf-8")
 
         registry = Registry(allow=allow)
-        for tool in build_tools(str(workspace), skill_loader=skills):
+        builder = tool_builder or (lambda ws, sk: build_tools(ws, skill_loader=sk))
+        for tool in builder(str(workspace), skills):
             registry.register(tool)
 
         budget = Budget(
@@ -162,7 +177,7 @@ def run_suite(args) -> int:
         started = time.time()
         result = agent.run(task["prompt"])
         wall = round(time.time() - started, 2)
-        ok, failures = _check(task.get("checks", []), result.answer, workspace)
+        ok, failures = _check(task.get("checks", []), result.answer, workspace, predicates)
         summary = trace.summarize()
         trace.close(ok=ok, failures=failures, answer=result.answer,
                     status=result.status, reason=result.reason, **summary)

@@ -1,0 +1,175 @@
+[
+  {
+    "id": "g01_rag_problems",
+    "workspace": "kb",
+    "prompt": "RAG 主要解决大模型的哪两个问题？",
+    "reference_answer": "幻觉问题（生成不正确、荒谬或与事实不符的结果）；数据新鲜度（对时效性强的问题给出过时答案）。",
+    "reference_note": "源自 kb-lab/data/qa.json 第 0 题。要点：幻觉、数据新鲜度。",
+    "require_explore": false,
+    "expected_skills": ["retrieval-qa"],
+    "stage_limits": { "steps": 8, "tokens": 25000 },
+    "checks": [
+      { "type": "predicate", "name": "not_refused" },
+      { "type": "predicate", "name": "answer_covers", "must": ["幻觉", "数据新鲜度"], "min_hit": 2 },
+      { "type": "predicate", "name": "citations_grounded" }
+    ]
+  },
+  {
+    "id": "g02_hyde_idea",
+    "workspace": "kb",
+    "prompt": "HYDE 这个召回策略的思路是什么？",
+    "reference_answer": "用 LLM 根据用户 query 生成 k 个假答案，把假答案和 query 一起向量化后取平均，用融合向量去文档库召回。",
+    "reference_note": "qa.json 第 2 题。要点：生成假答案。",
+    "require_explore": false,
+    "expected_skills": ["retrieval-qa"],
+    "stage_limits": { "steps": 8, "tokens": 25000 },
+    "checks": [
+      { "type": "predicate", "name": "not_refused" },
+      { "type": "predicate", "name": "answer_covers", "must": ["假答案"], "min_hit": 1 },
+      { "type": "predicate", "name": "citations_grounded" }
+    ]
+  },
+  {
+    "id": "g03_hyde_weak",
+    "workspace": "kb",
+    "prompt": "HYDE 在什么情况下效果不好，甚至起反作用？",
+    "reference_answer": "结合微调过的向量化模型时效果变差；非常依赖辅助 LLM 的能力，用小模型（小于 52B）生成假答案甚至会带来负面影响。",
+    "reference_note": "qa.json 第 3 题。要点：微调。",
+    "require_explore": false,
+    "expected_skills": ["retrieval-qa"],
+    "stage_limits": { "steps": 8, "tokens": 25000 },
+    "checks": [
+      { "type": "predicate", "name": "not_refused" },
+      { "type": "predicate", "name": "answer_covers", "must": ["微调"], "min_hit": 1 },
+      { "type": "predicate", "name": "citations_grounded" }
+    ]
+  },
+  {
+    "id": "g04_lora_core",
+    "workspace": "kb",
+    "prompt": "LoRA 的核心思想是什么？",
+    "reference_answer": "通过低秩分解模拟参数的改变量，以极小的参数量实现大模型的间接训练。",
+    "reference_note": "qa.json 第 6 题。要点：低秩。",
+    "require_explore": false,
+    "expected_skills": ["retrieval-qa"],
+    "stage_limits": { "steps": 8, "tokens": 25000 },
+    "checks": [
+      { "type": "predicate", "name": "not_refused" },
+      { "type": "predicate", "name": "answer_covers", "must": ["低秩"], "min_hit": 1 },
+      { "type": "predicate", "name": "citations_grounded" }
+    ]
+  },
+  {
+    "id": "g05_lora_init",
+    "workspace": "kb",
+    "prompt": "LoRA 里 A 和 B 两个矩阵分别怎么初始化，为什么要这样？",
+    "reference_answer": "A 用高斯函数初始化，B 初始化为零矩阵，这样训练开始时 BA=0，新增通路对模型输出没有影响。",
+    "reference_note": "qa.json 第 7 题。要点：高斯、零矩阵（或 BA=0）。",
+    "require_explore": false,
+    "expected_skills": ["retrieval-qa"],
+    "stage_limits": { "steps": 8, "tokens": 25000 },
+    "checks": [
+      { "type": "predicate", "name": "not_refused" },
+      { "type": "predicate", "name": "answer_covers", "must": ["高斯", "零矩阵", "BA=0"], "min_hit": 2 },
+      { "type": "predicate", "name": "citations_grounded" }
+    ]
+  },
+  {
+    "id": "g06_decoder_only",
+    "workspace": "kb",
+    "prompt": "为什么现在的大模型基本都是 Decoder-only 架构？",
+    "reference_answer": "encoder 存在低秩问题；decoder-only 无需 tuning 数据即可 zero-shot 表现好；支持复用 KV-Cache，对多轮对话友好。",
+    "reference_note": "qa.json 第 9 题。要点：KV-Cache（或 encoder 低秩）。",
+    "require_explore": false,
+    "expected_skills": ["retrieval-qa"],
+    "stage_limits": { "steps": 8, "tokens": 25000 },
+    "checks": [
+      { "type": "predicate", "name": "not_refused" },
+      { "type": "predicate", "name": "answer_covers", "must": ["KV-Cache", "KV Cache", "低秩"], "min_hit": 1 },
+      { "type": "predicate", "name": "citations_grounded" }
+    ]
+  },
+  {
+    "id": "g07_paged_attention",
+    "workspace": "kb",
+    "prompt": "用了 PagedAttention 之后，KV 缓存的内存浪费率能降到多少？",
+    "reference_answer": "浪费只发生在序列最后一个块，内存使用接近最优，浪费率低于 4%。",
+    "reference_note": "qa.json 第 11 题。要点：4%。",
+    "require_explore": false,
+    "expected_skills": ["retrieval-qa"],
+    "stage_limits": { "steps": 8, "tokens": 25000 },
+    "checks": [
+      { "type": "predicate", "name": "not_refused" },
+      { "type": "predicate", "name": "answer_covers", "must": ["4%"], "min_hit": 1 },
+      { "type": "predicate", "name": "citations_grounded" }
+    ]
+  },
+  {
+    "id": "g08_react",
+    "workspace": "kb",
+    "prompt": "ReAct 框架把哪两种东西交错生成结合在一起？",
+    "reference_answer": "推理轨迹（reasoning trace）和任务特定操作（action），以便与外部源交互收集信息。",
+    "reference_note": "qa.json 第 17 题。要点：推理/思考 + 动作/操作。",
+    "require_explore": false,
+    "expected_skills": ["retrieval-qa"],
+    "stage_limits": { "steps": 8, "tokens": 25000 },
+    "checks": [
+      { "type": "predicate", "name": "not_refused" },
+      { "type": "predicate", "name": "answer_covers", "must": ["推理", "思考"], "min_hit": 1 },
+      { "type": "predicate", "name": "answer_covers", "must": ["操作", "动作", "行为"], "min_hit": 1 },
+      { "type": "predicate", "name": "citations_grounded" }
+    ]
+  },
+  {
+    "id": "g09_refuse_version",
+    "workspace": "kb",
+    "prompt": "vLLM 0.4.2 版本的更新日志里修复了哪些 bug？",
+    "reference_answer": "资料中没有 vLLM 0.4.2 的更新日志内容，无法回答。",
+    "reference_note": "qa.json 第 18 题，拒答样本。",
+    "require_explore": false,
+    "expected_skills": [],
+    "stage_limits": { "steps": 8, "tokens": 25000 },
+    "checks": [
+      { "type": "predicate", "name": "states_missing" }
+    ]
+  },
+  {
+    "id": "g10_refuse_dim",
+    "workspace": "kb",
+    "prompt": "BGE-M3 模型输出的向量维度是多少？",
+    "reference_answer": "资料中没有提到 BGE-M3 模型或它的向量维度。",
+    "reference_note": "qa.json 第 19 题，拒答样本。资料里可能是别的 embedding 模型，注意别串。",
+    "require_explore": false,
+    "expected_skills": [],
+    "stage_limits": { "steps": 8, "tokens": 25000 },
+    "checks": [
+      { "type": "predicate", "name": "states_missing" }
+    ]
+  },
+  {
+    "id": "g11_refuse_aime",
+    "workspace": "kb",
+    "prompt": "OpenAI o1 在 AIME 2024 上的准确率是多少？",
+    "reference_answer": "资料中没有给出 OpenAI o1 在 AIME 2024 上的准确率。",
+    "reference_note": "qa.json 第 20 题，拒答样本。",
+    "require_explore": false,
+    "expected_skills": [],
+    "stage_limits": { "steps": 8, "tokens": 25000 },
+    "checks": [
+      { "type": "predicate", "name": "states_missing" }
+    ]
+  },
+  {
+    "id": "g12_refuse_count",
+    "workspace": "kb",
+    "prompt": "这个知识库总共收录了多少篇文档？",
+    "reference_answer": "资料中没有关于本知识库文档总数的信息。",
+    "reference_note": "qa.json 第 21 题，拒答样本。这题容易被模型的元认知带偏（它会想说'我不知道我的语料有多少'）。",
+    "require_explore": false,
+    "expected_skills": [],
+    "stage_limits": { "steps": 8, "tokens": 25000 },
+    "checks": [
+      { "type": "predicate", "name": "states_missing" }
+    ]
+  }
+]
