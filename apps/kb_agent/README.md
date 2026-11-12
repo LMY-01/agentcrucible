@@ -165,6 +165,54 @@ if ctx.get("status") == "budget_exhausted":
 
 在实现之前，任何「A 比 B 好 0.05」的结论都是不成立的——0.05 完全在抖动范围内。
 
+## 交付方式：用工具而不是提示词约束格式
+
+初版是把输出格式写进提示词（「最后只输出一个 JSON」），结果格式遵循率在 **8/12 到 12/12 之间抖**——
+同一份 prompt 同一套题，模型有时候就是不肯包 JSON。
+
+后来发现根因：格式要求写在**技能**里，而技能是「按需加载」的。模型为了省一步跳过 `load_skill`，
+就同时丢掉了格式知识。
+
+修法不是加一句「必须输出 JSON」，而是换机制——加一个**终止型工具** `submit_answer`：
+
+```python
+@dataclass
+class Tool:
+    ...
+    terminal: bool = False   # 调用即结束本轮，参数就是最终交付物
+```
+
+它的参数 schema 就是交付契约：
+
+```json
+{
+  "answer":    {"type": "string"},
+  "citations": {"type": "array"},
+  "refused":   {"type": "boolean"}
+}
+```
+
+三个必填，缺一个就被 `validate()` 打回，模型收到错误后重试。**格式由 runtime 保证，不靠模型记性。**
+
+效果对比（同为 2 条任务）：
+
+| | 输出格式 | 说明 |
+|---|---|---|
+| 提示词约束 | 8~12/12 抖动 | 依赖模型是否加载了技能 |
+| `submit_answer` | **2/2 PASS** | 其中一条技能召回 FAIL，格式仍然 PASS |
+
+最后一行是关键证据：**格式已经和技能加载解耦了**。模型不知道格式也能提交成功，因为工具 schema
+把格式变成了调用参数的类型检查。
+
+trace 里的标准流程：
+
+```
+step1  load_skill + kb_search   (并行)
+step2  kb_read × 2              (并行)
+step3  cite_check × 4           (并行)
+step4  submit_answer            {answer, citations, refused}
+```
+
 ## 用法
 
 ```bash
