@@ -13,6 +13,7 @@ import time
 from pathlib import Path
 from typing import Any
 
+from . import fingerprint as fp
 from .budget import Budget
 from .llm import LLM
 from .loop import Agent
@@ -139,8 +140,14 @@ def _check(checks: list[dict], answer: str, workspace: Path,
 
 
 def run_suite(args, tool_builder=None, predicates=None) -> int:
-    tasks_path = Path(args.tasks)
-    tasks = json.loads(tasks_path.read_text(encoding="utf-8"))
+    # 支持多份题集：--tasks gold.json,silver.json —— 两份一起跑，分账统计
+    task_files = [Path(p.strip()) for p in str(args.tasks).split(",") if p.strip()]
+    tasks: list[dict] = []
+    for tf in task_files:
+        if not tf.exists():
+            print(f"题集不存在: {tf}")
+            return 1
+        tasks.extend(json.loads(tf.read_text(encoding="utf-8")))
     if args.limit:
         tasks = tasks[: args.limit]
 
@@ -150,6 +157,8 @@ def run_suite(args, tool_builder=None, predicates=None) -> int:
     out_root = Path(args.runs)
     rows = []
     all_verdicts = []
+    verdicts_by_tier: dict[str, list] = {}
+    fingerprint = None
     details = []  # 给报告用的完整现场，包含输入材料和标准答案
     judge_llm = LLM(base_url=args.base_url, model=getattr(args, "judge_model", None) or args.model)
     print(f"评测 {len(tasks)} 条任务，模型 {args.model}，权限 {sorted(allow)}\n")
@@ -178,6 +187,19 @@ def run_suite(args, tool_builder=None, predicates=None) -> int:
         agent = Agent(LLM(base_url=args.base_url, model=args.model), registry,
                       skills=skills, budget=budget, trace=trace)
 
+        # 输入指纹：记录「这次跑的是哪一版 prompt / 技能 / 题集」
+        if fingerprint is None:
+            fingerprint = fp.collect(
+                system_prompt=agent._system_prompt(),
+                skills_dir=args.skills,
+                tasks_path=args.tasks,
+                model=args.model,
+                runtime_params={"max_steps": args.max_steps,
+                                "max_tokens": args.max_tokens,
+                                "max_seconds": args.max_seconds},
+            )
+            trace.emit("fingerprint", **fingerprint)
+
         started = time.time()
         result = agent.run(task["prompt"])
         wall = round(time.time() - started, 2)
@@ -196,6 +218,7 @@ def run_suite(args, tool_builder=None, predicates=None) -> int:
         is_control = bool(task.get("control"))
         if not is_control:
             all_verdicts.append(verdicts)  # 对照组不参与任何统计
+            verdicts_by_tier.setdefault(task.get("tier", "gold"), []).append(verdicts)
         issues = [v for v in verdicts if v.level in (WARN, FAIL)]
 
         rows.append(
@@ -272,10 +295,22 @@ def run_suite(args, tool_builder=None, predicates=None) -> int:
         round(agg["tool_failed"] / agg["tool_calls"], 3) if agg["tool_calls"] else 0.0
     )
     agg["stage_summary"] = aggregate(all_verdicts)
+    agg["fingerprint"] = fingerprint
 
     # ---- 质量分：最后才算，前两件事（找问题、给建议）都不该依赖它 ----
     score = run_score(all_verdicts, threshold=getattr(args, "threshold", 0.90))
     agg["score"] = score
+
+    # 分档统计：黄金集定验收线，白银集看回归涨跌，两者不混算
+    tier_scores = {
+        t: run_score(v, threshold=getattr(args, "threshold", 0.90))
+        for t, v in verdicts_by_tier.items()
+    }
+    agg["tier_scores"] = {
+        t: {**{k: v for k, v in s.items() if k != "per_task"},
+            "tasks": len(verdicts_by_tier[t])}
+        for t, s in tier_scores.items()
+    }
     si = 0
     for row in details:
         if row.get("control"):
@@ -301,6 +336,8 @@ def run_suite(args, tool_builder=None, predicates=None) -> int:
                 "tokens": sum(r["tokens"] for r in rows),
             },
             "score": score,
+            "tier_scores": agg["tier_scores"],
+            "fingerprint": fingerprint,
             "stages": agg["stage_summary"],
             "rows": details,
             "error_types": error_types,
@@ -339,6 +376,14 @@ def run_suite(args, tool_builder=None, predicates=None) -> int:
             print(f"  · {name}: {note}")
 
     print(f"\n{'=' * 62}")
+    if len(tier_scores) > 1:
+        names = {"gold": "黄金集·验收", "silver": "白银集·回归"}
+        print(f"{_pad('分档', 14)}{'条数':>5}{'质量分':>9}{'闸门':>8}")
+        for tier, sc in tier_scores.items():
+            n = len(verdicts_by_tier[tier])
+            flag = "✅" if sc["gate"] == "pass" else "❌"
+            print(f"{_pad(names.get(tier, tier), 14)}{n:>5}{sc['quality']:>9.3f}{flag:>8}")
+        print("-" * 62)
     gate = "✅ 可发布" if score["gate"] == "pass" else "❌ 未达及格线"
     print(f"质量分 {score['quality']:.3f} / 及格线 {score['threshold']:.2f}   {gate}")
     if score["drag_counter"]:

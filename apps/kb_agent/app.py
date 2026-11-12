@@ -29,6 +29,7 @@ from .kb_tools import build_kb_tools, _store
 APP_ROOT = Path(__file__).resolve().parent
 SKILLS_DIR = APP_ROOT / "skills"
 GOLD_PATH = APP_ROOT / "eval" / "gold.json"
+SILVER_PATH = APP_ROOT / "eval" / "silver.json"
 RUNS_DIR = APP_ROOT / "runs"
 
 DOMAIN_PROMPT = """你是一个技术文档问答助手，只能依据知识库里的资料回答。
@@ -110,6 +111,24 @@ def pred_not_refused(answer: str, spec: dict, ctx: dict | None = None) -> str | 
     return None
 
 
+def pred_chunk_hit(answer: str, spec: dict, ctx: dict | None = None) -> str | None:
+    """白银集用：引用必须命中期望的块（本块或同文档后继块）。
+
+    白银集的期望值由块序号程序推出，所以这条判据完全不需要人写答案。
+    """
+    data, cites = _citations(answer)
+    if data is None:
+        return "答案不是可解析的 JSON"
+    expected = {e for e in (spec.get("expected") or []) if isinstance(e, str)}
+    if not expected:
+        return "白银任务缺少 expected 字段"
+    got = {c["chunk_id"] for c in cites
+           if isinstance(c, dict) and isinstance(c.get("chunk_id"), str)}
+    if got & expected:
+        return None
+    return f"引用未命中期望块。期望之一 {sorted(expected)[:2]}，实际 {sorted(got)[:3]}"
+
+
 def pred_states_missing(answer: str, spec: dict, ctx: dict | None = None) -> str | None:
     """资料里确实没有时：要么标 refused，要么在正文里说明缺失。
 
@@ -137,6 +156,7 @@ PREDICATES = {
     "answer_covers": pred_answer_covers,
     "not_refused": pred_not_refused,
     "states_missing": pred_states_missing,
+    "chunk_hit": pred_chunk_hit,
 }
 
 
@@ -195,7 +215,7 @@ def cmd_eval(args) -> int:
     from arlab.evaluate import run_suite
 
     ns = argparse.Namespace(
-        tasks=str(GOLD_PATH),
+        tasks=f"{GOLD_PATH},{SILVER_PATH}",
         limit=args.limit,
         workspace=str(APP_ROOT / "workspace"),
         skills=str(SKILLS_DIR),

@@ -196,6 +196,25 @@ def _card(row: dict) -> str:
 </article>"""
 
 
+def _tier_board(tier_scores: dict, threshold: float) -> str:
+    if not tier_scores or len(tier_scores) < 2:
+        return ""
+    names = {"gold": "黄金集 · 验收", "silver": "白银集 · 回归"}
+    rows = []
+    for tier, sc in tier_scores.items():
+        rate = sc["quality"]
+        cls = "ok" if rate >= threshold else ("warn" if rate >= threshold - 0.1 else "fail")
+        badge = "可发布" if sc["gate"] == "pass" else "未达线"
+        rows.append(
+            f"<tr><td>{_esc(names.get(tier, tier))}</td>"
+            f"<td class='num'>{sc.get('tasks', '—')}</td>"
+            f"<td class='num' style='color:var(--{cls})'>{rate:.3f}</td>"
+            f"<td><span class='gate {sc['gate']}'>{badge}</span></td></tr>"
+        )
+    return ("<h2>分档质量</h2><table><tr><th>数据集</th><th class='num'>质量分</th>"
+            "<th class='num'>分数</th><th>闸门</th></tr>" + "".join(rows) + "</table>")
+
+
 def render(data: dict) -> str:
     meta = data["meta"]
     score = data["score"]
@@ -215,6 +234,11 @@ def render(data: dict) -> str:
     drag_line = "、".join(f"{k}×{v}" for k, v in score["drag_counter"].items()) or "无"
 
     cards = "".join(_card(r) for r in rows)
+    tier_board = _tier_board(data.get("tier_scores") or {}, score["threshold"])
+    fp = data.get("fingerprint") or {}
+    fp_line = (f"输入指纹 {fp.get('combined', '未记录')} · "
+               f"prompt {fp.get('system', {}).get('hash', '?')} · "
+               f"技能 {len(fp.get('skills') or {})} 个 · 题集 {fp.get('tasks', '?')}")
 
     return f"""<!DOCTYPE html>
 <html lang="zh-CN"><head><meta charset="utf-8">
@@ -235,6 +259,8 @@ def render(data: dict) -> str:
     <div class="v" style="font-size:14px;font-weight:500">{_esc(drag_line)}</div></div>
 </div>
 
+{tier_board}
+
 <h2>阶段漏斗</h2>
 <table>
 <tr><th>阶段</th><th class="num">PASS</th><th class="num">WARN</th><th class="num">FAIL</th>
@@ -249,8 +275,10 @@ def render(data: dict) -> str:
 {cards}
 
 <footer>
-判分：确定性断言（json_field / answer_contains / file_exists），不调模型，可复现。<br>
-归因：LLM-as-a-Judge 读失败轨迹产出，属于假设，带置信度，仅供参考，不影响分数。
+判分：确定性断言（json_field / answer_contains / file_exists / predicate），不调模型，可复现。<br>
+归因：LLM-as-a-Judge 读失败轨迹产出，属于假设，带置信度，仅供参考，不影响分数。<br>
+<span class="mono">{_esc(fp_line)}</span><br>
+指纹一致才说明这份分数对应的是当前这版 prompt——改一个字也应该重跑。
 </footer>
 </body></html>"""
 
