@@ -103,6 +103,10 @@ class Registry:
     def names(self) -> list[str]:
         return sorted(self.tools)
 
+    def has_terminal(self) -> bool:
+        """是否存在「调用即交付」的终止型工具。"""
+        return any(t.terminal for t in self.tools.values())
+
     def schemas(self) -> list[dict]:
         return [self.tools[n].openai_schema() for n in self.names()]
 

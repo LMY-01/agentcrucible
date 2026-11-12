@@ -118,6 +118,7 @@ class Agent:
         ]
         usage = Usage()
         nudged = False
+        pushed_submit = False
 
         while True:
             reason = self.budget.exhausted()
@@ -161,6 +162,20 @@ class Agent:
             content = (msg.get("content") or "").strip()
 
             if not tool_calls:
+                # 有终止型工具、模型却直接吐文本 —— 它绕过了交付通道。
+                # 推一次回去逼它走工具，但不无限推（只推一次，且预算用完时不推）。
+                if (self.registry.has_terminal() and content
+                        and not pushed_submit and not nudged):
+                    pushed_submit = True
+                    messages.append({"role": "assistant", "content": content})
+                    messages.append({
+                        "role": "user",
+                        "content": ("你没有调用 submit_answer，直接输出的文本不会被采纳。"
+                                    "请立即调用 submit_answer 工具提交答案，参数为 "
+                                    "answer / citations / refused。"),
+                    })
+                    continue
+
                 status = "budget_exhausted" if nudged else "ok"
                 return AgentResult(
                     answer=content or "(模型返回空)",
