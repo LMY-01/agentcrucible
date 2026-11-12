@@ -42,9 +42,9 @@ SYSTEM_TEMPLATE = """你是一个会使用工具的智能体，运行在一个�
 """
 
 FINISH_NUDGE = (
-    "预算已耗尽（原因：{reason}）。工具已关闭。"
-    "请立刻基于你已经获得的信息，给出尽可能完整的最终答案；"
-    "确实缺的部分，直接说明缺什么，不要编造。"
+    "预算已耗尽（原因：{reason}）。检索类工具已关闭，但交付通道仍然开放。"
+    "请立刻调用 submit_answer 提交你已有的结论；确实缺的部分，在 answer 里直接说明缺什么，不要编造。"
+    "直接输出文本不会被采纳。"
 )
 
 
@@ -134,7 +134,10 @@ class Agent:
                         reason=reason,
                     )
                 messages.append({"role": "user", "content": FINISH_NUDGE.format(reason=reason)})
-                tools = []
+                # 收尾时关掉检索类工具（继续调用只会更贵），但保留交付通道。
+                # 之前这里是 tools=[]，等于把 submit_answer 也关了，
+                # 导致模型只能裸输出文本，格式必然失败 —— 实测 g01 连续三轮栽在这上面。
+                tools = self.registry.terminal_schemas()
                 nudged = True
 
             reply = self.llm.chat(messages, tools=tools)

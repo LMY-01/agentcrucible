@@ -107,6 +107,10 @@ class Registry:
         """是否存在「调用即交付」的终止型工具。"""
         return any(t.terminal for t in self.tools.values())
 
+    def terminal_schemas(self) -> list[dict]:
+        """只留终止型工具。预算耗尽收尾时用——关掉检索，但不关交付通道。"""
+        return [t.openai_schema() for name, t in sorted(self.tools.items()) if t.terminal]
+
     def schemas(self) -> list[dict]:
         return [self.tools[n].openai_schema() for n in self.names()]
 
