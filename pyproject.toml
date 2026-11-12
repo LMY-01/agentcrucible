@@ -1,0 +1,19 @@
+[project]
+name = "arlab"
+version = "0.1.0"
+description = "轻量 Agent Runtime：skill 渐进披露、工具权限分级、预算降级、轨迹落盘、断言式评测"
+requires-python = ">=3.11"
+dependencies = []          # 刻意零第三方依赖：标准库就能跑
+
+[project.scripts]
+arlab = "arlab.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+arlab = ["py.typed"]
