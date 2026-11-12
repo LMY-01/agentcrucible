@@ -4,6 +4,18 @@
 
 零第三方依赖（纯标准库），任何 OpenAI 兼容端点都能跑。
 
+仓库分两层：
+
+```
+src/arlab/          通用运行时 —— 循环、预算、工具权限、技能加载、trace、8 阶段评测
+apps/kb_agent/      垂直应用 —— 技术文档检索问答，只换工具集和技能集，运行时零改动
+```
+
+垂直层的存在是为了回答「你用它做了什么」：同一套引擎，挂上 `kb_search/kb_read/cite_check`
+和 `retrieval-qa/refusal-policy`，就变成一个能带引用作答、能自查引用真伪、知道何时该拒答的问答 Agent。
+它的黄金集评分是 `质量分 0.923 / 12 条`，评测判据全是机械可核验的（引用能否在原文逐字找到），
+不需要领域专家判断答案对不对 —— 详见 [`apps/kb_agent/README.md`](apps/kb_agent/README.md)。
+
 ```
 任务
  └─ Agent.run()
