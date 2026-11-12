@@ -38,6 +38,9 @@ class Tool:
     # 终止型工具：调用即结束本轮，参数本身就是最终交付物。
     # 用工具而不是 prompt 约束输出格式——schema 校验是硬的，提示词是软的。
     terminal: bool = False
+    # 交付门禁：terminal 工具生效前跑一遍，返回 None 放行，返回字符串就拒绝并让模型改。
+    # 和事后判分的区别是「提交不进去」而不是「提交了扣分」。
+    validator: Callable[[dict], str | None] | None = None
 
     def openai_schema(self) -> dict:
         return {

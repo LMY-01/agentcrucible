@@ -129,5 +129,51 @@ class TestRefusalPredicates(GroundedBase):
         self.assertIsNone(pred_states_missing(ans, {}, {"status": "ok", "tokens": 12000}))
 
 
+class TestSubmissionGate(GroundedBase):
+    """交付门禁：编造的引用必须提交不进去，而不是提交后扣分。"""
+
+    def test_real_quote_passes(self):
+        from apps.kb_agent.kb_tools import validate_submission
+
+        payload = {"citations": [{"chunk_id": "c1", "quote": "通过低秩分解来模拟参数的改变量"}],
+                   "refused": False}
+        self.assertIsNone(validate_submission(payload))
+
+    def test_fabricated_quote_rejected(self):
+        from apps.kb_agent.kb_tools import validate_submission
+
+        payload = {"citations": [{"chunk_id": "c1", "quote": "这句话原文里没有"}], "refused": False}
+        reason = validate_submission(payload)
+        self.assertIsNotNone(reason, "编造的引文没被拦住")
+        self.assertIn("找不到", reason)
+
+    def test_bad_chunk_id_rejected(self):
+        from apps.kb_agent.kb_tools import validate_submission
+
+        payload = {"citations": [{"chunk_id": "不存在", "quote": "随便"}], "refused": False}
+        self.assertIn("不存在", validate_submission(payload) or "")
+
+    def test_no_citation_without_refusal_rejected(self):
+        from apps.kb_agent.kb_tools import validate_submission
+
+        payload = {"citations": [], "refused": False}
+        self.assertIsNotNone(validate_submission(payload))
+
+    def test_refusal_allows_empty_citations(self):
+        from apps.kb_agent.kb_tools import validate_submission
+
+        self.assertIsNone(validate_submission({"citations": [], "refused": True}))
+
+    def test_partial_fabrication_rejected(self):
+        """8 条真的 + 2 条假的，也要整单拒绝——这正是 silver_007 的实际情况。"""
+        from apps.kb_agent.kb_tools import validate_submission
+
+        cites = [{"chunk_id": "c1", "quote": "通过低秩分解来模拟参数的改变量"} for _ in range(8)]
+        cites += [{"chunk_id": "c1", "quote": "编的第九条"}, {"chunk_id": "c1", "quote": "编的第十条"}]
+        reason = validate_submission({"citations": cites, "refused": False})
+        self.assertIsNotNone(reason)
+        self.assertIn("找不到", reason)
+
+
 if __name__ == "__main__":
     unittest.main()

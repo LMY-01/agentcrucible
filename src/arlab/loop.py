@@ -204,6 +204,21 @@ class Agent:
                 fn = call.get("function") or {}
                 spec = self.registry.tools.get(fn.get("name") or "")
                 if spec is not None and spec.terminal and result.ok:
+                    # 交付门禁：validator 不通过就拒绝交付，把原因回填给模型改
+                    if spec.validator is not None:
+                        try:
+                            payload = json.loads(fn.get("arguments") or "{}")
+                        except json.JSONDecodeError:
+                            payload = {}
+                        reason = spec.validator(payload)
+                        if reason:
+                            messages.append({
+                                "role": "tool",
+                                "tool_call_id": call.get("id", ""),
+                                "content": f"提交被拒绝：{reason}\n请修正后重新调用 submit_answer。",
+                            })
+                            continue
+
                     return AgentResult(
                         answer=fn.get("arguments") or "{}",
                         status="ok",

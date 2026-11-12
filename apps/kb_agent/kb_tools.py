@@ -104,6 +104,47 @@ def submit_answer(answer: str, citations: list, refused: bool) -> str:
     return "已提交"
 
 
+def validate_submission(payload: dict) -> str | None:
+    """交付门禁：每条引文必须能在对应 chunk 里逐字找到，否则提交不进去。
+
+    为什么必须在交付时校验，而不是事后判分：
+    实测 silver_007 调了 8 次 cite_check 全部通过，却提交了 10 条引用——
+    多出的 2 条从没检查过，而且是编的。cite_check 是建议性的，模型可以跳过；
+    只有把校验放进交付路径，"引用可溯源"才是运行时保证的性质。
+    """
+    cites = payload.get("citations")
+    if not isinstance(cites, list):
+        return "citations 必须是数组"
+    refused = payload.get("refused") is True
+    if not cites and not refused:
+        return "没有给任何引用，也没标 refused=true：要么给出处，要么明确说资料不足"
+
+    store = _store()
+    bad: list[str] = []
+    for i, c in enumerate(cites, 1):
+        if not isinstance(c, dict):
+            bad.append(f"第 {i} 条不是对象")
+            continue
+        quote = (c.get("quote") or "").strip()
+        cid = (c.get("chunk_id") or "").strip()
+        if not quote or not cid:
+            bad.append(f"第 {i} 条缺 quote 或 chunk_id")
+            continue
+        try:
+            text = store.chunk(cid).text
+        except KeyError:
+            bad.append(f"第 {i} 条的 chunk_id 不存在：{cid[:36]}")
+            continue
+        if quote not in text:
+            bad.append(f"第 {i} 条的引文在原文里找不到：{quote[:36]!r}")
+
+    if bad:
+        head = "；".join(bad[:4])
+        tail = f"（另有 {len(bad) - 4} 条）" if len(bad) > 4 else ""
+        return f"{head}{tail}。请用 kb_read 重新读取并逐字复制原句。"
+    return None
+
+
 def build_kb_tools() -> list[Tool]:
     return [
         Tool(
@@ -185,5 +226,6 @@ def build_kb_tools() -> list[Tool]:
             handler=submit_answer,
             permission=READ,
             terminal=True,
+            validator=validate_submission,
         ),
     ]
