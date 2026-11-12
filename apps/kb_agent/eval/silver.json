@@ -13,7 +13,7 @@
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 57472
     },
     "checks": [
       {
@@ -59,7 +59,7 @@
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 57472
     },
     "checks": [
       {
@@ -101,7 +101,7 @@
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 57472
     },
     "checks": [
       {
@@ -145,7 +145,7 @@
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 57472
     },
     "checks": [
       {
@@ -187,7 +187,7 @@
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 57472
     },
     "checks": [
       {
@@ -228,7 +228,7 @@
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 57472
     },
     "checks": [
       {
@@ -269,7 +269,7 @@
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 57472
     },
     "checks": [
       {
@@ -317,7 +317,7 @@
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 57472
     },
     "checks": [
       {
@@ -361,7 +361,7 @@
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 57472
     },
     "checks": [
       {
@@ -402,7 +402,7 @@
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 57472
     },
     "checks": [
       {
@@ -443,7 +443,7 @@
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 57472
     },
     "checks": [
       {
@@ -484,7 +484,7 @@
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 57472
     },
     "checks": [
       {
@@ -528,7 +528,7 @@
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 57472
     },
     "checks": [
       {
@@ -571,7 +571,7 @@
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 57472
     },
     "checks": [
       {
@@ -612,7 +612,7 @@
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 57472
     },
     "checks": [
       {
@@ -651,7 +651,7 @@
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 57472
     },
     "checks": [
       {
@@ -696,7 +696,7 @@
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 57472
     },
     "checks": [
       {
@@ -738,7 +738,7 @@
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 57472
     },
     "checks": [
       {
@@ -778,7 +778,7 @@
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 57472
     },
     "checks": [
       {
@@ -817,7 +817,7 @@
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 57472
     },
     "checks": [
       {
@@ -863,7 +863,7 @@
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 57472
     },
     "checks": [
       {
@@ -905,7 +905,7 @@
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 57472
     },
     "checks": [
       {
@@ -947,7 +947,7 @@
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 57472
     },
     "checks": [
       {
@@ -991,7 +991,7 @@
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 57472
     },
     "checks": [
       {
@@ -1034,7 +1034,7 @@
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 57472
     },
     "checks": [
       {
@@ -1080,7 +1080,7 @@
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 57472
     },
     "checks": [
       {
@@ -1125,7 +1125,7 @@
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 57472
     },
     "checks": [
       {
@@ -1166,7 +1166,7 @@
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 57472
     },
     "checks": [
       {
@@ -1207,7 +1207,7 @@
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 57472
     },
     "checks": [
       {
@@ -1251,7 +1251,7 @@
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 57472
     },
     "checks": [
       {
@@ -1291,7 +1291,7 @@
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 57472
     },
     "checks": [
       {
@@ -1335,7 +1335,7 @@
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 57472
     },
     "checks": [
       {
@@ -1379,7 +1379,7 @@
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 57472
     },
     "checks": [
       {
@@ -1419,7 +1419,7 @@
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 57472
     },
     "checks": [
       {
@@ -1463,7 +1463,7 @@
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 57472
     },
     "checks": [
       {
@@ -1510,7 +1510,7 @@
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 57472
     },
     "checks": [
       {
@@ -1558,7 +1558,7 @@
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 57472
     },
     "checks": [
       {
@@ -1600,7 +1600,7 @@
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 57472
     },
     "checks": [
       {
@@ -1644,7 +1644,7 @@
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 57472
     },
     "checks": [
       {
@@ -1686,7 +1686,7 @@
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 57472
     },
     "checks": [
       {
