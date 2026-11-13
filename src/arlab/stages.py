@@ -100,7 +100,13 @@ def _missed_read(tools: list[dict]) -> list[dict]:
     return [t for t in tools if t.get("name") == "read_file" and not t.get("ok")]
 
 
-def judge(events: list[dict], task: dict) -> list[Verdict]:
+def judge(events: list[dict], task: dict, ctx: dict | None = None) -> list[Verdict]:
+    """ctx 传运行时事实（status / steps / tokens / available_tools / fault_injected）。
+
+    没有它的时候这些阶段只能靠猜；有了才能区分「做对了」和「碰巧看起来对」，
+    以及「没加载技能」到底是失误还是本次根本没提供技能。
+    """
+    ctx = ctx or {}
     tools = _tool_events(events)
     end = next((e for e in events if e["event"] == "run_end"), {})
     limits = task.get("stage_limits") or {}
@@ -213,8 +219,13 @@ def judge(events: list[dict], task: dict) -> list[Verdict]:
     # ---- 5. skill_recall：该想起的手册想起来了吗 ----
     expected = task.get("expected_skills") or []
     loaded = _load_skill_calls(tools)
+    available = ctx.get("available_tools")
     if not expected:
         verdicts.append(Verdict("skill_recall", "技能召回", NA, "任务未声明期望技能"))
+    elif available is not None and "load_skill" not in available:
+        # A/B 实验里可能整组都不提供技能，这不是「忘了加载」
+        verdicts.append(Verdict("skill_recall", "技能召回", NA,
+                                "本次运行未提供技能加载能力（技能目录为空）"))
     else:
         hit = [s for s in expected if s in loaded]
         if hit:

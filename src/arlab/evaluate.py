@@ -327,7 +327,14 @@ def run_suite(args, tool_builder=None, predicates=None) -> int:
 
         # 端到端判完再回看 trace，做阶段级判定
         events = load_events(trace.path)
-        verdicts = judge(events, task)
+        verdicts = judge(events, task, ctx={
+            "status": result.status,
+            "reason": result.reason,
+            "steps": summary["steps"],
+            "tokens": summary["total_tokens"],
+            "available_tools": registry.names(),
+            "fault_injected": registry.injector is not None,
+        })
         is_control = bool(task.get("control"))
         if not is_control:
             all_verdicts.append(verdicts)  # 对照组不参与任何统计

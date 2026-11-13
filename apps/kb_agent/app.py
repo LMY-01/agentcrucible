@@ -238,7 +238,7 @@ def cmd_eval(args) -> int:
         tasks=args.tasks or f"{GOLD_PATH},{SILVER_PATH}",
         limit=args.limit,
         workspace=str(APP_ROOT / "workspace"),
-        skills=str(SKILLS_DIR),
+        skills="" if getattr(args, "no_skills", False) else str(SKILLS_DIR),
         model=args.model,
         base_url=args.base_url,
         runs=str(RUNS_DIR),
@@ -246,7 +246,7 @@ def cmd_eval(args) -> int:
         max_steps=args.max_steps,
         max_tokens=40_000,
         max_seconds=240.0,
-        out="",
+        out=args.out,
         threshold=args.threshold,
         report=not args.no_report,
         report_out=args.report_out,
@@ -282,6 +282,9 @@ def main(argv: list[str] | None = None) -> int:
     e.add_argument("--no-judge", action="store_true")
     e.add_argument("--repeat", type=int, default=1,
                    help="重复跑 N 轮，准确率取中位数并给区间，延迟/成本合并采样")
+    e.add_argument("--out", default="", help="结果 json 路径，默认按时间戳生成")
+    e.add_argument("--no-skills", action="store_true",
+                   help="不提供任何技能（A/B 用：验证技能是否有价值）")
     common(e)
     e.set_defaults(func=cmd_eval)
 
