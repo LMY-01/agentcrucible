@@ -192,6 +192,14 @@ def tool_builder(workspace: str, skills):
     return tools
 
 
+# 预算/模型参数只在这里定义一次，评测路径和生产路径共用。
+# 之前 make_agent 写 40_000、cmd_eval 又写一遍 40_000，改一处忘另一处就会让评测失真——
+# 「评测跑的不是生产配置」这个 bug 就是这么来的，已经害得所有历史数据要重新解释。
+BUDGET_STEPS = 8
+BUDGET_TOKENS = 40_000
+BUDGET_SECONDS = 240.0
+
+
 def make_agent(*, model: str, base_url: str | None, max_steps: int,
                trace: Trace | None = None) -> Agent:
     skills = SkillLoader(str(SKILLS_DIR)).discover()
@@ -202,7 +210,8 @@ def make_agent(*, model: str, base_url: str | None, max_steps: int,
         LLM(base_url=base_url, model=model),
         registry,
         skills=skills,
-        budget=Budget(max_steps=max_steps, max_tokens=40_000, max_seconds=240.0),
+        budget=Budget(max_steps=max_steps, max_tokens=BUDGET_TOKENS,
+                      max_seconds=BUDGET_SECONDS),
         trace=trace,
         extra_system=DOMAIN_PROMPT,
     )
@@ -256,8 +265,8 @@ def cmd_eval(args) -> int:
         runs=str(RUNS_DIR),
         allow="read",
         max_steps=args.max_steps,
-        max_tokens=40_000,
-        max_seconds=240.0,
+        max_tokens=BUDGET_TOKENS,
+        max_seconds=BUDGET_SECONDS,
         out=args.out,
         threshold=args.threshold,
         report=not args.no_report,
