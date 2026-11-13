@@ -234,11 +234,23 @@ def cmd_ask(args) -> int:
 def cmd_eval(args) -> int:
     from arlab.evaluate import run_suite
 
+    # 内联模式：技能正文直接进 system prompt，不提供 load_skill 工具。
+    # 这样技能内容 100% 生效，测的才是「内容有没有用」而不是「模型会不会去加载」。
+    inline = getattr(args, "inline_skills", False)
+    if inline:
+        _loader = SkillLoader(str(SKILLS_DIR)).discover()
+        _extra = DOMAIN_PROMPT + "\n\n" + _loader.inline_body()
+        _skills = ""
+    else:
+        _extra = DOMAIN_PROMPT
+        _skills = "" if getattr(args, "no_skills", False) else str(SKILLS_DIR)
+
     ns = argparse.Namespace(
         tasks=args.tasks or f"{GOLD_PATH},{SILVER_PATH}",
         limit=args.limit,
         workspace=str(APP_ROOT / "workspace"),
-        skills="" if getattr(args, "no_skills", False) else str(SKILLS_DIR),
+        skills=_skills,
+        extra_system=_extra,
         model=args.model,
         base_url=args.base_url,
         runs=str(RUNS_DIR),
@@ -285,6 +297,8 @@ def main(argv: list[str] | None = None) -> int:
     e.add_argument("--out", default="", help="结果 json 路径，默认按时间戳生成")
     e.add_argument("--no-skills", action="store_true",
                    help="不提供任何技能（A/B 用：验证技能是否有价值）")
+    e.add_argument("--inline-skills", action="store_true",
+                   help="把技能正文直接内联进 system prompt（不走 load_skill，内容 100% 生效）")
     common(e)
     e.set_defaults(func=cmd_eval)
 

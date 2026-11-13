@@ -85,6 +85,21 @@ class SkillLoader:
             )
         return self
 
+    def inline_body(self) -> str:
+        """把全部技能正文拼成一段，直接塞进 system prompt（不走 load_skill）。
+
+        为什么需要这个：A/B 实验里模型只加载了 40/53 次技能，
+        所以前一轮实验测的是「技能机制有没有用」，不是「技能内容有没有用」。
+        内联之后内容 100% 生效，才真正测得到内容的价值——
+        代价是每一步都要为这段文字付 prompt token。
+        """
+        if not self.skills:
+            return ""
+        parts = ["## 操作手册（已内置，无需加载）"]
+        for skill in self.skills.values():
+            parts.append(f"### {skill.name}\n\n{skill.body.strip()}")
+        return "\n\n".join(parts)
+
     def catalog(self) -> str:
         """给 system prompt 用的目录：只有名字和一句话描述。"""
         if not self.skills:

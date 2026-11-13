@@ -298,7 +298,8 @@ def run_suite(args, tool_builder=None, predicates=None) -> int:
         if registry.injector is not None:
             trace.emit("fault_injection", spec=registry.injector.describe())
         agent = Agent(LLM(base_url=args.base_url, model=args.model), registry,
-                      skills=skills, budget=budget, trace=trace, pricing=price)
+                      skills=skills, budget=budget, trace=trace, pricing=price,
+                      extra_system=getattr(args, "extra_system", "") or "")
 
         # 输入指纹：记录「这次跑的是哪一版 prompt / 技能 / 题集」
         if fingerprint is None:
