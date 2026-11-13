@@ -243,16 +243,21 @@ def cmd_ask(args) -> int:
 def cmd_eval(args) -> int:
     from arlab.evaluate import run_suite
 
-    # 内联模式：技能正文直接进 system prompt，不提供 load_skill 工具。
-    # 这样技能内容 100% 生效，测的才是「内容有没有用」而不是「模型会不会去加载」。
-    inline = getattr(args, "inline_skills", False)
-    if inline:
+    # 默认内联：A/B 实测按需加载只命中 75% 且随机，内联是确定性的。
+    # --no-skills / --skills-on-demand 仅用于对照实验。
+    no_skills = getattr(args, "no_skills", False)
+    on_demand = getattr(args, "skills_on_demand", False)
+    inline = not no_skills and not on_demand
+    if no_skills:
+        _extra = DOMAIN_PROMPT
+        _skills = ""
+    elif on_demand:
+        _extra = DOMAIN_PROMPT
+        _skills = str(SKILLS_DIR)
+    else:
         _loader = SkillLoader(str(SKILLS_DIR)).discover()
         _extra = DOMAIN_PROMPT + "\n\n" + _loader.inline_body()
         _skills = ""
-    else:
-        _extra = DOMAIN_PROMPT
-        _skills = "" if getattr(args, "no_skills", False) else str(SKILLS_DIR)
 
     ns = argparse.Namespace(
         tasks=args.tasks or f"{GOLD_PATH},{SILVER_PATH}",
@@ -307,7 +312,9 @@ def main(argv: list[str] | None = None) -> int:
     e.add_argument("--no-skills", action="store_true",
                    help="不提供任何技能（A/B 用：验证技能是否有价值）")
     e.add_argument("--inline-skills", action="store_true",
-                   help="把技能正文直接内联进 system prompt（不走 load_skill，内容 100% 生效）")
+                   help="把技能正文内联进 system prompt（已是默认，保留仅为兼容）")
+    e.add_argument("--skills-on-demand", action="store_true",
+                   help="按需加载技能（旧行为，A/B 对照用；实测内容命中率仅 75% 且随机）")
     common(e)
     e.set_defaults(func=cmd_eval)
 
