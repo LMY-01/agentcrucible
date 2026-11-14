@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import json
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from typing import Any, Callable
 
 from ..faults import FAULT
@@ -101,6 +101,7 @@ class Registry:
     # 最后靠预算强停才算完。这属于安全缺口——靠预算兜底不算防护，只算没崩。
     _recent: list[tuple[str, str]] = field(default_factory=list)
     loop_threshold: int = 3  # 连续 N 次同工具同参数即判定死循环
+    guard: Any = None  # InjectionGuard；工具输出的注入检测 + 数据标记
 
     def register(self, tool: Tool) -> "Registry":
         if tool.name in self.tools:
@@ -123,6 +124,15 @@ class Registry:
         return [self.tools[n].openai_schema() for n in self.names()]
 
     def call(self, name: str, raw_args: str | None) -> ToolResult:
+        """对外入口：跑一次工具，成功返回时过一遍防御组件。"""
+        result = self._call_inner(name, raw_args)
+        if self.guard is not None and result.ok and result.content:
+            # 只包成功返回的内容。错误信息不需要标记——
+            # 而成功返回的文本，正是模型最容易当成指令的东西。
+            result = replace(result, content=self.guard.wrap(name, result.content))
+        return result
+
+    def _call_inner(self, name: str, raw_args: str | None) -> ToolResult:
         """执行一次工具调用。任何失败都变成 ok=False 的结果，不向上抛。"""
         started = time.time()
 
