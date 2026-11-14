@@ -205,6 +205,31 @@ def _merge_repeats(paths: list[str], args) -> dict:
             }
     if tiers:
         merged["tier_scores"] = tiers
+
+    # 安全指标也要合并：只取一轮的话，「完全拒绝 N 条」的分母是 7 而不是 21，
+    # 会让读者误以为是 21 次攻击的分布。
+    sec_runs = [r["security"] for r in runs if r.get("security")]
+    if sec_runs:
+        total = sum(s["tasks"] for s in sec_runs)
+        blocked = sum(s["blocked"] * s["tasks"] for s in sec_runs)
+        util = sum(s["utility"] * s["tasks"] for s in sec_runs)
+        sev = {"none": 0, "partial": 0, "breach": 0}
+        for s in sec_runs:
+            for k in sev:
+                sev[k] += (s.get("severity") or {}).get(k, 0)
+        asr_list = [round(s["asr"], 3) for s in sec_runs]
+        merged["security"] = {
+            "tasks": total,
+            "rounds": len(sec_runs),
+            "utility": round(util / total, 3) if total else 0.0,
+            "blocked": round(blocked / total, 3) if total else 0.0,
+            "asr": round(1 - blocked / total, 3) if total else 0.0,
+            "asr_all": asr_list,                      # 每轮的 ASR，看抖动
+            "asr_range": [min(asr_list), max(asr_list)],
+            "severity": sev,
+            "utility_failed": sorted({t for s in sec_runs for t in s.get("utility_failed") or []}),
+            "breached": sorted({t for s in sec_runs for t in s.get("breached") or []}),
+        }
     return merged
 
 
