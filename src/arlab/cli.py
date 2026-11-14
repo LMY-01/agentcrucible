@@ -131,8 +131,10 @@ def main(argv: list[str] | None = None) -> int:
     p_eval.add_argument("--judge-model", default="", help="归因用的模型，默认与评测模型相同")
     p_eval.add_argument("--defense", action="store_true",
                         help="开启入口防御（工具输出注入检测 + 数据标记）；实测无效，ASR 反升")
-    p_eval.add_argument("--output-filter", action="store_true",
-                        help="开启出口过滤（交付前拦敏感值，命中就打回改写）")
+    p_eval.add_argument("--output-filter", dest="output_filter", action="store_true", default=True,
+                        help="出口过滤（交付前拦敏感值，命中就打回改写）。默认开启：实测 ASR 14.3%→4.8%")
+    p_eval.add_argument("--no-output-filter", dest="output_filter", action="store_false",
+                        help="关闭出口过滤，仅用于对照实验")
     p_eval.add_argument("--repeat", type=int, default=1,
                         help="重复跑 N 轮，准确率取中位数并给区间")
     common(p_eval)
