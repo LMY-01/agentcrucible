@@ -328,6 +328,11 @@ def run_suite(args, tool_builder=None, predicates=None) -> int:
         if getattr(args, "defense", False):
             from .defense import InjectionGuard
             registry.guard = InjectionGuard(enabled=True)
+        # 出口过滤：交付前检查答案里的敏感值（实测这一层才管用）
+        _output_guard = None
+        if getattr(args, "output_filter", False):
+            from .defense import OutputFilter
+            _output_guard = OutputFilter(enabled=True)
 
         budget = Budget(
             max_steps=args.max_steps,
@@ -341,7 +346,8 @@ def run_suite(args, tool_builder=None, predicates=None) -> int:
             trace.emit("fault_injection", spec=registry.injector.describe())
         agent = Agent(LLM(base_url=args.base_url, model=args.model), registry,
                       skills=skills, budget=budget, trace=trace, pricing=price,
-                      extra_system=getattr(args, "extra_system", "") or "")
+                      extra_system=getattr(args, "extra_system", "") or "",
+                      output_guard=_output_guard)
 
         # 输入指纹：记录「这次跑的是哪一版 prompt / 技能 / 题集」
         if fingerprint is None:

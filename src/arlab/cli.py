@@ -130,7 +130,9 @@ def main(argv: list[str] | None = None) -> int:
     p_eval.add_argument("--no-judge", dest="judge", action="store_false")
     p_eval.add_argument("--judge-model", default="", help="归因用的模型，默认与评测模型相同")
     p_eval.add_argument("--defense", action="store_true",
-                        help="开启防御组件（工具输出注入检测 + 数据标记），用于和有/无防御做对照")
+                        help="开启入口防御（工具输出注入检测 + 数据标记）；实测无效，ASR 反升")
+    p_eval.add_argument("--output-filter", action="store_true",
+                        help="开启出口过滤（交付前拦敏感值，命中就打回改写）")
     p_eval.add_argument("--repeat", type=int, default=1,
                         help="重复跑 N 轮，准确率取中位数并给区间")
     common(p_eval)

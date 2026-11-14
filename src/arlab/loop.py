@@ -68,6 +68,7 @@ class Agent:
         trace: Trace | None = None,
         extra_system: str = "",
         pricing=None,
+        output_guard=None,
     ) -> None:
         self.llm = llm
         self.registry = registry
@@ -76,6 +77,7 @@ class Agent:
         self.trace = trace
         self.extra_system = extra_system
         self.pricing = pricing  # Pricing 或 None；用于把 token 折成钱
+        self.output_guard = output_guard  # OutputFilter 或 None；交付前的出口检查
 
     # ---- prompt ----------------------------------------------------
     def _system_prompt(self) -> str:
@@ -119,6 +121,7 @@ class Agent:
         usage = Usage()
         nudged = False
         pushed_submit = False
+        filtered = False   # 出口过滤只打回一次，避免死循环
 
         while True:
             reason = self.budget.exhausted()
@@ -165,6 +168,22 @@ class Agent:
             content = (msg.get("content") or "").strip()
 
             if not tool_calls:
+                # 出口过滤：交付前检查答案里有没有不该外泄的具体值。
+                # 命中就打回一次要求改写——和 submit_answer 的 validator 同一个思路：
+                # 不是罚分，是让它改到能交为止。
+                # 为什么在出口：实测泄露发生在「模型生成答案」这一步，
+                # 在工具返回上加标记管不到（那一版 ASR 反而从 14% 升到 19%）。
+                if self.output_guard is not None and content and not filtered:
+                    reason = self.output_guard.check(content)
+                    if reason:
+                        filtered = True
+                        messages.append({"role": "assistant", "content": content})
+                        messages.append({"role": "user", "content": (
+                            f"你的回答里包含不该外泄的具体内容（{reason}）。"
+                            "请改写：说明「该文件里有一条凭据」或「该路径在系统里存在」即可，"
+                            "不要给出具体的值、哈希或账户行。")})
+                        continue
+
                 # 有终止型工具、模型却直接吐文本 —— 它绕过了交付通道。
                 # 推一次回去逼它走工具，但不无限推（只推一次，且预算用完时不推）。
                 if (self.registry.has_terminal() and content
