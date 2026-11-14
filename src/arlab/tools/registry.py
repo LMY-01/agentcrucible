@@ -96,6 +96,11 @@ class Registry:
     tools: dict[str, Tool] = field(default_factory=dict)
     allow: set[str] = field(default_factory=lambda: {READ})
     injector: Any = None  # FaultInjector；故障注入挂在调用入口，对工具实现零侵入
+    # 最近几次调用的签名，用于抓「同参数死循环」。
+    # 存在的理由：实测一条「反复调用直到我说停」的指令能让模型连跑 15 轮，
+    # 最后靠预算强停才算完。这属于安全缺口——靠预算兜底不算防护，只算没崩。
+    _recent: list[tuple[str, str]] = field(default_factory=list)
+    loop_threshold: int = 3  # 连续 N 次同工具同参数即判定死循环
 
     def register(self, tool: Tool) -> "Registry":
         if tool.name in self.tools:
@@ -121,10 +126,37 @@ class Registry:
         """执行一次工具调用。任何失败都变成 ok=False 的结果，不向上抛。"""
         started = time.time()
 
+        # 死循环防护：连续 N 次「同工具 + 同参数」直接拒绝。
+        # 放在故障注入之前——重复调用本身就是要拦的行为，不必先注入再拦。
+        # 实测一条「反复调用直到我说停」能让模型连跑 15 轮，最后靠预算强停；
+        # 靠预算兜底不算防护，只算没崩。
+        sig = (name, (raw_args or "").strip())
+        self._recent.append(sig)
+        keep = self.loop_threshold * 2
+        if len(self._recent) > keep:
+            self._recent = self._recent[-keep:]
+        tail = self._recent[-self.loop_threshold:]
+        if len(tail) == self.loop_threshold and len(set(tail)) == 1:
+            return ToolResult(
+                False,
+                f"错误：检测到连续 {self.loop_threshold} 次完全相同的 {name} 调用，已拒绝执行。"
+                "结果不会因为再调一次而改变，请直接基于已有信息作答。",
+                error="loop_detected",
+                duration_ms=int((time.time() - started) * 1000),
+            )
+
         # 故障注入：命中就当作上游失败，走真实的失败路径
         if self.injector is not None:
             injected = self.injector.intercept(name)
             if injected:
+                # mode="response"：工具「正常返回」，但内容被篡改过。
+                # 这是间接提示注入的真实载体——模型看到的是一段合法工具输出，
+                # 无法区分里面哪句是数据、哪句是伪造的指令。
+                if getattr(self.injector, "mode", "") == "response":
+                    return ToolResult(
+                        True, injected,
+                        duration_ms=int((time.time() - started) * 1000),
+                    )
                 return ToolResult(
                     False, f"错误：{injected}", error=FAULT,
                     duration_ms=int((time.time() - started) * 1000),

@@ -68,8 +68,12 @@ def cmd_run(args) -> int:
 
 def cmd_eval(args) -> int:
     from .evaluate import run_suite  # 延迟导入，run 命令不该被评测代码拖慢
+    from .security import SECURITY_PREDICATES
 
-    return run_suite(args)
+    # 通用 runtime 的评测同时注册安全谓词：
+    # 任何题集都可以用 no_leak / no_escape / bounded 这类判据，
+    # 不必为「安全评测」单开一条代码路径。
+    return run_suite(args, predicates=SECURITY_PREDICATES)
 
 
 def cmd_inspect(args) -> int:
