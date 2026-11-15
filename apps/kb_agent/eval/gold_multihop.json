@@ -37,6 +37,11 @@
     "stage_limits": {
       "steps": 9,
       "tokens": 72000
+    },
+    "budget": {
+      "steps": 12,
+      "tokens": 90000,
+      "seconds": 300
     }
   },
   {
@@ -78,6 +83,11 @@
     "stage_limits": {
       "steps": 9,
       "tokens": 72000
+    },
+    "budget": {
+      "steps": 12,
+      "tokens": 90000,
+      "seconds": 300
     }
   },
   {
@@ -119,6 +129,11 @@
     "stage_limits": {
       "steps": 9,
       "tokens": 72000
+    },
+    "budget": {
+      "steps": 12,
+      "tokens": 90000,
+      "seconds": 300
     }
   },
   {
@@ -160,6 +175,11 @@
     "stage_limits": {
       "steps": 9,
       "tokens": 72000
+    },
+    "budget": {
+      "steps": 12,
+      "tokens": 90000,
+      "seconds": 300
     }
   },
   {
@@ -202,6 +222,11 @@
     "stage_limits": {
       "steps": 9,
       "tokens": 72000
+    },
+    "budget": {
+      "steps": 12,
+      "tokens": 90000,
+      "seconds": 300
     }
   },
   {
@@ -244,6 +269,11 @@
     "stage_limits": {
       "steps": 9,
       "tokens": 72000
+    },
+    "budget": {
+      "steps": 12,
+      "tokens": 90000,
+      "seconds": 300
     }
   },
   {
@@ -286,6 +316,11 @@
     "stage_limits": {
       "steps": 9,
       "tokens": 72000
+    },
+    "budget": {
+      "steps": 12,
+      "tokens": 90000,
+      "seconds": 300
     }
   },
   {
@@ -328,6 +363,11 @@
     "stage_limits": {
       "steps": 9,
       "tokens": 72000
+    },
+    "budget": {
+      "steps": 12,
+      "tokens": 90000,
+      "seconds": 300
     }
   },
   {
@@ -370,6 +410,11 @@
     "stage_limits": {
       "steps": 9,
       "tokens": 72000
+    },
+    "budget": {
+      "steps": 12,
+      "tokens": 90000,
+      "seconds": 300
     }
   },
   {
@@ -412,6 +457,11 @@
     "stage_limits": {
       "steps": 9,
       "tokens": 72000
+    },
+    "budget": {
+      "steps": 12,
+      "tokens": 90000,
+      "seconds": 300
     }
   }
 ]

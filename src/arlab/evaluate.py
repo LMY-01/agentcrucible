@@ -334,10 +334,14 @@ def run_suite(args, tool_builder=None, predicates=None) -> int:
             from .defense import OutputFilter
             _output_guard = OutputFilter(enabled=True)
 
+        # 任务级预算覆盖：多跳题天然需要更多步数和 token。
+        # 用单跳题的 8 步 / 40k 去跑它，会把它掐死在「信息够了但没来得及答」——
+        # mh07 实测用 64.8k token 就撞上了全局 40k 上限。
+        bspec = task.get("budget") or {}
         budget = Budget(
-            max_steps=args.max_steps,
-            max_tokens=args.max_tokens,
-            max_seconds=args.max_seconds,
+            max_steps=int(bspec.get("steps", args.max_steps)),
+            max_tokens=int(bspec.get("tokens", args.max_tokens)),
+            max_seconds=float(bspec.get("seconds", args.max_seconds)),
         )
         run_dir = new_run_dir(str(out_root), tag=f"eval-{task['id']}")
         trace = Trace(run_dir, meta={"task_id": task["id"], "prompt": task["prompt"],
