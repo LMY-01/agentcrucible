@@ -211,7 +211,11 @@ PREDICATES = {
 def tool_builder(workspace: str, skills):
     """垂直层的工具集：检索三件套 + load_skill。不给文件读写和跑代码。"""
     from arlab.tools.builtin import build_tools as _build
+    from .kb_tools import reset_reads
 
+    # 每条任务都重新构建工具集，顺便重置读块计数——
+    # 计数器如果不重置，第二条任务会继承上一条的读数，提示时机全乱。
+    reset_reads()
     base = {t.name: t for t in _build(workspace, skill_loader=skills)}
     tools = build_kb_tools()
     if "load_skill" in base:

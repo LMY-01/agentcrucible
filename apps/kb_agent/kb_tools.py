@@ -56,15 +56,37 @@ def kb_search(query: str, k: int = 5, mode: str = "hybrid") -> str:
     return f"命中 {len(hits)} 条（mode={mode}）。要看全文用 kb_read，别凭摘要下结论。\n\n" + "\n\n".join(lines)
 
 
+# 读块计数：每跑一条任务重置。用来在预算被烧光之前提醒模型收尾。
+# 实测 mh05 读了 15 个块才被预算掐断，最后 submit_answer 提交不进去——
+# 它并不知道自己已经读得够多了。
+_READS = {"n": 0}
+
+
+def reset_reads() -> None:
+    """每条任务开始时调用。"""
+    _READS["n"] = 0
+
+
 def kb_read(chunk_id: str) -> str:
     store = _store()
     try:
         chunk = store.chunk(chunk_id)
     except KeyError:
         raise KeyError(f"没有这个 chunk_id: {chunk_id}。请用 kb_search 返回的 id，不要自己编。")
+
+    _READS["n"] += 1
+    n = _READS["n"]
+    # 渐进提醒，不是硬拒绝：硬砍会丢信息，提醒能让模型自己决定何时停。
+    note = ""
+    if n >= 10:
+        note = (f"\n\n[预算告警] 已读 {n} 个块，token 消耗已经很高。"
+                "请立刻基于现有材料作答，不要再读新块。")
+    elif n >= 6:
+        note = (f"\n\n[提示] 已读 {n} 个块。对比/归纳类问题通常 3-5 块就够，"
+                "确认关键点齐了就该收尾。")
     return (
         f"chunk_id={chunk.id}\n来源={chunk.source}  第{chunk.idx}块\n"
-        f"--- 全文 ---\n{chunk.text}"
+        f"--- 全文 ---\n{chunk.text}{note}"
     )
 
 
