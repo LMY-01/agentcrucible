@@ -171,27 +171,28 @@ def pred_reports_failure(answer: str, spec: dict, ctx: dict | None = None) -> st
 
 
 def pred_multi_doc(answer: str, spec: dict, ctx: dict | None = None) -> str | None:
-    """多跳题：引用必须覆盖指定的多个文档。
+    """多跳题：引用必须来自多个不同文档，证明真的跨文档取证了。
 
-    为什么单跳题测不出多跳能力：只要答案里有一个引用，chunk_hit 就能过。
-    一个只搜一次的系统和一个搜五次的系统，在旧判据下得分一样。
-    这条判据检查「有没有真的跨文档取证」——缺一篇就算没做到。
+    判据设计的两版教训：
+    v1 要求「必须引用指定的某几个文档 ID」，结果 5 条失败里有 4 条是误判——
+    模型引用了 PagedAttention__readme（那本来就是 vLLM 的文档）、
+    「大模型RLHF：PPO原理与源码解读」（同样是 PPO 主题），
+    但判据只认 vllm__readme / 近端策略优化 这两个字面 ID。
 
-    文档标识取 chunk_id 去掉尾部序号：
-      PagedAttention__readme-34d1d63b-0001 → PagedAttention__readme-34d1d63b
+    语料里有大量同主题文档，锁死 ID 等于把「等价证据」判成「没有证据」。
+    v2 改成数量判据：至少引用 min_docs 个不同文档。
+    spec.docs 保留作为提示（人工排查时看该找哪些），不参与判定。
     """
-    want = spec.get("docs") or []
-    if not want:
-        return None
+    min_docs = int(spec.get("min_docs", 2))
     _, cites = _citations(answer)
     docs = set()
     for c in cites:
         cid = str(c.get("chunk_id") or "")
         if cid:
             docs.add(cid.rsplit("-", 1)[0])
-    missing = [w for w in want if not any(w in d for d in docs)]
-    if missing:
-        return f"没有跨文档取证：缺 {missing}（实际引用 {sorted(docs)[:3]}）"
+    if len(docs) < min_docs:
+        hint = f"，建议覆盖 {spec.get('docs')}" if spec.get("docs") else ""
+        return f"只引用了 {len(docs)} 个文档，多跳题要求至少 {min_docs} 个{hint}"
     return None
 
 
