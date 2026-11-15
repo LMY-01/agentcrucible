@@ -1,0 +1,144 @@
+[
+  {
+    "id": "mh01_inference_frameworks",
+    "tier": "multihop",
+    "prompt": "vLLM 和 LightLLM 在推理优化的思路上有什么不同？各自的侧重点是什么？请对比后回答。",
+    "checks": [
+      {"type": "predicate", "name": "multi_doc", "docs": ["vllm__readme", "LightLLM__readme"]},
+      {"type": "predicate", "name": "answer_covers",
+       "must": ["PagedAttention", "显存", "吞吐"], "min_hit": 2},
+      {"type": "predicate", "name": "citations_grounded"},
+      {"type": "predicate", "name": "not_refused"}
+    ],
+    "reference_answer": "vLLM 的核心是 PagedAttention，把 KV cache 分页管理，消除显存碎片，提升吞吐；LightLLM 同样关注显存与吞吐，但走的是轻量化和 continuous batching 路线，代码更轻、部署成本更低。两者都在解决 LLM 推理的显存与吞吐问题，侧重不同：一个在算法层（分页注意力），一个在工程层（轻量框架）。",
+    "reference_note": "多跳：必须同时引用两篇框架文档。只引用 vLLM 就答不出差异。"
+  },
+  {
+    "id": "mh02_kv_memory",
+    "tier": "multihop",
+    "prompt": "PagedAttention 和 StreamingLLM 分别怎么处理 KV cache 占用过大的问题？两者解决的问题是同一种吗？",
+    "checks": [
+      {"type": "predicate", "name": "multi_doc",
+       "docs": ["LLMs_inference_optimize", "StreamingLLM__readme"]},
+      {"type": "predicate", "name": "answer_covers",
+       "must": ["分页", "块", "注意力", "窗口"], "min_hit": 2},
+      {"type": "predicate", "name": "citations_grounded"},
+      {"type": "predicate", "name": "not_refused"}
+    ],
+    "reference_answer": "PagedAttention 解决的是「显存浪费」：KV cache 按最大长度预留、碎片多，用分页和块表把它变成按需分配，浪费从 60-80% 降到不足 4%。StreamingLLM 解决的是「序列太长」：用滑动窗口加注意力汇点（attention sink），只保留最近若干 token 和开头几个 token，让模型能处理超长输入而不爆显存。两者不是同一个问题：前者是分配效率，后者是长度上限。",
+    "reference_note": "多跳：概念容易混淆，必须读两篇才能说清区别。只答「都是省显存」不得分。"
+  },
+  {
+    "id": "mh03_peft_compare",
+    "tier": "multihop",
+    "prompt": "LoRA 和 Adapter-tuning 在参数高效微调上的做法有什么不同？各自适合什么场景？",
+    "checks": [
+      {"type": "predicate", "name": "multi_doc", "docs": ["4.lora", "3.adapter-tuning"]},
+      {"type": "predicate", "name": "answer_covers",
+       "must": ["低秩", "旁路", "插入", "参数"], "min_hit": 2},
+      {"type": "predicate", "name": "citations_grounded"},
+      {"type": "predicate", "name": "not_refused"}
+    ],
+    "reference_answer": "LoRA 在原有权重旁并联一个低秩分解矩阵（A×B），训练时只更新这部分，推理时可以把增量合并回原权重，不增加推理延迟。Adapter-tuning 是在 Transformer 层之间插入小的前馈网络模块，训练这些模块而冻结主干；推理时模块必须保留，因此会带来额外延迟。LoRA 适合对推理延迟敏感的生产场景，Adapter 适合需要频繁切换任务的场景（换 Adapter 即换任务）。",
+    "reference_note": "多跳：需要两篇文档的做法细节对比。只答 LoRA 的公式不够。"
+  },
+  {
+    "id": "mh04_ppo_vs_dpo",
+    "tier": "multihop",
+    "prompt": "PPO 和 DPO 在训练对齐模型时有什么本质区别？为什么说 DPO 更简单？",
+    "checks": [
+      {"type": "predicate", "name": "multi_doc", "docs": ["近端策略优化", "DPO__DPO"]},
+      {"type": "predicate", "name": "answer_covers",
+       "must": ["奖励模型", "策略", "偏好", "监督"], "min_hit": 2},
+      {"type": "predicate", "name": "citations_grounded"},
+      {"type": "predicate", "name": "not_refused"}
+    ],
+    "reference_answer": "PPO 是强化学习路线：先训练奖励模型（RM），再用 PPO 优化策略，让策略在奖励模型下得分更高，同时用 KL 惩罚防止偏离太远。它需要在线采样、四个模型（策略、参考、奖励、价值），训练不稳定、调参困难。DPO 直接从偏好数据（好回答/坏回答成对）出发，把「奖励模型 + RL」这一步数学等价地化简成一个监督学习目标，不需要单独训练 RM，也不需要在线采样，因此更简单、更稳定。",
+    "reference_note": "多跳：本质区别在「是否需要 RM 和在线采样」，必须两篇都读。"
+  },
+  {
+    "id": "mh05_rag_recall",
+    "tier": "multihop",
+    "prompt": "HYDE 和 RAG-Fusion 都在优化检索召回，它们的思路差别在哪？分别在什么情况下更有用？",
+    "checks": [
+      {"type": "predicate", "name": "multi_doc",
+       "docs": ["RAG_optimization_strategy", "RAG_fusion"]},
+      {"type": "predicate", "name": "answer_covers",
+       "must": ["假设", "生成", "查询", "多个", "融合"], "min_hit": 2},
+      {"type": "predicate", "name": "citations_grounded"},
+      {"type": "predicate", "name": "not_refused"}
+    ],
+    "reference_answer": "HYDE 的思路是「先让模型生成一段假设答案，再用这段假设答案去检索」——它解决的是「问题太短、和文档用词不匹配」的语义鸿沟问题。RAG-Fusion 的思路是「把一个问题改写成多个不同角度的子查询，分别检索后融合排序」——它解决的是「单一查询覆盖不全」的召回不足问题。前者改查询的形态，后者改查询的数量。HYDE 适合问答式短查询，RAG-Fusion 适合多面性问题。",
+    "reference_note": "多跳：两者都叫「优化召回」但机制完全不同，需要对比。"
+  },
+  {
+    "id": "mh06_advanced_rag",
+    "tier": "multihop",
+    "prompt": "Self-RAG 和 GraphRAG 各自解决传统 RAG 的什么缺陷？它们的适用场景有什么区别？",
+    "checks": [
+      {"type": "predicate", "name": "multi_doc", "docs": ["self_rag", "KG-RAG"]},
+      {"type": "predicate", "name": "answer_covers",
+       "must": ["反思", "检索", "图谱", "实体", "关系"], "min_hit": 2},
+      {"type": "predicate", "name": "citations_grounded"},
+      {"type": "predicate", "name": "not_refused"}
+    ],
+    "reference_answer": "Self-RAG 解决的是「检索了但不该用、或用了但没验证」的问题：让模型自己生成反思标记，判断要不要检索、检索到的内容相不相关、答案有没有被支撑，属于「检索质量控制」。GraphRAG 解决的是「碎片化片段无法回答全局性问题」的缺陷：它把文档抽成实体和关系的知识图谱，支持多跳推理和全局摘要，属于「知识结构化」。Self-RAG 适合对答案可靠性要求高的问答，GraphRAG 适合需要跨文档关联和全局理解的问题。",
+    "reference_note": "多跳：两条完全不同的技术路线，必须分别读。"
+  },
+  {
+    "id": "mh07_rag_eval",
+    "tier": "multihop",
+    "prompt": "RAG 系统常见的失败模式有哪些？应该用什么指标来评估？请把失败模式和对策/指标对应起来说。",
+    "checks": [
+      {"type": "predicate", "name": "multi_doc", "docs": ["RAG_Failure", "RAG_valuation"]},
+      {"type": "predicate", "name": "answer_covers",
+       "must": ["召回", "上下文", "答案", "评估", "指标"], "min_hit": 3},
+      {"type": "predicate", "name": "citations_grounded"},
+      {"type": "predicate", "name": "not_refused"}
+    ],
+    "reference_answer": "常见失败分三阶段：①检索阶段——没召回相关文档、召回了不相关的；②上下文阶段——关键信息被截断、上下文里有多余干扰；③生成阶段——模型忽略上下文、编造内容、答案不完整。对应指标：检索看 recall@k、命中率；上下文看精度与噪声比例；生成看忠实度（faithfulness，答案是否被上下文支撑）、答案相关性。评估要分阶段做，不能只看最终答案对不对。",
+    "reference_note": "多跳：失败模式在一篇、评估指标在另一篇，需要对齐才能答好。"
+  },
+  {
+    "id": "mh08_cot_vs_react",
+    "tier": "multihop",
+    "prompt": "思维链（CoT）和 ReAct 在让模型推理上的差别是什么？为什么 Agent 更常用 ReAct？",
+    "checks": [
+      {"type": "predicate", "name": "multi_doc", "docs": ["思维链（cot）", "大模型agent技术"]},
+      {"type": "predicate", "name": "answer_covers",
+       "must": ["推理", "步骤", "工具", "行动", "观察"], "min_hit": 2},
+      {"type": "predicate", "name": "citations_grounded"},
+      {"type": "predicate", "name": "not_refused"}
+    ],
+    "reference_answer": "CoT 让模型把推理过程一步步写出来，全部在「语言空间」里完成，靠模型自身的知识；它的问题是推理链条可能在中途出错且无法校验。ReAct 把「思考（Reason）」和「行动（Act）」交替进行：先想一步，调用工具拿观察结果，再基于真实结果继续想。区别在于 CoT 是纯生成的推理，ReAct 是与外部环境交互的推理。Agent 更常用 ReAct，因为它需要工具返回的真实信息来支撑下一步决策，不能只靠模型记忆。",
+    "reference_note": "多跳：两个概念的差异体现在「是否与外部交互」，需要两篇。"
+  },
+  {
+    "id": "mh09_hallucination",
+    "tier": "multihop",
+    "prompt": "大模型幻觉是怎么定义的？它的主要来源有哪些，对应的缓解手段分别是什么？",
+    "checks": [
+      {"type": "predicate", "name": "multi_doc", "docs": ["1.大模型幻觉", "2.幻觉来源与缓解"]},
+      {"type": "predicate", "name": "answer_covers",
+       "must": ["来源", "数据", "训练", "缓解", "检索"], "min_hit": 3},
+      {"type": "predicate", "name": "citations_grounded"},
+      {"type": "predicate", "name": "not_refused"}
+    ],
+    "reference_answer": "幻觉指模型生成的内容看起来合理但与事实不符、或与给定上下文不一致。来源分几层：①数据层——训练数据本身有噪声、有错误、有知识盲区；②训练层——最大似然目标鼓励「说点什么」而不是「说不知道」，SFT 数据可能引入错误事实；③推理层——解码策略（采样温度）会增加随机性。缓解手段对应：数据上做清洗和质量过滤；训练上引入 RLHF 让模型学会拒答、用检索增强把外部事实接进来；推理上降低温度、加约束解码、做自我一致性校验。",
+    "reference_note": "多跳：定义与来源分在两篇文档，需要串起来。"
+  },
+  {
+    "id": "mh10_finetune_vs_prompt",
+    "tier": "multihop",
+    "prompt": "微调和提示工程各自的成本和效果边界在哪？什么情况下应该选微调而不是写更好的 prompt？",
+    "checks": [
+      {"type": "predicate", "name": "multi_doc", "docs": ["1.微调", "2.prompting"]},
+      {"type": "predicate", "name": "answer_covers",
+       "must": ["数据", "显存", "成本", "泛化", "样本"], "min_hit": 2},
+      {"type": "predicate", "name": "citations_grounded"},
+      {"type": "predicate", "name": "not_refused"}
+    ],
+    "reference_answer": "提示工程成本极低（只改输入），适合快速验证和格式控制，但受限于上下文长度和模型已有能力，复杂任务提升有限。微调成本高：需要标注数据、需要显存（全参微调对显存要求大，PEFT 可降低）、需要训练和评估周期，但它能改变模型的行为倾向和领域知识，效果上限更高。选择标准：如果任务能用清晰的指令和少量示例描述清楚，先做提示工程；如果提示工程已经到位但模型仍系统性犯错（格式、领域术语、风格），或者需要压缩成本（用小模型替代大模型），才值得微调。",
+    "reference_note": "多跳：成本数据在一篇、prompt 方法在另一篇，需要综合判断。"
+  }
+]

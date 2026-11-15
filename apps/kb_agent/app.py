@@ -170,6 +170,31 @@ def pred_reports_failure(answer: str, spec: dict, ctx: dict | None = None) -> st
     return f"工具已注入故障，但答案没有说明失败（很可能是编的）。答案开头：{head!r}"
 
 
+def pred_multi_doc(answer: str, spec: dict, ctx: dict | None = None) -> str | None:
+    """多跳题：引用必须覆盖指定的多个文档。
+
+    为什么单跳题测不出多跳能力：只要答案里有一个引用，chunk_hit 就能过。
+    一个只搜一次的系统和一个搜五次的系统，在旧判据下得分一样。
+    这条判据检查「有没有真的跨文档取证」——缺一篇就算没做到。
+
+    文档标识取 chunk_id 去掉尾部序号：
+      PagedAttention__readme-34d1d63b-0001 → PagedAttention__readme-34d1d63b
+    """
+    want = spec.get("docs") or []
+    if not want:
+        return None
+    _, cites = _citations(answer)
+    docs = set()
+    for c in cites:
+        cid = str(c.get("chunk_id") or "")
+        if cid:
+            docs.add(cid.rsplit("-", 1)[0])
+    missing = [w for w in want if not any(w in d for d in docs)]
+    if missing:
+        return f"没有跨文档取证：缺 {missing}（实际引用 {sorted(docs)[:3]}）"
+    return None
+
+
 PREDICATES = {
     "citations_grounded": pred_citations_grounded,
     "answer_covers": pred_answer_covers,
@@ -177,6 +202,7 @@ PREDICATES = {
     "states_missing": pred_states_missing,
     "chunk_hit": pred_chunk_hit,
     "reports_failure": pred_reports_failure,
+    "multi_doc": pred_multi_doc,
 }
 
 
