@@ -344,7 +344,7 @@ def main(argv: list[str] | None = None) -> int:
     e.add_argument("--no-skills", action="store_true",
                    help="不提供任何技能（A/B 用：验证技能是否有价值）")
     e.add_argument("--inline-skills", action="store_true",
-                   help="技能正文内联进 system prompt（3 轮基线证明：质量无提升但成本 +28%，仅用于对照）")
+                   help="技能正文内联进 system prompt（3 轮基线证明：质量无提升但成本 +28%%，仅用于对照）")
     common(e)
     e.set_defaults(func=cmd_eval)
 
