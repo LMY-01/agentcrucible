@@ -1,0 +1,42 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # 语法检查：比单测先跑，能在 2 秒内抓出明显的 SyntaxError
+      - name: 语法检查
+        run: python -m compileall -q src apps scripts
+
+      # 单测不需要装任何第三方包：
+      # 运行时是纯标准库，kb_lab（jieba/chroma/sentence-transformers）
+      # 是在 _store() 里延迟 import 的，而且测试把它 patch 掉了。
+      # 所以这里不配 pip install，跑得又快又能证明「零依赖」不是吹的。
+      - name: 单测（103 条，零第三方依赖）
+        env:
+          PYTHONPATH: "src:."
+        run: python -m unittest discover -s tests -v
+
+      # prompt 指纹守卫：确认改了 prompt/技能之后没有静默通过
+      # 只做存在性检查——真正的比对要在本地跑（依赖上次通过的指纹）
+      - name: 指纹守卫可执行性
+        env:
+          PYTHONPATH: "src:."
+        run: |
+          test -f scripts/prompt_guard.py
+          python -c "import ast,sys; ast.parse(open('scripts/prompt_guard.py').read()); print('prompt_guard.py 语法正常')"

@@ -1,5 +1,7 @@
 # AgentCrucible
 
+[![tests](https://github.com/LMY-01/agentcrucible/actions/workflows/test.yml/badge.svg)](https://github.com/LMY-01/agentcrucible/actions/workflows/test.yml)
+
 **An agent runtime that can prove itself.** 把 Agent 放进十个阶段的熔炉里，看它在哪一步裂开。
 
 一个能讲清楚每个设计决定的 Agent 运行时：**工具权限分级、预算耗尽降级、逐步轨迹落盘、
