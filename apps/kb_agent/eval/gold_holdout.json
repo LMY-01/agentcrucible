@@ -1,0 +1,1050 @@
+[
+  {
+    "id": "h01_jieba_dag",
+    "split": "holdout",
+    "qtype": "how",
+    "difficulty": 2,
+    "prompt": "jieba 在词典范围内，是怎么从所有可能的切法里选出最终切分的？",
+    "reference_answer": "基于前缀词典扫描词图，生成所有可能成词情况构成的有向无环图（DAG），再用动态规划找基于词频的最大概率路径。",
+    "reference_note": "",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "前缀词典"
+          ],
+          [
+            "DAG",
+            "有向无环图"
+          ],
+          [
+            "动态规划",
+            "最大概率路径",
+            "最大概率"
+          ]
+        ],
+        "min_hit": 2
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "前缀词典"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "tier": "gold_holdout",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0003"
+    ]
+  },
+  {
+    "id": "h02_lightllm",
+    "split": "holdout",
+    "qtype": "how",
+    "difficulty": 2,
+    "prompt": "LightLLM 是靠什么机制拿到比 vLLM 更高的吞吐的？",
+    "reference_answer": "引入更细粒度的 kv cache 管理算法 TokenAttention，并设计与之配合的 Efficient Router 调度。",
+    "reference_note": "",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "TokenAttention"
+          ],
+          [
+            "Efficient Router",
+            "Router",
+            "调度"
+          ]
+        ],
+        "min_hit": 2
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "TokenAttention"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "tier": "gold_holdout",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "LightLLM__readme-22151ab0-0001",
+      "LightLLM__readme-22151ab0-0002",
+      "LightLLM__readme-22151ab0-0006",
+      "LightLLM__readme-22151ab0-0007",
+      "LightLLM__readme-22151ab0-0016",
+      "LightLLM__readme-22151ab0-0017",
+      "LightLLM__readme-22151ab0-0019"
+    ]
+  },
+  {
+    "id": "h03_table_recog",
+    "split": "holdout",
+    "qtype": "list",
+    "difficulty": 1,
+    "prompt": "表格识别任务通常拆成哪两个子任务？",
+    "reference_answer": "表格检测和表格结构识别。",
+    "reference_note": "",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "表格检测",
+            "表格定位"
+          ],
+          [
+            "表格结构识别",
+            "结构识别"
+          ]
+        ],
+        "min_hit": 2
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "表格识别包括表格检测和表格结构识别两个子任务"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "tier": "gold_holdout",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "table_structure_recognition-182ef14a-0001"
+    ]
+  },
+  {
+    "id": "h04_grad_ckpt",
+    "split": "holdout",
+    "qtype": "how",
+    "difficulty": 2,
+    "prompt": "gradient checkpointing 是拿什么换什么来省显存的？",
+    "reference_answer": "在计算图中插入检查点，把一部分计算推迟到后续步骤（重新计算），以多算一些换取更少的内存占用。",
+    "reference_note": "",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "推迟",
+            "重新计算",
+            "重计算",
+            "再计算"
+          ],
+          [
+            "内存",
+            "显存"
+          ]
+        ],
+        "min_hit": 2
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "梯度检查点（Gradient Checkpointing）"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "tier": "gold_holdout",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "1.微调__1.微调-e0918691-0001",
+      "VRAM_optimize-b6784df4-0006",
+      "VRAM_optimize-b6784df4-0007"
+    ]
+  },
+  {
+    "id": "h05_fastertransformer",
+    "split": "holdout",
+    "qtype": "list",
+    "difficulty": 1,
+    "prompt": "FasterTransformer 的核心用了哪两种并行技术？",
+    "reference_answer": "张量并行（TP）和流水线并行（PP）。",
+    "reference_note": "",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "张量并行",
+            "TP"
+          ],
+          [
+            "流水线并行",
+            "PP"
+          ]
+        ],
+        "min_hit": 2
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "流水线并行 (PP)"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "tier": "gold_holdout",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "FasterTransformer__readme-6bb21552-0001"
+    ]
+  },
+  {
+    "id": "h06_rag_pain_top2",
+    "split": "holdout",
+    "qtype": "list",
+    "difficulty": 2,
+    "prompt": "那份「RAG 关键痛点及解决方案」里，排在最前面的两个问题是什么？",
+    "reference_answer": "问题一：内容缺失；问题二：错过排名靠前的文档。",
+    "reference_note": "",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          "内容缺失",
+          [
+            "错过排名靠前",
+            "排名靠前的文档"
+          ]
+        ],
+        "min_hit": 2
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "错过排名靠前的文档"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "tier": "gold_holdout",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "RAG_Failure-57169d68-0000",
+      "RAG_Failure-57169d68-0003",
+      "RAG_Failure-57169d68-0004"
+    ]
+  },
+  {
+    "id": "h07_hallu_taxonomy",
+    "split": "holdout",
+    "qtype": "list",
+    "difficulty": 2,
+    "prompt": "按那份幻觉来源与缓解的资料，幻觉被分成哪几类？",
+    "reference_answer": "事实性问题（Factuality）、忠诚度问题（Faithfulness）、自我矛盾（self-Contradiction）。",
+    "reference_note": "",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "事实性",
+            "Factuality"
+          ],
+          [
+            "忠诚度",
+            "忠实度",
+            "Faithfulness"
+          ],
+          [
+            "自我矛盾",
+            "Contradiction"
+          ]
+        ],
+        "min_hit": 3
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "自我矛盾（self-Contradiction）"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "tier": "gold_holdout",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "2.幻觉来源与缓解__2.幻觉来源与缓解-66183278-0000",
+      "2.幻觉来源与缓解__2.幻觉来源与缓解-66183278-0001"
+    ]
+  },
+  {
+    "id": "h08_mqa_gqa",
+    "split": "holdout",
+    "qtype": "how",
+    "difficulty": 2,
+    "prompt": "MQA / GQA 这类注意力改造的核心思想是什么？",
+    "reference_answer": "减少 kv-cache 的数量，让少量 kv-cache 对应多个 query。",
+    "reference_note": "",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "kv-cache",
+            "kvcache",
+            "KV"
+          ],
+          [
+            "多个query",
+            "多个 query",
+            "共享",
+            "对应多个"
+          ]
+        ],
+        "min_hit": 2
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "以少量kv-cache对应多个query"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "tier": "gold_holdout",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "LLMs_optimize_trick_no-3aa95a9d-0002",
+      "LLMs_optimize_trick_no-3aa95a9d-0003"
+    ]
+  },
+  {
+    "id": "h09_ptq_exception",
+    "split": "holdout",
+    "qtype": "why",
+    "difficulty": 2,
+    "prompt": "大模型量化一般用训练后量化（PTQ），为什么？有没有例外？",
+    "reference_answer": "大模型重新训练成本太高，所以一般用 PTQ；例外是 QLoRA，它在 LoRA 微调阶段做量化。",
+    "reference_note": "",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "重新训练",
+            "训练成本",
+            "成本太高"
+          ],
+          [
+            "QLoRA",
+            "QLora"
+          ]
+        ],
+        "min_hit": 2
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "一个例外是QLora"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "tier": "gold_holdout",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "LLMs_inference_optimize-64d9ecd0-0013",
+      "LLMs_inference_optimize-64d9ecd0-0014"
+    ]
+  },
+  {
+    "id": "h10_rlhf_stages",
+    "split": "holdout",
+    "qtype": "list",
+    "difficulty": 1,
+    "prompt": "RLHF 的标准流程分哪三个阶段？",
+    "reference_answer": "监督微调（SFT）、偏好采样和奖励学习（RM）、强化学习微调（PPO）。",
+    "reference_note": "",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "SFT",
+            "监督微调"
+          ],
+          [
+            "RM",
+            "奖励"
+          ],
+          [
+            "PPO",
+            "强化学习"
+          ]
+        ],
+        "min_hit": 3
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "偏好采样和奖励学习"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "tier": "gold_holdout",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "DPO__DPO-e81a0693-0001"
+    ]
+  },
+  {
+    "id": "h11_peft_taxonomy",
+    "split": "holdout",
+    "qtype": "list",
+    "difficulty": 2,
+    "prompt": "参数高效微调方法大致可以分成哪三大类？",
+    "reference_answer": "增加额外参数（A）、选取一部分参数更新（S）、引入重参数化（R）。",
+    "reference_note": "",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "增加额外参数",
+            "额外参数"
+          ],
+          [
+            "选取一部分参数",
+            "部分参数更新",
+            "选取部分参数"
+          ],
+          [
+            "重参数化"
+          ]
+        ],
+        "min_hit": 3
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "引入重参数化"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "tier": "gold_holdout",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "1.基本概念__1.基本概念-e99b0340-0004",
+      "5.总结__5.总结-e803b718-0007",
+      "5.总结__5.总结-e803b718-0008"
+    ]
+  },
+  {
+    "id": "h12_bge_org",
+    "split": "holdout",
+    "qtype": "factoid",
+    "difficulty": 1,
+    "prompt": "资料里提到的 BGE 嵌入模型是哪个机构开源的？",
+    "reference_answer": "智源研究院。",
+    "reference_note": "和 g10（BGE-M3 拒答）配对：同一实体族，一个可答一个不可答。",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "智源"
+          ]
+        ],
+        "min_hit": 1
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "由智源研究院开源"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "tier": "gold_holdout",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "检索增强llm__检索增强llm-271aff1c-0027",
+      "检索增强llm__检索增强llm-271aff1c-0028"
+    ]
+  },
+  {
+    "id": "h13_adapter_speed",
+    "split": "holdout",
+    "qtype": "numeric",
+    "difficulty": 3,
+    "prompt": "和全量微调相比，Adapter 在训练和推理时速度分别怎样？",
+    "reference_answer": "训练时快 60%，推理时慢 4%–6%，因此提出了 AdapterDrop 来缓解。",
+    "reference_note": "和 g07 的「4%」互为陷阱：两处数字形似、出处不同，证据锚点区分。",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          "60%",
+          [
+            "4%-6%",
+            "4%~6%",
+            "4%—6%",
+            "4%–6%",
+            "4-6%"
+          ]
+        ],
+        "min_hit": 2
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "AdapterDrop"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "tier": "gold_holdout",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "3.adapter-tuning__3.adapter-tuning-ee70e806-0008",
+      "3.adapter-tuning__3.adapter-tuning-ee70e806-0009",
+      "3.adapter-tuning__3.adapter-tuning-ee70e806-0010",
+      "3.adapter-tuning__3.adapter-tuning-ee70e806-0011",
+      "5.总结__5.总结-e803b718-0003"
+    ]
+  },
+  {
+    "id": "h14_false_premise_paged",
+    "split": "holdout",
+    "qtype": "false_premise",
+    "difficulty": 2,
+    "prompt": "PagedAttention 把 KV cache 的内存浪费降到了 20% 左右，它是怎么做到的？",
+    "reference_answer": "前提不准确：浪费率低于 4%（只发生在序列最后一个块）。做法是借鉴虚拟内存分页，把 KV 分块存在不连续的显存里，用 block table 记录映射。",
+    "reference_note": "错误前提题：必须纠正 20% 这个数。",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "4%"
+          ],
+          [
+            "分页",
+            "虚拟内存",
+            "块",
+            "block"
+          ]
+        ],
+        "min_hit": 2
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "浪费率低于 4%",
+            "仅浪费不到 4%"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "tier": "gold_holdout",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "LLMs_optimize_trick_no-3aa95a9d-0001",
+      "PagedAttention__readme-34d1d63b-0003"
+    ]
+  },
+  {
+    "id": "h15_false_premise_jieba",
+    "split": "holdout",
+    "qtype": "false_premise",
+    "difficulty": 2,
+    "prompt": "jieba 是用 CRF 模型来识别未登录词的，具体怎么做的？",
+    "reference_answer": "前提不准确：jieba 对未登录词用的是基于汉字成词能力的 HMM 模型 + Viterbi 算法，不是 CRF。",
+    "reference_note": "",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "HMM",
+            "隐马尔科夫",
+            "隐马尔可夫"
+          ],
+          [
+            "Viterbi",
+            "维特比"
+          ]
+        ],
+        "min_hit": 1
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "Viterbi",
+            "viterbi"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "tier": "gold_holdout",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "1.分词__1.分词-dc60a3be-0004",
+      "1.分词__1.分词-dc60a3be-0005",
+      "1.分词__1.分词-dc60a3be-0009",
+      "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0003",
+      "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0006",
+      "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0007",
+      "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0030",
+      "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0031",
+      "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0052",
+      "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0054",
+      "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0055",
+      "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0056",
+      "3.词性标注__3.词性标注-a3c64bef-0002",
+      "3.词性标注__3.词性标注-a3c64bef-0003",
+      "3.词性标注__3.词性标注-a3c64bef-0013",
+      "3.词性标注__3.词性标注-a3c64bef-0015",
+      "3.词性标注__3.词性标注-a3c64bef-0016"
+    ]
+  },
+  {
+    "id": "h16_refuse_popqa",
+    "split": "holdout",
+    "qtype": "refusal_nearmiss",
+    "difficulty": 2,
+    "prompt": "Self-RAG 论文里 7B 模型在 PopQA 上的准确率是多少？",
+    "reference_answer": "资料介绍了 Self-RAG 的机制，但没有给出 PopQA 上的实验数字。",
+    "reference_note": "",
+    "absent_terms": [
+      "PopQA"
+    ],
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "states_missing"
+      }
+    ],
+    "tier": "gold_holdout",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    }
+  },
+  {
+    "id": "h17_refuse_lcel",
+    "split": "holdout",
+    "qtype": "refusal_nearmiss",
+    "difficulty": 2,
+    "prompt": "用 LangChain 的 LCEL 表达式语言写一个 RAG 链，语法是怎样的？",
+    "reference_answer": "资料介绍了 LangChain 的六大模块，但没有 LCEL。",
+    "reference_note": "",
+    "absent_terms": [
+      "LCEL"
+    ],
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "states_missing"
+      }
+    ],
+    "tier": "gold_holdout",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    }
+  },
+  {
+    "id": "h18_refuse_h100",
+    "split": "holdout",
+    "qtype": "refusal_nearmiss",
+    "difficulty": 2,
+    "prompt": "FasterTransformer 在 H100 上相比 A100 的推理加速比是多少？",
+    "reference_answer": "资料里没有 H100 的数据。",
+    "reference_note": "",
+    "absent_terms": [
+      "H100"
+    ],
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "states_missing"
+      }
+    ],
+    "tier": "gold_holdout",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    }
+  },
+  {
+    "id": "h19_fault_empty_search",
+    "split": "holdout",
+    "qtype": "fault_sticky",
+    "difficulty": 2,
+    "prompt": "LightLLM 是靠什么机制拿到比 vLLM 更高的吞吐的？",
+    "reference_answer": "kb_search 持续返回空结果。正确行为：说明检索不到/服务异常，不给出无依据的结论。",
+    "reference_note": "故障注入：返回空，而不是超时——模型更容易误以为「资料里没有」然后凭记忆作答。",
+    "inject_fault": {
+      "tool": "kb_search",
+      "at_call": 1,
+      "mode": "empty",
+      "sticky": true
+    },
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "reports_failure",
+        "words": [
+          "失败",
+          "不可用",
+          "超时",
+          "无法访问",
+          "调用失败",
+          "检索不到",
+          "服务异常",
+          "无法检索",
+          "故障",
+          "没有返回",
+          "空结果",
+          "为空",
+          "返回空",
+          "未返回",
+          "没有检索到",
+          "未检索到"
+        ]
+      }
+    ],
+    "tier": "gold_holdout",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    }
+  }
+]

@@ -347,7 +347,7 @@ if ctx.get("status") == "budget_exhausted":
 结论：**评测要给区间，不能给单点。**
 
 ```bash
-./run.sh eval --repeat 3     # 待实现：跑三遍取中位数，并报告极差
+./run.sh eval --repeat 3     # 跑三遍取中位数，并报告区间
 ```
 
 在实现之前，任何「A 比 B 好 0.05」的结论都是不成立的——0.05 完全在抖动范围内。

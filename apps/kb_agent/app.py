@@ -16,6 +16,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -59,13 +60,21 @@ def _citations(answer: str) -> tuple[dict | None, list[dict]]:
     return data, cites if isinstance(cites, list) else []
 
 
+MIN_QUOTE_CHARS = 6
+
+
 def pred_citations_grounded(answer: str, spec: dict, ctx: dict | None = None) -> str | None:
-    """每条引文必须在其 chunk 的原文里逐字存在，且至少一条。"""
+    """每条引文必须在其 chunk 的原文里逐字存在，且至少一条。
+
+    引文还要有最小长度（默认 6 字）：否则引一个「的」「模型」也能逐字命中，
+    「引用可溯源」就退化成了「引用了一个常用词」。
+    """
     data, cites = _citations(answer)
     if data is None:
         return "答案不是可解析的 JSON"
     if not cites:
         return "一条引用都没给"
+    min_chars = int(spec.get("min_quote_chars", MIN_QUOTE_CHARS))
     store = _store()
     bad: list[str] = []
     for c in cites:
@@ -76,6 +85,9 @@ def pred_citations_grounded(answer: str, spec: dict, ctx: dict | None = None) ->
         cid = (c.get("chunk_id") or "").strip()
         if not quote or not cid:
             bad.append("citation 缺 quote 或 chunk_id")
+            continue
+        if len(quote) < min_chars:
+            bad.append(f"引文太短（{len(quote)} 字 < {min_chars}）: {quote!r}")
             continue
         try:
             text = store.chunk(cid).text
@@ -89,18 +101,84 @@ def pred_citations_grounded(answer: str, spec: dict, ctx: dict | None = None) ->
     return None
 
 
+def _norm(text: str) -> str:
+    """要点匹配用的宽松归一：忽略大小写、空白和连字符（KV-Cache == kv cache）。"""
+    return re.sub(r"[\s\-_]+", "", text).lower()
+
+
+def _group_hit(group, text_n: str) -> bool:
+    """一个要点 = 一个字符串，或一组同义写法（命中任一即算命中这个要点）。"""
+    alts = group if isinstance(group, list) else [group]
+    return any(_norm(str(a)) in text_n for a in alts if str(a).strip())
+
+
+def _group_label(group) -> str:
+    return "/".join(map(str, group)) if isinstance(group, list) else str(group)
+
+
 def pred_answer_covers(answer: str, spec: dict, ctx: dict | None = None) -> str | None:
-    """要点覆盖：must 里至少命中 min_hit 个。"""
+    """要点覆盖：must 里至少命中 min_hit 个要点。
+
+    must 的每一项可以是字符串，也可以是同义词列表：
+        "must": [["幻觉", "hallucination"], ["数据新鲜度", "时效性", "过时"]]
+    同义组的存在理由：旧判据把「时效性」判成没答到「数据新鲜度」，
+    要点是语义单位，不是字面单位。
+
+    forbid（可选）：答案里不许出现的说法。用于错误前提题和陷阱题——
+    例如问「LoRA 为什么让推理变慢」，答案顺着说「会增加推理延迟」就该判错。
+    """
     data, _ = _citations(answer)
     if data is None:
         return "答案不是可解析的 JSON"
-    text = str(data.get("answer") or "")
+    text_n = _norm(str(data.get("answer") or ""))
     must = spec.get("must") or []
     need = int(spec.get("min_hit", len(must)))
-    hit = [w for w in must if w in text]
+    hit = [g for g in must if _group_hit(g, text_n)]
     if len(hit) < need:
-        missing = [w for w in must if w not in text]
+        missing = [_group_label(g) for g in must if not _group_hit(g, text_n)]
         return f"要点还差 {need - len(hit)} 个，缺：{missing}"
+    bad = [_group_label(g) for g in (spec.get("forbid") or []) if _group_hit(g, text_n)]
+    if bad:
+        return f"答案里出现了不该有的说法：{bad}"
+    return None
+
+
+def pred_evidence_hit(answer: str, spec: dict, ctx: dict | None = None) -> str | None:
+    """证据命中：引用的块里必须包含标准证据的「锚点」原文。
+
+    和 chunk_hit 的区别：chunk_hit 认块 ID，这里认内容。
+    语料里有大量重复/转载文档（同一段话出现在两三个 doc 里），
+    锁死 ID 会把等价证据判成没证据——multi_doc v1 就栽在这上面。
+    锚点是标准答案所在原文里的一小段独特文字，谁的块里有它，谁就算命中。
+
+        "groups": [["TokenAttention"], ["PagedAttention", "分页"]]
+
+    每个 group 都必须被至少一条引用的块覆盖（多跳题 = 多个 group）。
+    group 内是「任一锚点」关系。
+    """
+    data, cites = _citations(answer)
+    if data is None:
+        return "答案不是可解析的 JSON"
+    groups = spec.get("groups") or []
+    if not groups:
+        return "evidence_hit 缺少 groups"
+    store = _store()
+    texts: list[str] = []
+    for c in cites:
+        if not isinstance(c, dict):
+            continue
+        cid = str(c.get("chunk_id") or "").strip()
+        try:
+            texts.append(store.chunk(cid).text)
+        except KeyError:
+            continue
+    if not texts:
+        return "没有任何一条引用指向真实存在的块"
+    missed = [g for g in groups
+              if not any(str(a) in t for t in texts for a in (g if isinstance(g, list) else [g]))]
+    if missed:
+        return (f"{len(missed)}/{len(groups)} 组关键证据没被引用到："
+                + "；".join(_group_label(g) for g in missed[:3]))
     return None
 
 
@@ -144,13 +222,26 @@ def pred_states_missing(answer: str, spec: dict, ctx: dict | None = None) -> str
     data, _ = _citations(answer)
     if data is None:
         return "答案不是可解析的 JSON"
+    text = str(data.get("answer") or "")
+    # 拒答了但顺手编了一个具体值（「资料里没有，不过一般是 1024 维」）——仍然是编造
+    leaked = [_group_label(g) for g in (spec.get("forbid") or []) if _group_hit(g, _norm(text))]
+    if leaked:
+        return f"声称资料缺失，却给出了资料里不存在的具体内容：{leaked}"
     if data.get("refused") is True:
         return None
-    text = str(data.get("answer") or "")
-    words = spec.get("words") or ["没有", "未提及", "不包含", "找不到", "无法", "资料中没", "未提供"]
+    words = spec.get("words") or MISSING_WORDS
     if any(w in text for w in words):
         return None
     return f"既没标 refused，也没说明资料缺失。答案开头：{text[:60]!r}"
+
+
+# 「说明缺失」的措辞表。「无法」单独太宽（「无法直接比较」也会命中），收窄成搭配；
+# 「未能」「未找到」「不存在」是实测漏掉过的写法。
+MISSING_WORDS = [
+    "没有", "未提及", "没提到", "未涉及", "不包含", "找不到", "未找到", "未能找到", "未能检索",
+    "无法回答", "无法确定", "无法给出", "无法找到", "无法从", "资料中没", "未提供", "不存在",
+    "缺少", "缺乏相关", "并未", "未收录", "没有收录",
+]
 
 
 def pred_reports_failure(answer: str, spec: dict, ctx: dict | None = None) -> str | None:
@@ -204,6 +295,7 @@ PREDICATES = {
     "chunk_hit": pred_chunk_hit,
     "reports_failure": pred_reports_failure,
     "multi_doc": pred_multi_doc,
+    "evidence_hit": pred_evidence_hit,
 }
 
 

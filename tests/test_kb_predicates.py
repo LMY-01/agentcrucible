@@ -14,14 +14,20 @@ from unittest.mock import patch
 
 from apps.kb_agent.app import (
     pred_answer_covers,
+    pred_chunk_hit,
     pred_citations_grounded,
+    pred_evidence_hit,
+    pred_multi_doc,
     pred_not_refused,
+    pred_reports_failure,
     pred_states_missing,
 )
 
 DOCS = {
     "c1": "LoRA 通过低秩分解来模拟参数的改变量，从而以极小的参数量实现大模型的间接训练。",
     "c2": "第一个矩阵 A 通过高斯函数初始化，第二个矩阵 B 初始化为零矩阵。",
+    "docA-0001": "PagedAttention 借鉴操作系统虚拟内存和分页思想，浪费率低于 4%。",
+    "docB-0002": "LightLLM 引入了更细粒度的 kv cache 管理算法 TokenAttention。",
 }
 
 
@@ -71,7 +77,7 @@ class TestCitationsGrounded(GroundedBase):
 
     def test_unknown_chunk_id_fails(self):
         ans = answer({"answer": "x", "citations": [
-            {"id": 1, "chunk_id": "不存在的块", "quote": "随便"},
+            {"id": 1, "chunk_id": "不存在的块", "quote": "随便写的一句引文"},
         ]})
         self.assertIn("不存在", pred_citations_grounded(ans, {}))
 
@@ -81,6 +87,15 @@ class TestCitationsGrounded(GroundedBase):
     def test_missing_fields_fails(self):
         ans = answer({"answer": "x", "citations": [{"quote": "只有引文没有 id"}]})
         self.assertIn("缺", pred_citations_grounded(ans, {}))
+
+    def test_too_short_quote_rejected(self):
+        """只引一两个常用字（「的」「模型」）算假溯源，必须被最小长度挡住。"""
+        ans = answer({"answer": "x", "citations": [
+            {"id": 1, "chunk_id": "c1", "quote": "大模型"},
+        ]})
+        reason = pred_citations_grounded(ans, {})
+        self.assertIsNotNone(reason)
+        self.assertIn("太短", reason)
 
 
 class TestAnswerCovers(GroundedBase):
@@ -96,6 +111,89 @@ class TestAnswerCovers(GroundedBase):
     def test_partial_allowed(self):
         ans = answer({"answer": "幻觉", "citations": []})
         self.assertIsNone(pred_answer_covers(ans, {"must": ["幻觉", "数据新鲜度"], "min_hit": 1}))
+
+    def test_synonym_groups_and_normalization(self):
+        """同义组命中其一即算命中该要点；大小写、空白与连字符差异不该造成假阴性。"""
+        ans = answer({"answer": "主要解决幻觉和时效性问题，并且能复用 kv cache", "citations": []})
+        spec = {
+            "must": [
+                ["幻觉", "hallucination"],
+                ["数据新鲜度", "时效性", "过时"],
+                ["KV-Cache"],
+            ],
+            "min_hit": 3,
+        }
+        self.assertIsNone(pred_answer_covers(ans, spec))
+
+    def test_synonym_group_counts_as_one_point(self):
+        """同一个同义组里的多个词同时出现，也只能算 1 个要点，不能刷分。"""
+        ans = answer({"answer": "Decoding 就是解码阶段", "citations": []})
+        spec = {
+            "must": [["Prefill", "预填充"], ["Decoding", "解码"]],
+            "min_hit": 2,
+        }
+        reason = pred_answer_covers(ans, spec)
+        self.assertIsNotNone(reason)
+        self.assertIn("Prefill/预填充", reason)
+
+    def test_forbid_catches_false_premise_compliance(self):
+        """错误前提题：顺着错误前提编造的不允许说法必须被 forbid 拦住。"""
+        ans = answer({"answer": "LoRA 会增加推理延迟，可以用量化缓解", "citations": []})
+        spec = {
+            "must": [["量化", "合并"]],
+            "min_hit": 1,
+            "forbid": [["增加推理延迟", "拖慢推理"]],
+        }
+        reason = pred_answer_covers(ans, spec)
+        self.assertIsNotNone(reason)
+        self.assertIn("不该有的说法", reason)
+
+
+class TestEvidenceAndChunkPredicates(GroundedBase):
+    def test_evidence_hit_passes_when_all_groups_covered(self):
+        ans = answer({"answer": "对比", "citations": [
+            {"chunk_id": "docA-0001", "quote": "借鉴操作系统虚拟内存和分页思想"},
+            {"chunk_id": "docB-0002", "quote": "更细粒度的 kv cache 管理算法 TokenAttention"},
+        ]})
+        spec = {"groups": [["虚拟内存", "分页"], ["TokenAttention"]]}
+        self.assertIsNone(pred_evidence_hit(ans, spec))
+
+    def test_evidence_hit_fails_when_one_hop_missing(self):
+        ans = answer({"answer": "只查了一边", "citations": [
+            {"chunk_id": "docA-0001", "quote": "借鉴操作系统虚拟内存和分页思想"},
+        ]})
+        spec = {"groups": [["虚拟内存"], ["TokenAttention"]]}
+        reason = pred_evidence_hit(ans, spec)
+        self.assertIsNotNone(reason)
+        self.assertIn("TokenAttention", reason)
+
+    def test_chunk_hit_passes_on_expected_chunk(self):
+        ans = answer({"answer": "x", "citations": [{"chunk_id": "c2", "quote": "初始化为零矩阵"}]})
+        self.assertIsNone(pred_chunk_hit(ans, {"expected": ["c1", "c2"]}))
+
+    def test_chunk_hit_fails_on_wrong_chunk(self):
+        ans = answer({"answer": "x", "citations": [{"chunk_id": "c1", "quote": "低秩分解"}]})
+        self.assertIn("未命中", pred_chunk_hit(ans, {"expected": ["c2"]}) or "")
+
+    def test_multi_doc_requires_distinct_doc_prefixes(self):
+        one_doc = answer({"answer": "x", "citations": [
+            {"chunk_id": "docA-0001", "quote": "虚拟内存和分页思想"},
+            {"chunk_id": "docA-0002", "quote": "另一个同文档块"},
+        ]})
+        self.assertIsNotNone(pred_multi_doc(one_doc, {"min_docs": 2}))
+
+        two_docs = answer({"answer": "x", "citations": [
+            {"chunk_id": "docA-0001", "quote": "虚拟内存和分页思想"},
+            {"chunk_id": "docB-0002", "quote": "TokenAttention"},
+        ]})
+        self.assertIsNone(pred_multi_doc(two_docs, {"min_docs": 2}))
+
+    def test_reports_failure_detects_hallucination_under_fault(self):
+        hallucinated = answer({"answer": "HYDE 的核心是用 LLM 生成假答案再去检索", "citations": []})
+        self.assertIn("没有说明失败", pred_reports_failure(hallucinated, {}) or "")
+
+        honest = answer({"answer": "kb_search 检索服务异常超时，无法获取资料", "citations": []})
+        self.assertIsNone(pred_reports_failure(honest, {}))
 
 
 class TestRefusalPredicates(GroundedBase):
@@ -132,6 +230,13 @@ class TestRefusalPredicates(GroundedBase):
     def test_normal_finish_still_passes(self):
         ans = answer({"answer": "资料中没有相关资料", "refused": True, "citations": []})
         self.assertIsNone(pred_states_missing(ans, {}, {"status": "ok", "tokens": 12000}))
+
+    def test_refusal_with_hedged_guess_fails_forbid(self):
+        """嘴上说「资料里没有，但一般是 1024 维」——拒答夹带编造也必须判败。"""
+        ans = answer({"answer": "资料中没有提到 BGE-M3，但一般来说它的维度是 1024", "refused": True, "citations": []})
+        reason = pred_states_missing(ans, {"forbid": ["1024"]})
+        self.assertIsNotNone(reason)
+        self.assertIn("1024", reason)
 
 
 class TestSubmissionGate(GroundedBase):

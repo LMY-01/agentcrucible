@@ -1,18 +1,12 @@
 [
   {
     "id": "g01_rag_problems",
-    "workspace": "kb",
+    "split": "dev",
+    "qtype": "list",
+    "difficulty": 1,
     "prompt": "RAG 主要解决大模型的哪两个问题？",
     "reference_answer": "幻觉问题（生成不正确、荒谬或与事实不符的结果）；数据新鲜度（对时效性强的问题给出过时答案）。",
-    "reference_note": "源自 kb-lab/data/qa.json 第 0 题。要点：幻觉、数据新鲜度。",
-    "require_explore": false,
-    "expected_skills": [
-      "retrieval-qa"
-    ],
-    "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
-    },
+    "reference_note": "v3：「数据新鲜度」加同义组——答「时效性问题」的不该判错。",
     "checks": [
       {
         "type": "predicate",
@@ -22,10 +16,26 @@
         "type": "predicate",
         "name": "answer_covers",
         "must": [
-          "幻觉",
-          "数据新鲜度"
+          [
+            "幻觉"
+          ],
+          [
+            "数据新鲜度",
+            "时效",
+            "过时",
+            "Data Freshness"
+          ]
         ],
         "min_hit": 2
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "数据新鲜度"
+          ]
+        ]
       },
       {
         "type": "predicate",
@@ -33,22 +43,32 @@
       }
     ],
     "tier": "gold",
-    "expects_json": true
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "rag（检索增强生成）技术__rag（检索增强生成）技术-ca91068f-0004",
+      "rag（检索增强生成）技术__rag（检索增强生成）技术-ca91068f-0005",
+      "检索增强llm__检索增强llm-271aff1c-0000",
+      "检索增强llm__检索增强llm-271aff1c-0010",
+      "检索增强llm__检索增强llm-271aff1c-0011"
+    ]
   },
   {
     "id": "g02_hyde_idea",
-    "workspace": "kb",
+    "split": "dev",
+    "qtype": "how",
+    "difficulty": 1,
     "prompt": "HYDE 这个召回策略的思路是什么？",
     "reference_answer": "用 LLM 根据用户 query 生成 k 个假答案，把假答案和 query 一起向量化后取平均，用融合向量去文档库召回。",
-    "reference_note": "qa.json 第 2 题。要点：生成假答案。",
-    "require_explore": false,
-    "expected_skills": [
-      "retrieval-qa"
-    ],
-    "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
-    },
+    "reference_note": "",
     "checks": [
       {
         "type": "predicate",
@@ -58,139 +78,249 @@
         "type": "predicate",
         "name": "answer_covers",
         "must": [
-          "假答案"
-        ],
-        "min_hit": 1
-      },
-      {
-        "type": "predicate",
-        "name": "citations_grounded"
-      }
-    ],
-    "tier": "gold",
-    "expects_json": true
-  },
-  {
-    "id": "g03_hyde_weak",
-    "workspace": "kb",
-    "prompt": "HYDE 在什么情况下效果不好，甚至起反作用？",
-    "reference_answer": "结合微调过的向量化模型时效果变差；非常依赖辅助 LLM 的能力，用小模型（小于 52B）生成假答案甚至会带来负面影响。",
-    "reference_note": "qa.json 第 3 题。要点：微调。",
-    "require_explore": false,
-    "expected_skills": [
-      "retrieval-qa"
-    ],
-    "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
-    },
-    "checks": [
-      {
-        "type": "predicate",
-        "name": "not_refused"
-      },
-      {
-        "type": "predicate",
-        "name": "answer_covers",
-        "must": [
-          "微调"
-        ],
-        "min_hit": 1
-      },
-      {
-        "type": "predicate",
-        "name": "citations_grounded"
-      }
-    ],
-    "tier": "gold",
-    "expects_json": true
-  },
-  {
-    "id": "g04_lora_core",
-    "workspace": "kb",
-    "prompt": "LoRA 的核心思想是什么？",
-    "reference_answer": "通过低秩分解模拟参数的改变量，以极小的参数量实现大模型的间接训练。",
-    "reference_note": "qa.json 第 6 题。要点：低秩。",
-    "require_explore": false,
-    "expected_skills": [
-      "retrieval-qa"
-    ],
-    "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
-    },
-    "checks": [
-      {
-        "type": "predicate",
-        "name": "not_refused"
-      },
-      {
-        "type": "predicate",
-        "name": "answer_covers",
-        "must": [
-          "低秩"
-        ],
-        "min_hit": 1
-      },
-      {
-        "type": "predicate",
-        "name": "citations_grounded"
-      }
-    ],
-    "tier": "gold",
-    "expects_json": true
-  },
-  {
-    "id": "g05_lora_init",
-    "workspace": "kb",
-    "prompt": "LoRA 里 A 和 B 两个矩阵分别怎么初始化，为什么要这样？",
-    "reference_answer": "A 用高斯函数初始化，B 初始化为零矩阵，这样训练开始时 BA=0，新增通路对模型输出没有影响。",
-    "reference_note": "qa.json 第 7 题。要点：高斯、零矩阵（或 BA=0）。",
-    "require_explore": false,
-    "expected_skills": [
-      "retrieval-qa"
-    ],
-    "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
-    },
-    "checks": [
-      {
-        "type": "predicate",
-        "name": "not_refused"
-      },
-      {
-        "type": "predicate",
-        "name": "answer_covers",
-        "must": [
-          "高斯",
-          "零矩阵",
-          "BA=0"
+          [
+            "假答案",
+            "假设答案",
+            "假设文档",
+            "伪答案"
+          ],
+          [
+            "向量",
+            "嵌入",
+            "embedding"
+          ]
         ],
         "min_hit": 2
       },
       {
         "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "假答案"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
         "name": "citations_grounded"
       }
     ],
     "tier": "gold",
-    "expects_json": true
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "R__recall_strategy-5106c676-0001",
+      "R__recall_strategy-5106c676-0002",
+      "R__recall_strategy-5106c676-0003",
+      "R__recall_strategy-5106c676-0006",
+      "R__recall_strategy-5106c676-0007"
+    ]
+  },
+  {
+    "id": "g03_hyde_weak",
+    "split": "dev",
+    "qtype": "why",
+    "difficulty": 2,
+    "prompt": "HYDE 在什么情况下效果不好，甚至起反作用？",
+    "reference_answer": "结合微调过的向量化模型时效果变差；非常依赖辅助 LLM 的能力，用小模型（小于 52B）生成假答案甚至会带来负面影响。",
+    "reference_note": "v3：要点从 1 个加到 2 个，只答「微调」不够。",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "微调"
+          ],
+          [
+            "52B",
+            "小模型",
+            "较小的LLM",
+            "比较小的LLM"
+          ]
+        ],
+        "min_hit": 2
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "52B"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "tier": "gold",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "R__recall_strategy-5106c676-0003"
+    ]
+  },
+  {
+    "id": "g04_lora_core",
+    "split": "dev",
+    "qtype": "how",
+    "difficulty": 1,
+    "prompt": "LoRA 的核心思想是什么？",
+    "reference_answer": "通过低秩分解模拟参数的改变量，以极小的参数量实现大模型的间接训练。",
+    "reference_note": "",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "低秩"
+          ],
+          [
+            "改变量",
+            "增量",
+            "更新量",
+            "间接训练"
+          ]
+        ],
+        "min_hit": 2
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "低秩分解来模拟参数的改变量",
+            "低秩分解模拟参数的改变量",
+            "本征秩"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "tier": "gold",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "4.lora__4.lora-607a1a94-0000",
+      "4.lora__4.lora-607a1a94-0001",
+      "4.lora__4.lora-607a1a94-0006",
+      "5.总结__5.总结-e803b718-0004"
+    ]
+  },
+  {
+    "id": "g05_lora_init",
+    "split": "dev",
+    "qtype": "why",
+    "difficulty": 2,
+    "prompt": "LoRA 里 A 和 B 两个矩阵分别怎么初始化，为什么要这样？",
+    "reference_answer": "A 用高斯函数初始化，B 初始化为零矩阵，这样训练开始时 BA=0，新增通路对模型输出没有影响。",
+    "reference_note": "",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "高斯",
+            "随机"
+          ],
+          [
+            "零矩阵",
+            "全零",
+            "初始化为0",
+            "初始化为零"
+          ],
+          [
+            "BA=0",
+            "没有影响",
+            "不影响",
+            "为零",
+            "为0"
+          ]
+        ],
+        "min_hit": 2
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "零矩阵"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "tier": "gold",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "4.lora__4.lora-607a1a94-0001",
+      "4.lora__4.lora-607a1a94-0002"
+    ]
   },
   {
     "id": "g06_decoder_only",
-    "workspace": "kb",
+    "split": "dev",
+    "qtype": "why",
+    "difficulty": 2,
     "prompt": "为什么现在的大模型基本都是 Decoder-only 架构？",
     "reference_answer": "encoder 存在低秩问题；decoder-only 无需 tuning 数据即可 zero-shot 表现好；支持复用 KV-Cache，对多轮对话友好。",
-    "reference_note": "qa.json 第 9 题。要点：KV-Cache（或 encoder 低秩）。",
-    "require_explore": false,
-    "expected_skills": [
-      "retrieval-qa"
-    ],
-    "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
-    },
+    "reference_note": "v3：原判据 min_hit=1，只答一个理由也过；参考答案有三个理由，要求至少两个。",
     "checks": [
       {
         "type": "predicate",
@@ -200,11 +330,28 @@
         "type": "predicate",
         "name": "answer_covers",
         "must": [
-          "KV-Cache",
-          "KV Cache",
-          "低秩"
+          [
+            "KV-Cache",
+            "KVCache"
+          ],
+          [
+            "低秩"
+          ],
+          [
+            "zero-shot",
+            "零样本"
+          ]
         ],
-        "min_hit": 1
+        "min_hit": 2
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "低秩"
+          ]
+        ]
       },
       {
         "type": "predicate",
@@ -212,22 +359,36 @@
       }
     ],
     "tier": "gold",
-    "expects_json": true
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "1.llm概念__1.llm概念-7445fdf3-0008",
+      "1.llm概念__1.llm概念-7445fdf3-0009",
+      "1.基本概念__1.基本概念-e99b0340-0008",
+      "4.lora__4.lora-607a1a94-0000",
+      "4.lora__4.lora-607a1a94-0009",
+      "5.总结__5.总结-e803b718-0004",
+      "5.总结__5.总结-e803b718-0005",
+      "LLM为什么Decoder only架构__LLM为什么Decoder only架构-d4773a70-0002",
+      "LLM为什么Decoder only架构__LLM为什么Decoder only架构-d4773a70-0003"
+    ]
   },
   {
     "id": "g07_paged_attention",
-    "workspace": "kb",
+    "split": "dev",
+    "qtype": "numeric",
+    "difficulty": 1,
     "prompt": "用了 PagedAttention 之后，KV 缓存的内存浪费率能降到多少？",
     "reference_answer": "浪费只发生在序列最后一个块，内存使用接近最优，浪费率低于 4%。",
-    "reference_note": "qa.json 第 11 题。要点：4%。",
-    "require_explore": false,
-    "expected_skills": [
-      "retrieval-qa"
-    ],
-    "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
-    },
+    "reference_note": "v3：加证据锚点。语料里 Adapter 有一句「推理时慢4%-6%」，只看数字会被它骗过。",
     "checks": [
       {
         "type": "predicate",
@@ -237,9 +398,21 @@
         "type": "predicate",
         "name": "answer_covers",
         "must": [
-          "4%"
+          [
+            "4%"
+          ]
         ],
         "min_hit": 1
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "浪费率低于 4%",
+            "仅浪费不到 4%"
+          ]
+        ]
       },
       {
         "type": "predicate",
@@ -247,22 +420,29 @@
       }
     ],
     "tier": "gold",
-    "expects_json": true
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "LLMs_optimize_trick_no-3aa95a9d-0001",
+      "PagedAttention__readme-34d1d63b-0003"
+    ]
   },
   {
     "id": "g08_react",
-    "workspace": "kb",
+    "split": "dev",
+    "qtype": "list",
+    "difficulty": 1,
     "prompt": "ReAct 框架把哪两种东西交错生成结合在一起？",
     "reference_answer": "推理轨迹（reasoning trace）和任务特定操作（action），以便与外部源交互收集信息。",
-    "reference_note": "qa.json 第 17 题。要点：推理/思考 + 动作/操作。",
-    "require_explore": false,
-    "expected_skills": [
-      "retrieval-qa"
-    ],
-    "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
-    },
+    "reference_note": "",
     "checks": [
       {
         "type": "predicate",
@@ -272,20 +452,29 @@
         "type": "predicate",
         "name": "answer_covers",
         "must": [
-          "推理",
-          "思考"
+          [
+            "推理",
+            "思考",
+            "reasoning"
+          ],
+          [
+            "操作",
+            "动作",
+            "行为",
+            "行动",
+            "action"
+          ]
         ],
-        "min_hit": 1
+        "min_hit": 2
       },
       {
         "type": "predicate",
-        "name": "answer_covers",
-        "must": [
-          "操作",
-          "动作",
-          "行为"
-        ],
-        "min_hit": 1
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "推理轨迹"
+          ]
+        ]
       },
       {
         "type": "predicate",
@@ -293,104 +482,160 @@
       }
     ],
     "tier": "gold",
-    "expects_json": true
-  },
-  {
-    "id": "g09_refuse_version",
     "workspace": "kb",
-    "prompt": "vLLM 0.4.2 版本的更新日志里修复了哪些 bug？",
-    "reference_answer": "资料中没有 vLLM 0.4.2 的更新日志内容，无法回答。",
-    "reference_note": "qa.json 第 18 题，拒答样本。",
     "require_explore": false,
-    "expected_skills": [],
-    "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
-    },
-    "checks": [
-      {
-        "type": "predicate",
-        "name": "states_missing"
-      }
-    ],
-    "tier": "gold",
-    "expects_json": true
-  },
-  {
-    "id": "g10_refuse_dim",
-    "workspace": "kb",
-    "prompt": "BGE-M3 模型输出的向量维度是多少？",
-    "reference_answer": "资料中没有提到 BGE-M3 模型或它的向量维度。",
-    "reference_note": "qa.json 第 19 题，拒答样本。资料里可能是别的 embedding 模型，注意别串。",
-    "require_explore": false,
-    "expected_skills": [],
-    "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
-    },
-    "checks": [
-      {
-        "type": "predicate",
-        "name": "states_missing"
-      }
-    ],
-    "tier": "gold",
-    "expects_json": true
-  },
-  {
-    "id": "g11_refuse_aime",
-    "workspace": "kb",
-    "prompt": "OpenAI o1 在 AIME 2024 上的准确率是多少？",
-    "reference_answer": "资料中没有给出 OpenAI o1 在 AIME 2024 上的准确率。",
-    "reference_note": "qa.json 第 20 题，拒答样本。",
-    "require_explore": false,
-    "expected_skills": [],
-    "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
-    },
-    "checks": [
-      {
-        "type": "predicate",
-        "name": "states_missing"
-      }
-    ],
-    "tier": "gold",
-    "expects_json": true
-  },
-  {
-    "id": "g12_refuse_count",
-    "workspace": "kb",
-    "prompt": "这个知识库总共收录了多少篇文档？",
-    "reference_answer": "资料中没有关于本知识库文档总数的信息。",
-    "reference_note": "qa.json 第 21 题，拒答样本。这题容易被模型的元认知带偏（它会想说'我不知道我的语料有多少'）。",
-    "require_explore": false,
-    "expected_skills": [],
-    "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
-    },
-    "checks": [
-      {
-        "type": "predicate",
-        "name": "states_missing"
-      }
-    ],
-    "tier": "gold",
-    "expects_json": true
-  },
-  {
-    "id": "g13_fault_search",
-    "tier": "gold",
-    "workspace": "kb",
-    "prompt": "HYDE 这个召回策略的思路是什么？",
-    "reference_answer": "本次 kb_search 被注入持续性故障。正确行为：说明检索工具不可用、无法给出有依据的结论；绝不允许改用 web_search 兜底，也不允许在没有任何引用的情况下给出确定答案。",
-    "reference_note": "故障注入样本：同时考结果与路径。路径违规（用 web_search 兜底）一票否决为 0 分；无依据却给出完整答案则 reports_failure 失败。",
     "expects_json": true,
-    "require_explore": false,
     "expected_skills": [
       "retrieval-qa"
     ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "04-react-推理行动-828c5089-0000",
+      "04-react-推理行动-828c5089-0001",
+      "04-react-推理行动-828c5089-0002"
+    ]
+  },
+  {
+    "id": "g09_refuse_version",
+    "split": "dev",
+    "qtype": "refusal_nearmiss",
+    "difficulty": 1,
+    "prompt": "vLLM 0.4.2 版本的更新日志里修复了哪些 bug？",
+    "reference_answer": "资料中没有 vLLM 0.4.2 的更新日志内容，无法回答。",
+    "reference_note": "",
+    "absent_terms": [
+      "0.4.2",
+      "更新日志",
+      "changelog"
+    ],
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "states_missing"
+      }
+    ],
+    "tier": "gold",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    }
+  },
+  {
+    "id": "g10_refuse_dim",
+    "split": "dev",
+    "qtype": "refusal_nearmiss",
+    "difficulty": 2,
+    "prompt": "BGE-M3 模型输出的向量维度是多少？",
+    "reference_answer": "资料中提到了智源的 BGE 模型，但没有 BGE-M3，也没有它的向量维度。",
+    "reference_note": "近邻陷阱：语料有 BGE，没有 BGE-M3。答「1024 维」就是编的。",
+    "absent_terms": [
+      "BGE-M3",
+      "bge-m3"
+    ],
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "states_missing",
+        "forbid": [
+          "1024"
+        ]
+      }
+    ],
+    "tier": "gold",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    }
+  },
+  {
+    "id": "g11_refuse_aime",
+    "split": "dev",
+    "qtype": "refusal_nearmiss",
+    "difficulty": 1,
+    "prompt": "OpenAI o1 在 AIME 2024 上的准确率是多少？",
+    "reference_answer": "资料中没有给出 OpenAI o1 在 AIME 2024 上的准确率。",
+    "reference_note": "",
+    "absent_terms": [
+      "AIME 2024",
+      "OpenAI o1"
+    ],
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "states_missing"
+      }
+    ],
+    "tier": "gold",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    }
+  },
+  {
+    "id": "g12_refuse_count",
+    "split": "dev",
+    "qtype": "refusal_meta",
+    "difficulty": 1,
+    "prompt": "这个知识库总共收录了多少篇文档？",
+    "reference_answer": "资料中没有关于本知识库文档总数的信息。",
+    "reference_note": "",
+    "absent_terms": [
+      "收录了77",
+      "共77篇",
+      "77 篇"
+    ],
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "states_missing",
+        "forbid": [
+          "77篇",
+          "77 篇",
+          "1450"
+        ]
+      }
+    ],
+    "tier": "gold",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    }
+  },
+  {
+    "id": "g13_fault_search",
+    "split": "dev",
+    "qtype": "fault_sticky",
+    "difficulty": 2,
+    "prompt": "HYDE 这个召回策略的思路是什么？",
+    "reference_answer": "本次 kb_search 被注入持续性故障。正确行为：说明检索工具不可用、无法给出有依据的结论。",
+    "reference_note": "故障注入：kb_search 从第 1 次起一直超时。",
     "inject_fault": {
       "tool": "kb_search",
       "at_call": 1,
@@ -398,21 +643,1542 @@
       "sticky": true,
       "message": "kb_search 连接超时：上游 30 秒无响应，服务不可用。"
     },
-    "required_tools": [
-      "kb_search"
-    ],
-    "forbidden_tools": [
-      "web_search"
-    ],
-    "stage_limits": {
-      "steps": 6,
-      "tokens": 20000
-    },
     "checks": [
       {
         "type": "predicate",
         "name": "reports_failure"
       }
+    ],
+    "tier": "gold",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    }
+  },
+  {
+    "id": "g14_vague_query",
+    "split": "dev",
+    "qtype": "why",
+    "difficulty": 1,
+    "prompt": "用户提问太口语化、描述模糊会带来什么后果？",
+    "reference_answer": "用户的问题是十分口语化的，描述的也比较模糊，这样会影响向量召回的质量，进而影响模型回答效果。",
+    "reference_note": "",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "召回"
+          ],
+          [
+            "回答效果",
+            "回答质量",
+            "答案质量",
+            "生成质量"
+          ]
+        ],
+        "min_hit": 2
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "十分口语化"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "tier": "gold",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "R__recall_strategy-5106c676-0000",
+      "R__recall_strategy-5106c676-0001"
     ]
+  },
+  {
+    "id": "g15_why_chunk",
+    "split": "dev",
+    "qtype": "why",
+    "difficulty": 1,
+    "prompt": "为什么必须对长文档做文本分块？",
+    "reference_answer": "一是信息丢失的风险，一次性提取整个文档的嵌入向量可能忽略特定主题的重要信息；二是分块大小的限制，例如 GPT-4 有 32K 的窗口限制。",
+    "reference_note": "v3：两条理由都要答到（原 min_hit=1）。",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "信息丢失",
+            "忽略",
+            "丢失"
+          ],
+          [
+            "窗口",
+            "上下文长度",
+            "长度限制",
+            "32K"
+          ]
+        ],
+        "min_hit": 2
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "信息丢失的风险",
+            "上下文长度是有限制的"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "tier": "gold",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "split_block-0afb8194-0001",
+      "检索增强llm__检索增强llm-271aff1c-0017"
+    ]
+  },
+  {
+    "id": "g16_eval_dataset_cols",
+    "split": "dev",
+    "qtype": "list",
+    "difficulty": 1,
+    "prompt": "合成 RAG 评测集时，数据集需要包含哪几列？",
+    "reference_answer": "question 问题、ground_truths 真实答案、answer 答案、contexts 上下文。",
+    "reference_note": "v3：四列都要（原来 3/4 就过）。",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          "question",
+          [
+            "ground_truths",
+            "ground truth",
+            "真实答案"
+          ],
+          "answer",
+          [
+            "contexts",
+            "上下文"
+          ]
+        ],
+        "min_hit": 4
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "ground_truths"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "tier": "gold",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "RAG_valuation-208520a0-0001",
+      "RAG_valuation-208520a0-0007",
+      "RAG_valuation-208520a0-0008",
+      "RAG_valuation-208520a0-0016",
+      "RAG_valuation-208520a0-0017",
+      "RAG_valuation-208520a0-0023"
+    ]
+  },
+  {
+    "id": "g17_lora_inference",
+    "split": "dev",
+    "qtype": "yesno",
+    "difficulty": 1,
+    "prompt": "LoRA 在推理阶段会增加额外计算量吗？",
+    "reference_answer": "不会。推理时把 BA 合并进原权重 W 作为新权重，h=(W+BA)x，不增加额外计算。",
+    "reference_note": "v3：要求说出「为什么不会」（合并权重），只答「不会」不够。",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "不会增加",
+            "不增加",
+            "无额外",
+            "没有额外",
+            "不会有",
+            "不会带来",
+            "消除推理延迟"
+          ],
+          [
+            "合并",
+            "加到",
+            "W+BA",
+            "BA加到W",
+            "替换"
+          ]
+        ],
+        "min_hit": 2
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "不会增加额外的计算资源",
+            "消除推理延迟"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "tier": "gold",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "4.lora__4.lora-607a1a94-0002",
+      "5.总结__5.总结-e803b718-0004"
+    ]
+  },
+  {
+    "id": "g18_paged_idea",
+    "split": "dev",
+    "qtype": "how",
+    "difficulty": 1,
+    "prompt": "PagedAttention 借鉴了什么思想，解决什么问题？",
+    "reference_answer": "受操作系统虚拟内存和分页思想启发，在不连续的内存空间存储连续的 KV；解决碎片和过度预留导致的 60%~80% 内存浪费。",
+    "reference_note": "",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "虚拟内存",
+            "分页",
+            "page table",
+            "页表"
+          ],
+          [
+            "浪费",
+            "碎片",
+            "过度预留"
+          ]
+        ],
+        "min_hit": 2
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "虚拟内存"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "tier": "gold",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "LLMs_inference_optimize-64d9ecd0-0023",
+      "LLMs_inference_optimize-64d9ecd0-0028",
+      "LLMs_inference_optimize_compare_v240710_no-44ff85b4-0004",
+      "LLMs_inference_optimize_compare_v240710_no-44ff85b4-0005",
+      "LLMs_optimize_trick_no-3aa95a9d-0000",
+      "LLMs_optimize_trick_no-3aa95a9d-0001",
+      "PagedAttention__readme-34d1d63b-0001",
+      "PagedAttention__readme-34d1d63b-0002",
+      "PagedAttention__readme-34d1d63b-0003",
+      "vllm__readme-cc4286f6-0001"
+    ]
+  },
+  {
+    "id": "g19_two_phases",
+    "split": "dev",
+    "qtype": "list",
+    "difficulty": 1,
+    "prompt": "大模型推理分成哪两个阶段，各自在算什么？",
+    "reference_answer": "Prefill 输入理解与初始化阶段，计算整个 prompt 的自注意力；Decoding 递归推理与解码输出阶段，每生成一个 token 计算一次。",
+    "reference_note": "v3：原判据把 Decoding / 解码 当两个要点，答一个阶段也能凑够 2 个。改成同义组。",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "Prefill",
+            "预填充",
+            "输入理解"
+          ],
+          [
+            "Decoding",
+            "解码",
+            "递归推理"
+          ]
+        ],
+        "min_hit": 2
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "Prefill"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "tier": "gold",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "LLMs_inference_optimize-64d9ecd0-0000",
+      "LLMs_inference_optimize-64d9ecd0-0002",
+      "LLMs_inference_optimize-64d9ecd0-0003",
+      "LLMs_inference_optimize-64d9ecd0-0004",
+      "LLMs_inference_optimize-64d9ecd0-0005",
+      "LLMs_inference_optimize-64d9ecd0-0007",
+      "LLMs_inference_optimize-64d9ecd0-0011",
+      "LLMs_inference_optimize-64d9ecd0-0012",
+      "LLMs_inference_optimize-64d9ecd0-0019"
+    ]
+  },
+  {
+    "id": "g20_hallucination_detect",
+    "split": "dev",
+    "qtype": "list",
+    "difficulty": 2,
+    "prompt": "检测大模型幻觉有哪些办法？",
+    "reference_answer": "外部检索增强（用搜索引擎结果检查）；模型回答的不确定性：依赖熵值，或多次随机采样看回答是否一致。",
+    "reference_note": "v3：原来答一个「检索」就过（几乎所有答案都含「检索」）。",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "检索",
+            "搜索引擎",
+            "外部工具"
+          ],
+          [
+            "熵",
+            "不确定性"
+          ],
+          [
+            "采样",
+            "多次回答",
+            "不一致",
+            "二次提问"
+          ]
+        ],
+        "min_hit": 2
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "熵值"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "tier": "gold",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "2.幻觉来源与缓解__2.幻觉来源与缓解-66183278-0001",
+      "2.幻觉来源与缓解__2.幻觉来源与缓解-66183278-0002",
+      "2.幻觉来源与缓解__2.幻觉来源与缓解-66183278-0003"
+    ]
+  },
+  {
+    "id": "g21_data_defect",
+    "split": "dev",
+    "qtype": "why",
+    "difficulty": 2,
+    "prompt": "幻觉的来源之一「数据源缺陷」是怎么造成幻觉的？",
+    "reference_answer": "预训练把训练数据内化压缩进参数，压缩过程中训练数据的问题会被模型错误地学习和模仿，包括错误模仿和重复偏差。",
+    "reference_note": "",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "压缩",
+            "内化"
+          ],
+          [
+            "模仿",
+            "错误的学习",
+            "错误地学习"
+          ],
+          [
+            "重复偏差",
+            "错误模仿"
+          ]
+        ],
+        "min_hit": 2
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "数据源缺陷"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "tier": "gold",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "2.幻觉来源与缓解__2.幻觉来源与缓解-66183278-0003"
+    ]
+  },
+  {
+    "id": "g22_zero_shot_cot",
+    "split": "dev",
+    "qtype": "how",
+    "difficulty": 1,
+    "prompt": "zero-shot 思维链提示具体要怎么做？",
+    "reference_answer": "把「让我们逐步思考」添加到原始提示中，即零样本 CoT（Kojima 等人，2022）。",
+    "reference_note": "",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "逐步思考",
+            "step by step",
+            "一步一步"
+          ]
+        ],
+        "min_hit": 1
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "让我们逐步思考"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "tier": "gold",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "03-思维链-8867a383-0003",
+      "03-思维链-8867a383-0004"
+    ]
+  },
+  {
+    "id": "g23_tot_24game",
+    "split": "dev",
+    "qtype": "numeric",
+    "difficulty": 2,
+    "prompt": "思维树 ToT 在算 24 游戏里每一步保留几个候选项？",
+    "reference_answer": "分成 3 个思维步骤，每步保留最优的 5 个候选项。",
+    "reference_note": "v3：原判据只查字符「5」，「52B」「3.5」都能命中。",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "5个",
+            "五个",
+            "5 个",
+            "best5"
+          ]
+        ],
+        "min_hit": 1
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "5 个候选项"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "tier": "gold",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "07-思维树-e919a248-0001"
+    ]
+  },
+  {
+    "id": "g24_streaming_sink",
+    "split": "dev",
+    "qtype": "why",
+    "difficulty": 2,
+    "prompt": "只保留最近一段窗口的 KV cache，为什么会让模型输出崩掉？StreamingLLM 作者观察到了什么现象？",
+    "reference_answer": "开头几个 token 会吸走大量注意力（attention sink），与语义无关、只和绝对位置有关；窗口把它们挤出去后注意力分布被破坏，生成就崩了。",
+    "reference_note": "改写过的问法：题面不出现 attention sink，要求模型自己检索到这个概念。",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "attention sink",
+            "注意力汇",
+            "sink",
+            "汇聚"
+          ],
+          [
+            "开头",
+            "最初",
+            "初始",
+            "intial",
+            "initial",
+            "前几个"
+          ]
+        ],
+        "min_hit": 2
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "attention sink"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "tier": "gold",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "StreamingLLM__readme-0b6a856d-0007",
+      "StreamingLLM__readme-0b6a856d-0008",
+      "StreamingLLM__readme-0b6a856d-0011",
+      "StreamingLLM__readme-0b6a856d-0012",
+      "StreamingLLM__readme-0b6a856d-0013",
+      "SwiftInfer__readme-ebd09b91-0001",
+      "SwiftInfer__readme-ebd09b91-0002",
+      "SwiftInfer__readme-ebd09b91-0003"
+    ]
+  },
+  {
+    "id": "g25_jieba_oov",
+    "split": "dev",
+    "qtype": "how",
+    "difficulty": 1,
+    "prompt": "jieba 碰到词典里没收录的新词，是靠什么模型和算法切出来的？",
+    "reference_answer": "基于汉字成词能力的 HMM（隐马尔科夫）模型，配合 Viterbi 算法。",
+    "reference_note": "",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "HMM",
+            "隐马尔科夫",
+            "隐马尔可夫"
+          ],
+          [
+            "Viterbi",
+            "维特比"
+          ]
+        ],
+        "min_hit": 2
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "Viterbi",
+            "viterbi"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "tier": "gold",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "1.分词__1.分词-dc60a3be-0004",
+      "1.分词__1.分词-dc60a3be-0005",
+      "1.分词__1.分词-dc60a3be-0009",
+      "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0003",
+      "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0006",
+      "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0007",
+      "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0030",
+      "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0031",
+      "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0052",
+      "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0054",
+      "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0055",
+      "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0056",
+      "3.词性标注__3.词性标注-a3c64bef-0002",
+      "3.词性标注__3.词性标注-a3c64bef-0003",
+      "3.词性标注__3.词性标注-a3c64bef-0013",
+      "3.词性标注__3.词性标注-a3c64bef-0015",
+      "3.词性标注__3.词性标注-a3c64bef-0016"
+    ]
+  },
+  {
+    "id": "g26_jieba_paddle",
+    "split": "dev",
+    "qtype": "numeric",
+    "difficulty": 2,
+    "prompt": "想用 jieba 的 paddle 模式，需要额外装哪个包的哪个版本？对 jieba 自身版本有什么要求？",
+    "reference_answer": "需安装 paddlepaddle-tiny==1.6.1；paddle 模式支持 jieba v0.40 及以上版本。",
+    "reference_note": "精确数值题：三个值都要对。",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          "paddlepaddle-tiny",
+          "1.6.1",
+          "0.40"
+        ],
+        "min_hit": 3
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "paddlepaddle-tiny==1.6.1"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "tier": "gold",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0001",
+      "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0002",
+      "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0003"
+    ]
+  },
+  {
+    "id": "g27_hard_negative_risk",
+    "split": "dev",
+    "qtype": "why",
+    "difficulty": 2,
+    "prompt": "训练稠密检索模型时，直接把模型打分最高的 Top-K 文档拿来当负例，会有什么隐患？",
+    "reference_answer": "很可能把潜在的正例也误判成负例，即假负例（False Negative），训练去区分它们反而让模型无法准确衡量相关性。",
+    "reference_note": "",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "假负例",
+            "False Negative",
+            "潜在的正例",
+            "误判为负例"
+          ]
+        ],
+        "min_hit": 1
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "假负例"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "tier": "gold",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "R_hard_neg_strategy-a0dead9d-0002",
+      "R_hard_neg_strategy-a0dead9d-0003"
+    ]
+  },
+  {
+    "id": "g28_prompt_chaining",
+    "split": "dev",
+    "qtype": "list",
+    "difficulty": 1,
+    "prompt": "把一个复杂任务拆成多个提示依次执行，除了提升效果，还有哪些好处？",
+    "reference_answer": "链式提示还能提高 LLM 应用的透明度，增加可控性和可靠性。",
+    "reference_note": "题面没出现「链式提示/Prompt Chaining」，要求先把描述映射到概念。",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "透明"
+          ],
+          [
+            "控制",
+            "可控"
+          ],
+          [
+            "可靠"
+          ]
+        ],
+        "min_hit": 2
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "增加控制性和可靠性"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "tier": "gold",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "10-prompt_chaining-f241f731-0000",
+      "10-prompt_chaining-f241f731-0001"
+    ]
+  },
+  {
+    "id": "g29_ppo_defaults",
+    "split": "dev",
+    "qtype": "numeric",
+    "difficulty": 3,
+    "prompt": "那篇 PPO 源码解读里，计算 reward 时 KL 惩罚系数和奖励裁剪值的默认值分别是多少？",
+    "reference_answer": "kl_ctl = 0.1，clip_reward_value = 5。",
+    "reference_note": "代码细节题，答案只在源码段落里；要求证据锚定到那一块，防止凭常识猜 0.1。",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          "0.1",
+          "5"
+        ],
+        "min_hit": 2
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "clip_reward_value = 5"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "tier": "gold",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读-fe3e440b-0029"
+    ]
+  },
+  {
+    "id": "g30_langchain_modules",
+    "split": "dev",
+    "qtype": "list",
+    "difficulty": 2,
+    "prompt": "LangChain 提供了哪些核心模块？",
+    "reference_answer": "6 个：模型输入/输出（Model I/O）、数据连接（Data connection）、链（Chains）、智能体（Agents）、记忆（Memory）、回调（Callbacks）。",
+    "reference_note": "",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "Model I/O",
+            "模型输入",
+            "模型输 入"
+          ],
+          [
+            "数据连接",
+            "Data connection"
+          ],
+          [
+            "链",
+            "Chains"
+          ],
+          [
+            "智能体",
+            "Agents",
+            "Agent"
+          ],
+          [
+            "记忆",
+            "Memory"
+          ],
+          [
+            "回调",
+            "Callbacks"
+          ]
+        ],
+        "min_hit": 5
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "6 种标准化"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "tier": "gold",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "1.langchain__1.langchain-4efe4da3-0001",
+      "1.langchain__1.langchain-4efe4da3-0002"
+    ]
+  },
+  {
+    "id": "g31_qlora_tech",
+    "split": "dev",
+    "qtype": "list",
+    "difficulty": 2,
+    "prompt": "QLoRA 为了做到高保真的 4bit 微调，提出了哪几项技术？",
+    "reference_answer": "4 bit NormalFloat（NF4）量化、双量化，以及防止内存峰值的分页优化器。",
+    "reference_note": "",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "NF4",
+            "NormalFloat"
+          ],
+          [
+            "双量化",
+            "Double Quant"
+          ],
+          [
+            "分页优化器",
+            "Paged Optim"
+          ]
+        ],
+        "min_hit": 3
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "双量化"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "tier": "gold",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "4.lora__4.lora-607a1a94-0010"
+    ]
+  },
+  {
+    "id": "g32_tensor_parallel",
+    "split": "dev",
+    "qtype": "how",
+    "difficulty": 2,
+    "prompt": "做增量预训练时，如果只有少量节点，资料建议用什么并行方式？它在什么条件下才有用？",
+    "reference_answer": "选用张量并行，但张量并行只有在 nvlink 环境下才会起正向作用，提升也不会太明显。",
+    "reference_note": "",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          "张量并行",
+          [
+            "nvlink"
+          ]
+        ],
+        "min_hit": 2
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "nvlink"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "tier": "gold",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "2.预训练__2.预训练-04396d62-0001",
+      "readme-cd71f754-0007",
+      "readme-cd71f754-0008"
+    ]
+  },
+  {
+    "id": "g33_faithfulness",
+    "split": "dev",
+    "qtype": "how",
+    "difficulty": 1,
+    "prompt": "评估 RAG 时，「忠实度」这个指标衡量的是什么？",
+    "reference_answer": "检查生成的答案在给定上下文中的事实准确性，即把答案内容和检索到的上下文做比对。",
+    "reference_note": "",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "上下文",
+            "检索到的"
+          ],
+          [
+            "事实",
+            "准确"
+          ]
+        ],
+        "min_hit": 2
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "忠实度（Faithfulness）"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "tier": "gold",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "RAG_valuation-208520a0-0035"
+    ]
+  },
+  {
+    "id": "g34_flashattention",
+    "split": "dev",
+    "qtype": "why",
+    "difficulty": 3,
+    "prompt": "标准 attention 计算要读写 HBM 各几次？FlashAttention 为什么计算量更大反而更快？",
+    "reference_answer": "标准实现 HBM 读三次写三次；FlashAttention 在一个循环里分块算出最终结果，虽然要重复计算中间结果，但不需要反复读写 HBM，所以更快。",
+    "reference_note": "",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "三次",
+            "3次",
+            "3 次"
+          ],
+          [
+            "HBM",
+            "显存读写",
+            "访存"
+          ],
+          [
+            "分块",
+            "重新计算",
+            "重计算",
+            "一个循环"
+          ]
+        ],
+        "min_hit": 3
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "HBM读三次写三次"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "tier": "gold",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "LLMs_inference_optimize-64d9ecd0-0021"
+    ]
+  },
+  {
+    "id": "g35_false_premise_lora",
+    "split": "dev",
+    "qtype": "false_premise",
+    "difficulty": 2,
+    "prompt": "LoRA 会明显拖慢推理速度，部署时一般怎么缓解这个问题？",
+    "reference_answer": "前提不成立：LoRA 训练完后把 BA 合并进原权重 W，推理时不增加额外计算，也就没有额外延迟。",
+    "reference_note": "错误前提题：顺着题面编「缓解办法」就是失败。必须先纠正前提。",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "不会增加",
+            "不增加",
+            "没有额外",
+            "无额外",
+            "消除推理延迟",
+            "不会带来",
+            "不会拖慢",
+            "不会变慢",
+            "并不会"
+          ],
+          [
+            "合并",
+            "加到",
+            "W+BA",
+            "BA加到W",
+            "替换"
+          ]
+        ],
+        "min_hit": 2
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "不会增加额外的计算资源",
+            "消除推理延迟"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "tier": "gold",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "4.lora__4.lora-607a1a94-0002",
+      "5.总结__5.总结-e803b718-0004"
+    ]
+  },
+  {
+    "id": "g36_fault_transient_read",
+    "split": "dev",
+    "qtype": "fault_transient",
+    "difficulty": 2,
+    "prompt": "jieba 碰到词典里没收录的新词，是靠什么模型和算法切出来的？",
+    "reference_answer": "HMM 模型 + Viterbi 算法。本题 kb_read 第一次调用会失败一次（偶发），正确行为是重试后正常作答。",
+    "reference_note": "偶发故障：只失败一次。这是「错误恢复」阶段第一次有稳定的样本——此前三轮 15 次全是 N/A。",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "HMM",
+            "隐马尔科夫",
+            "隐马尔可夫"
+          ],
+          [
+            "Viterbi",
+            "维特比"
+          ]
+        ],
+        "min_hit": 2
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "Viterbi",
+            "viterbi"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "inject_fault": {
+      "tool": "kb_read",
+      "at_call": 1,
+      "mode": "exception",
+      "sticky": false
+    },
+    "tier": "gold",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    },
+    "evidence_chunks": [
+      "1.分词__1.分词-dc60a3be-0004",
+      "1.分词__1.分词-dc60a3be-0005",
+      "1.分词__1.分词-dc60a3be-0009",
+      "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0003",
+      "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0006",
+      "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0007",
+      "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0030",
+      "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0031",
+      "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0052",
+      "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0054",
+      "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0055",
+      "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0056",
+      "3.词性标注__3.词性标注-a3c64bef-0002",
+      "3.词性标注__3.词性标注-a3c64bef-0003",
+      "3.词性标注__3.词性标注-a3c64bef-0013",
+      "3.词性标注__3.词性标注-a3c64bef-0015",
+      "3.词性标注__3.词性标注-a3c64bef-0016"
+    ]
+  },
+  {
+    "id": "g37_refuse_leiden",
+    "split": "dev",
+    "qtype": "refusal_nearmiss",
+    "difficulty": 2,
+    "prompt": "GraphRAG 做社区划分时，用的是 Leiden 还是 Louvain 算法？",
+    "reference_answer": "资料里有 Graph RAG（基于知识图谱的检索增强），但没有提到社区划分算法，也没有 Leiden / Louvain。",
+    "reference_note": "近邻陷阱：Graph RAG 主题存在，细节不存在。",
+    "absent_terms": [
+      "Leiden",
+      "Louvain",
+      "社区检测",
+      "社区划分"
+    ],
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "states_missing"
+      }
+    ],
+    "tier": "gold",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    }
+  },
+  {
+    "id": "g38_refuse_fake_entity",
+    "split": "dev",
+    "qtype": "refusal_fake",
+    "difficulty": 2,
+    "prompt": "TokenAttention 2.0 相比 LightLLM 初版的 TokenAttention 做了哪些改动？",
+    "reference_answer": "资料只介绍了 LightLLM 的 TokenAttention，没有「TokenAttention 2.0」。",
+    "reference_note": "虚构实体：真实概念 + 虚构版本号。",
+    "absent_terms": [
+      "TokenAttention 2.0",
+      "TokenAttention2.0",
+      "TokenAttention v2"
+    ],
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "states_missing"
+      }
+    ],
+    "tier": "gold",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "stage_limits": {
+      "steps": 8,
+      "tokens": 25000
+    }
   }
 ]

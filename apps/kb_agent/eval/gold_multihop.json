@@ -1,39 +1,52 @@
 [
   {
     "id": "mh01_inference_frameworks",
-    "tier": "multihop",
+    "split": "dev",
+    "qtype": "multihop",
+    "difficulty": 3,
     "prompt": "vLLM 和 LightLLM 在推理优化的思路上有什么不同？各自的侧重点是什么？请对比后回答。",
+    "reference_answer": "vLLM 的核心是 PagedAttention：借鉴虚拟内存分页管理 KV cache，浪费率低于 4%，提升吞吐。LightLLM 引入更细粒度的 TokenAttention 管理 kv cache，并配合 Efficient Router 调度，在多数场景下吞吐高于 vLLM。",
+    "reference_note": "v2：旧参考答案说 LightLLM 走「continuous batching」路线——语料里 LightLLM 的核心是 TokenAttention，旧答案是凭记忆写的。",
     "checks": [
       {
         "type": "predicate",
-        "name": "multi_doc",
-        "docs": [
-          "vllm__readme",
-          "LightLLM__readme"
-        ],
-        "min_docs": 2
+        "name": "not_refused"
       },
       {
         "type": "predicate",
         "name": "answer_covers",
         "must": [
-          "PagedAttention",
-          "显存",
-          "吞吐"
+          [
+            "PagedAttention",
+            "分页"
+          ],
+          [
+            "TokenAttention"
+          ],
+          [
+            "Router",
+            "调度"
+          ]
         ],
         "min_hit": 2
       },
       {
         "type": "predicate",
-        "name": "citations_grounded"
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "PagedAttention"
+          ],
+          [
+            "TokenAttention"
+          ]
+        ]
       },
       {
         "type": "predicate",
-        "name": "not_refused"
+        "name": "citations_grounded"
       }
     ],
-    "reference_answer": "vLLM 的核心是 PagedAttention，把 KV cache 分页管理，消除显存碎片，提升吞吐；LightLLM 同样关注显存与吞吐，但走的是轻量化和 continuous batching 路线，代码更轻、部署成本更低。两者都在解决 LLM 推理的显存与吞吐问题，侧重不同：一个在算法层（分页注意力），一个在工程层（轻量框架）。",
-    "reference_note": "多跳：必须同时引用两篇框架文档。只引用 vLLM 就答不出差异。",
     "stage_limits": {
       "steps": 9,
       "tokens": 72000
@@ -42,44 +55,101 @@
       "steps": 12,
       "tokens": 90000,
       "seconds": 300
-    }
+    },
+    "tier": "multihop",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "evidence_chunks": [
+      "LLMs_inference_optimize-64d9ecd0-0028",
+      "LLMs_inference_optimize_compare_v240302-0306b4a7-0004",
+      "LLMs_inference_optimize_compare_v240302-0306b4a7-0005",
+      "LLMs_inference_optimize_compare_v240302-0306b4a7-0014",
+      "LLMs_inference_optimize_compare_v240302-0306b4a7-0015",
+      "LLMs_inference_optimize_compare_v240302-0306b4a7-0016",
+      "LLMs_inference_optimize_compare_v240710_no-44ff85b4-0001",
+      "LLMs_inference_optimize_compare_v240710_no-44ff85b4-0004",
+      "LLMs_inference_optimize_compare_v240710_no-44ff85b4-0005",
+      "LLMs_optimize_trick_no-3aa95a9d-0000",
+      "LLMs_optimize_trick_no-3aa95a9d-0001",
+      "LLMs_optimize_trick_no-3aa95a9d-0002",
+      "LightLLM__readme-22151ab0-0001",
+      "LightLLM__readme-22151ab0-0002",
+      "LightLLM__readme-22151ab0-0006",
+      "LightLLM__readme-22151ab0-0007",
+      "LightLLM__readme-22151ab0-0016",
+      "LightLLM__readme-22151ab0-0017",
+      "LightLLM__readme-22151ab0-0019",
+      "PagedAttention__readme-34d1d63b-0000",
+      "PagedAttention__readme-34d1d63b-0001",
+      "PagedAttention__readme-34d1d63b-0002",
+      "PagedAttention__readme-34d1d63b-0003",
+      "PagedAttention__readme-34d1d63b-0004",
+      "PagedAttention__readme-34d1d63b-0005",
+      "vllm__readme-cc4286f6-0001",
+      "vllm__readme-cc4286f6-0002",
+      "vllm__readme-cc4286f6-0003"
+    ]
   },
   {
     "id": "mh02_kv_memory",
-    "tier": "multihop",
+    "split": "dev",
+    "qtype": "multihop",
+    "difficulty": 3,
     "prompt": "PagedAttention 和 StreamingLLM 分别怎么处理 KV cache 占用过大的问题？两者解决的问题是同一种吗？",
+    "reference_answer": "PagedAttention 解决「显存浪费」：分页/块表按需分配，浪费降到 4% 以下。StreamingLLM 解决「序列太长」：保留开头的 attention sink token 加最近窗口。两者不是同一个问题。",
+    "reference_note": "v2：旧要点「块」「注意力」几乎任何答案都含。",
     "checks": [
       {
         "type": "predicate",
-        "name": "multi_doc",
-        "docs": [
-          "LLMs_inference_optimize",
-          "StreamingLLM__readme"
-        ],
-        "min_docs": 2
+        "name": "not_refused"
       },
       {
         "type": "predicate",
         "name": "answer_covers",
         "must": [
-          "分页",
-          "块",
-          "注意力",
-          "窗口"
+          [
+            "分页",
+            "虚拟内存",
+            "block table",
+            "块表"
+          ],
+          [
+            "attention sink",
+            "注意力汇",
+            "sink"
+          ],
+          [
+            "不是同一",
+            "不同的问题",
+            "两类",
+            "不一样"
+          ]
         ],
         "min_hit": 2
       },
       {
         "type": "predicate",
-        "name": "citations_grounded"
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "虚拟内存",
+            "block table",
+            "分页"
+          ],
+          [
+            "attention sink"
+          ]
+        ]
       },
       {
         "type": "predicate",
-        "name": "not_refused"
+        "name": "citations_grounded"
       }
     ],
-    "reference_answer": "PagedAttention 解决的是「显存浪费」：KV cache 按最大长度预留、碎片多，用分页和块表把它变成按需分配，浪费从 60-80% 降到不足 4%。StreamingLLM 解决的是「序列太长」：用滑动窗口加注意力汇点（attention sink），只保留最近若干 token 和开头几个 token，让模型能处理超长输入而不爆显存。两者不是同一个问题：前者是分配效率，后者是长度上限。",
-    "reference_note": "多跳：概念容易混淆，必须读两篇才能说清区别。只答「都是省显存」不得分。",
     "stage_limits": {
       "steps": 9,
       "tokens": 72000
@@ -88,44 +158,95 @@
       "steps": 12,
       "tokens": 90000,
       "seconds": 300
-    }
+    },
+    "tier": "multihop",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "evidence_chunks": [
+      "4.lora__4.lora-607a1a94-0010",
+      "4.lora__4.lora-607a1a94-0011",
+      "LLMs_inference_optimize-64d9ecd0-0022",
+      "LLMs_inference_optimize-64d9ecd0-0023",
+      "LLMs_inference_optimize-64d9ecd0-0024",
+      "LLMs_inference_optimize-64d9ecd0-0028",
+      "LLMs_inference_optimize_compare_v240302-0306b4a7-0014",
+      "LLMs_inference_optimize_compare_v240302-0306b4a7-0015",
+      "LLMs_inference_optimize_compare_v240302-0306b4a7-0016",
+      "LLMs_inference_optimize_compare_v240710_no-44ff85b4-0004",
+      "LLMs_inference_optimize_compare_v240710_no-44ff85b4-0005",
+      "LLMs_optimize_trick_no-3aa95a9d-0000",
+      "LLMs_optimize_trick_no-3aa95a9d-0001",
+      "PagedAttention__readme-34d1d63b-0001",
+      "PagedAttention__readme-34d1d63b-0002",
+      "PagedAttention__readme-34d1d63b-0003",
+      "StreamingLLM__readme-0b6a856d-0007",
+      "StreamingLLM__readme-0b6a856d-0008",
+      "StreamingLLM__readme-0b6a856d-0011",
+      "StreamingLLM__readme-0b6a856d-0012",
+      "StreamingLLM__readme-0b6a856d-0013",
+      "SwiftInfer__readme-ebd09b91-0001",
+      "SwiftInfer__readme-ebd09b91-0002",
+      "SwiftInfer__readme-ebd09b91-0003",
+      "vllm__readme-cc4286f6-0001"
+    ]
   },
   {
     "id": "mh03_peft_compare",
-    "tier": "multihop",
+    "split": "dev",
+    "qtype": "multihop",
+    "difficulty": 3,
     "prompt": "LoRA 和 Adapter-tuning 在参数高效微调上的做法有什么不同？各自适合什么场景？",
+    "reference_answer": "LoRA 用低秩分解模拟参数改变量，推理时 BA 合并进 W，不增加推理延迟。Adapter 在层间插入小模块，训练快 60%，但推理慢 4%–6%（因此有 AdapterDrop）。",
+    "reference_note": "",
     "checks": [
       {
         "type": "predicate",
-        "name": "multi_doc",
-        "docs": [
-          "4.lora",
-          "3.adapter-tuning"
-        ],
-        "min_docs": 2
+        "name": "not_refused"
       },
       {
         "type": "predicate",
         "name": "answer_covers",
         "must": [
-          "低秩",
-          "旁路",
-          "插入",
-          "参数"
+          [
+            "低秩"
+          ],
+          [
+            "插入",
+            "适配器",
+            "Adapter模块",
+            "Adapter 模块"
+          ],
+          [
+            "推理延迟",
+            "推理时慢",
+            "推理速度",
+            "不会增加额外",
+            "合并"
+          ]
         ],
         "min_hit": 2
       },
       {
         "type": "predicate",
-        "name": "citations_grounded"
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "低秩"
+          ],
+          [
+            "Adapter"
+          ]
+        ]
       },
       {
         "type": "predicate",
-        "name": "not_refused"
+        "name": "citations_grounded"
       }
     ],
-    "reference_answer": "LoRA 在原有权重旁并联一个低秩分解矩阵（A×B），训练时只更新这部分，推理时可以把增量合并回原权重，不增加推理延迟。Adapter-tuning 是在 Transformer 层之间插入小的前馈网络模块，训练这些模块而冻结主干；推理时模块必须保留，因此会带来额外延迟。LoRA 适合对推理延迟敏感的生产场景，Adapter 适合需要频繁切换任务的场景（换 Adapter 即换任务）。",
-    "reference_note": "多跳：需要两篇文档的做法细节对比。只答 LoRA 的公式不够。",
     "stage_limits": {
       "steps": 9,
       "tokens": 72000
@@ -134,44 +255,114 @@
       "steps": 12,
       "tokens": 90000,
       "seconds": 300
-    }
+    },
+    "tier": "multihop",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "evidence_chunks": [
+      "1.llm概念__1.llm概念-7445fdf3-0008",
+      "1.llm概念__1.llm概念-7445fdf3-0009",
+      "1.基本概念__1.基本概念-e99b0340-0004",
+      "1.基本概念__1.基本概念-e99b0340-0005",
+      "1.基本概念__1.基本概念-e99b0340-0007",
+      "1.基本概念__1.基本概念-e99b0340-0008",
+      "2.prompting__2.prompting-6d7456d6-0000",
+      "2.prompting__2.prompting-6d7456d6-0001",
+      "2.prompting__2.prompting-6d7456d6-0002",
+      "3.adapter-tuning__3.adapter-tuning-ee70e806-0000",
+      "3.adapter-tuning__3.adapter-tuning-ee70e806-0001",
+      "3.adapter-tuning__3.adapter-tuning-ee70e806-0002",
+      "3.adapter-tuning__3.adapter-tuning-ee70e806-0003",
+      "3.adapter-tuning__3.adapter-tuning-ee70e806-0004",
+      "3.adapter-tuning__3.adapter-tuning-ee70e806-0005",
+      "3.adapter-tuning__3.adapter-tuning-ee70e806-0006",
+      "3.adapter-tuning__3.adapter-tuning-ee70e806-0007",
+      "3.adapter-tuning__3.adapter-tuning-ee70e806-0008",
+      "3.adapter-tuning__3.adapter-tuning-ee70e806-0009",
+      "3.adapter-tuning__3.adapter-tuning-ee70e806-0010",
+      "3.adapter-tuning__3.adapter-tuning-ee70e806-0011",
+      "3.adapter-tuning__3.adapter-tuning-ee70e806-0012",
+      "3.adapter-tuning__3.adapter-tuning-ee70e806-0013",
+      "3.adapter-tuning__3.adapter-tuning-ee70e806-0014",
+      "3.adapter-tuning__3.adapter-tuning-ee70e806-0015",
+      "3.adapter-tuning__3.adapter-tuning-ee70e806-0016",
+      "3.adapter-tuning__3.adapter-tuning-ee70e806-0017",
+      "4.lora__4.lora-607a1a94-0000",
+      "4.lora__4.lora-607a1a94-0005",
+      "4.lora__4.lora-607a1a94-0009",
+      "5.总结__5.总结-e803b718-0000",
+      "5.总结__5.总结-e803b718-0002",
+      "5.总结__5.总结-e803b718-0003",
+      "5.总结__5.总结-e803b718-0004",
+      "5.总结__5.总结-e803b718-0005",
+      "5.总结__5.总结-e803b718-0006",
+      "5.总结__5.总结-e803b718-0007",
+      "5.总结__5.总结-e803b718-0008",
+      "LLM为什么Decoder only架构__LLM为什么Decoder only架构-d4773a70-0002",
+      "LLM为什么Decoder only架构__LLM为什么Decoder only架构-d4773a70-0003",
+      "RAG_optimization_strategy-777d22ec-0023"
+    ]
   },
   {
     "id": "mh04_ppo_vs_dpo",
-    "tier": "multihop",
+    "split": "dev",
+    "qtype": "multihop",
+    "difficulty": 3,
     "prompt": "PPO 和 DPO 在训练对齐模型时有什么本质区别？为什么说 DPO 更简单？",
+    "reference_answer": "PPO 走 RLHF 路线：先训练奖励模型，再用强化学习优化策略，用 KL 惩罚约束偏离。DPO 直接用偏好数据优化策略，不需要单独的奖励模型和强化学习采样，实现和训练都更简单。",
+    "reference_note": "",
     "checks": [
       {
         "type": "predicate",
-        "name": "multi_doc",
-        "docs": [
-          "近端策略优化",
-          "DPO__DPO"
-        ],
-        "min_docs": 2
+        "name": "not_refused"
       },
       {
         "type": "predicate",
         "name": "answer_covers",
         "must": [
-          "奖励模型",
-          "策略",
-          "偏好",
-          "监督"
+          [
+            "奖励模型",
+            "RM",
+            "reward"
+          ],
+          [
+            "强化学习",
+            "RL"
+          ],
+          [
+            "偏好数据",
+            "偏好"
+          ],
+          [
+            "简化",
+            "更简单",
+            "不需要",
+            "无需"
+          ]
         ],
-        "min_hit": 2
+        "min_hit": 3
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "PPO"
+          ],
+          [
+            "DPO"
+          ]
+        ]
       },
       {
         "type": "predicate",
         "name": "citations_grounded"
-      },
-      {
-        "type": "predicate",
-        "name": "not_refused"
       }
     ],
-    "reference_answer": "PPO 是强化学习路线：先训练奖励模型（RM），再用 PPO 优化策略，让策略在奖励模型下得分更高，同时用 KL 惩罚防止偏离太远。它需要在线采样、四个模型（策略、参考、奖励、价值），训练不稳定、调参困难。DPO 直接从偏好数据（好回答/坏回答成对）出发，把「奖励模型 + RL」这一步数学等价地化简成一个监督学习目标，不需要单独训练 RM，也不需要在线采样，因此更简单、更稳定。",
-    "reference_note": "多跳：本质区别在「是否需要 RM 和在线采样」，必须两篇都读。",
     "stage_limits": {
       "steps": 9,
       "tokens": 72000
@@ -180,45 +371,117 @@
       "steps": 12,
       "tokens": 90000,
       "seconds": 300
-    }
+    },
+    "tier": "multihop",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "evidence_chunks": [
+      "1.rlhf相关__1.rlhf相关-b4dec351-0009",
+      "1.rlhf相关__1.rlhf相关-b4dec351-0010",
+      "1.rlhf相关__1.rlhf相关-b4dec351-0011",
+      "1.rlhf相关__1.rlhf相关-b4dec351-0012",
+      "1.rlhf相关__1.rlhf相关-b4dec351-0013",
+      "2.强化学习__2.强化学习-9cd85005-0045",
+      "2.强化学习__2.强化学习-9cd85005-0046",
+      "2.强化学习__2.强化学习-9cd85005-0047",
+      "DPO__DPO-e81a0693-0000",
+      "DPO__DPO-e81a0693-0001",
+      "DPO__DPO-e81a0693-0002",
+      "DPO__DPO-e81a0693-0006",
+      "DPO__DPO-e81a0693-0007",
+      "DPO__DPO-e81a0693-0008",
+      "DPO__DPO-e81a0693-0009",
+      "DPO__DPO-e81a0693-0010",
+      "DPO__DPO-e81a0693-0011",
+      "DPO__DPO-e81a0693-0012",
+      "DPO__DPO-e81a0693-0013",
+      "RAG_optimization_strategy-777d22ec-0008",
+      "RAG_optimization_strategy-777d22ec-0009",
+      "大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读-fe3e440b-0000",
+      "大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读-fe3e440b-0003",
+      "大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读-fe3e440b-0008",
+      "大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读-fe3e440b-0041",
+      "大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读-fe3e440b-0042",
+      "大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读-fe3e440b-0047",
+      "大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读-fe3e440b-0048",
+      "数据格式__数据格式-7bc474d7-0003",
+      "数据格式__数据格式-7bc474d7-0004",
+      "数据格式__数据格式-7bc474d7-0006",
+      "近端策略优化(ppo)__近端策略优化(ppo)-fc2d51ce-0016",
+      "近端策略优化(ppo)__近端策略优化(ppo)-fc2d51ce-0017",
+      "近端策略优化(ppo)__近端策略优化(ppo)-fc2d51ce-0018",
+      "近端策略优化(ppo)__近端策略优化(ppo)-fc2d51ce-0019",
+      "近端策略优化(ppo)__近端策略优化(ppo)-fc2d51ce-0020",
+      "近端策略优化(ppo)__近端策略优化(ppo)-fc2d51ce-0021",
+      "近端策略优化(ppo)__近端策略优化(ppo)-fc2d51ce-0022",
+      "近端策略优化(ppo)__近端策略优化(ppo)-fc2d51ce-0023",
+      "近端策略优化(ppo)__近端策略优化(ppo)-fc2d51ce-0024",
+      "近端策略优化(ppo)__近端策略优化(ppo)-fc2d51ce-0025",
+      "近端策略优化(ppo)__近端策略优化(ppo)-fc2d51ce-0027",
+      "近端策略优化(ppo)__近端策略优化(ppo)-fc2d51ce-0028",
+      "近端策略优化(ppo)__近端策略优化(ppo)-fc2d51ce-0029",
+      "近端策略优化(ppo)__近端策略优化(ppo)-fc2d51ce-0038",
+      "近端策略优化(ppo)__近端策略优化(ppo)-fc2d51ce-0054"
+    ]
   },
   {
     "id": "mh05_rag_recall",
-    "tier": "multihop",
+    "split": "dev",
+    "qtype": "multihop",
+    "difficulty": 3,
     "prompt": "HYDE 和 RAG-Fusion 都在优化检索召回，它们的思路差别在哪？分别在什么情况下更有用？",
+    "reference_answer": "HYDE 让 LLM 先生成假答案再拿去检索，解决问题和文档用词不匹配；RAG-Fusion 把问题改写成多个查询分别检索，再用倒数排名融合（RRF）合并结果，解决单一查询覆盖面窄。",
+    "reference_note": "v2：旧要点「生成」「查询」题面就有。",
     "checks": [
       {
         "type": "predicate",
-        "name": "multi_doc",
-        "docs": [
-          "RAG_optimization_strategy",
-          "RAG_fusion"
-        ],
-        "min_docs": 2
+        "name": "not_refused"
       },
       {
         "type": "predicate",
         "name": "answer_covers",
         "must": [
-          "假设",
-          "生成",
-          "查询",
-          "多个",
-          "融合"
+          [
+            "假答案",
+            "假设答案",
+            "假设文档"
+          ],
+          [
+            "多个查询",
+            "多查询",
+            "多个子查询",
+            "改写"
+          ],
+          [
+            "RRF",
+            "排名融合"
+          ]
         ],
         "min_hit": 2
       },
       {
         "type": "predicate",
-        "name": "citations_grounded"
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "假答案"
+          ],
+          [
+            "RRF",
+            "倒数排名融合",
+            "逆向排名融合"
+          ]
+        ]
       },
       {
         "type": "predicate",
-        "name": "not_refused"
+        "name": "citations_grounded"
       }
     ],
-    "reference_answer": "HYDE 的思路是「先让模型生成一段假设答案，再用这段假设答案去检索」——它解决的是「问题太短、和文档用词不匹配」的语义鸿沟问题。RAG-Fusion 的思路是「把一个问题改写成多个不同角度的子查询，分别检索后融合排序」——它解决的是「单一查询覆盖不全」的召回不足问题。前者改查询的形态，后者改查询的数量。HYDE 适合问答式短查询，RAG-Fusion 适合多面性问题。",
-    "reference_note": "多跳：两者都叫「优化召回」但机制完全不同，需要对比。",
     "stage_limits": {
       "steps": 9,
       "tokens": 72000
@@ -227,45 +490,83 @@
       "steps": 12,
       "tokens": 90000,
       "seconds": 300
-    }
+    },
+    "tier": "multihop",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "evidence_chunks": [
+      "RAG_fusion-244ea5dc-0000",
+      "RAG_fusion-244ea5dc-0002",
+      "RAG_fusion-244ea5dc-0005",
+      "RAG_fusion-244ea5dc-0006",
+      "RAG_fusion-244ea5dc-0007",
+      "RAG_fusion-244ea5dc-0012",
+      "R__recall_strategy-5106c676-0001",
+      "R__recall_strategy-5106c676-0002",
+      "R__recall_strategy-5106c676-0003",
+      "R__recall_strategy-5106c676-0006",
+      "R__recall_strategy-5106c676-0007"
+    ]
   },
   {
     "id": "mh06_advanced_rag",
-    "tier": "multihop",
+    "split": "dev",
+    "qtype": "multihop",
+    "difficulty": 3,
     "prompt": "Self-RAG 和 GraphRAG 各自解决传统 RAG 的什么缺陷？它们的适用场景有什么区别？",
+    "reference_answer": "Self-RAG 训练评判模型（critic）并用评判 token 做自适应检索和树解码，控制「要不要检索、检索结果是否相关、答案是否有支撑」。Graph RAG 基于知识图谱，补足碎片化片段难以回答的实体关系类问题。",
+    "reference_note": "",
     "checks": [
       {
         "type": "predicate",
-        "name": "multi_doc",
-        "docs": [
-          "self_rag",
-          "KG-RAG"
-        ],
-        "min_docs": 2
+        "name": "not_refused"
       },
       {
         "type": "predicate",
         "name": "answer_covers",
         "must": [
-          "反思",
-          "检索",
-          "图谱",
-          "实体",
-          "关系"
+          [
+            "评判",
+            "critic",
+            "critique",
+            "反思"
+          ],
+          [
+            "知识图谱",
+            "图谱"
+          ],
+          [
+            "自适应检索",
+            "要不要检索",
+            "是否检索",
+            "按需检索"
+          ]
         ],
         "min_hit": 2
       },
       {
         "type": "predicate",
-        "name": "citations_grounded"
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "critic",
+            "critique",
+            "评判"
+          ],
+          [
+            "知识图谱"
+          ]
+        ]
       },
       {
         "type": "predicate",
-        "name": "not_refused"
+        "name": "citations_grounded"
       }
     ],
-    "reference_answer": "Self-RAG 解决的是「检索了但不该用、或用了但没验证」的问题：让模型自己生成反思标记，判断要不要检索、检索到的内容相不相关、答案有没有被支撑，属于「检索质量控制」。GraphRAG 解决的是「碎片化片段无法回答全局性问题」的缺陷：它把文档抽成实体和关系的知识图谱，支持多跳推理和全局摘要，属于「知识结构化」。Self-RAG 适合对答案可靠性要求高的问答，GraphRAG 适合需要跨文档关联和全局理解的问题。",
-    "reference_note": "多跳：两条完全不同的技术路线，必须分别读。",
     "stage_limits": {
       "steps": 9,
       "tokens": 72000
@@ -274,45 +575,128 @@
       "steps": 12,
       "tokens": 90000,
       "seconds": 300
-    }
+    },
+    "tier": "multihop",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "evidence_chunks": [
+      "1.rlhf相关__1.rlhf相关-b4dec351-0021",
+      "2.强化学习__2.强化学习-9cd85005-0052",
+      "2.强化学习__2.强化学习-9cd85005-0053",
+      "KG-RAG__LLMs_Graph_RAG__readme-560b6a44-0000",
+      "KG-RAG__LLMs_Graph_RAG__readme-560b6a44-0001",
+      "KG-RAG__LLMs_Graph_RAG__readme-560b6a44-0002",
+      "KG-RAG__LLMs_Graph_RAG__readme-560b6a44-0004",
+      "KG-RAG__LLMs_Graph_RAG__readme-560b6a44-0013",
+      "KG-RAG__LLMs_Graph_RAG__readme-560b6a44-0014",
+      "KG-RAG__LLMs_Graph_RAG__readme-560b6a44-0015",
+      "RAG_Failure-57169d68-0010",
+      "RAG_optimization_strategy-777d22ec-0000",
+      "RAG_optimization_strategy-777d22ec-0004",
+      "readme-1a14eeb5-0015",
+      "self_rag-793f92fd-0000",
+      "self_rag-793f92fd-0001",
+      "self_rag-793f92fd-0005",
+      "self_rag-793f92fd-0009",
+      "self_rag-793f92fd-0010",
+      "self_rag-793f92fd-0011",
+      "self_rag-793f92fd-0012",
+      "self_rag-793f92fd-0013",
+      "self_rag-793f92fd-0014",
+      "self_rag-793f92fd-0015",
+      "self_rag-793f92fd-0016",
+      "self_rag-793f92fd-0017",
+      "self_rag-793f92fd-0018",
+      "self_rag-793f92fd-0019",
+      "大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读-fe3e440b-0018",
+      "大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读-fe3e440b-0019",
+      "大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读-fe3e440b-0038",
+      "大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读-fe3e440b-0042",
+      "大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读-fe3e440b-0043",
+      "大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读-fe3e440b-0044",
+      "大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读-fe3e440b-0045",
+      "大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读-fe3e440b-0059",
+      "大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读-fe3e440b-0060",
+      "大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读-fe3e440b-0061",
+      "大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读-fe3e440b-0062",
+      "大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读-fe3e440b-0063",
+      "大模型agent技术__大模型agent技术-fed1b64e-0047",
+      "大模型agent技术__大模型agent技术-fed1b64e-0048",
+      "近端策略优化(ppo)__近端策略优化(ppo)-fc2d51ce-0039",
+      "近端策略优化(ppo)__近端策略优化(ppo)-fc2d51ce-0040",
+      "近端策略优化(ppo)__近端策略优化(ppo)-fc2d51ce-0044",
+      "近端策略优化(ppo)__近端策略优化(ppo)-fc2d51ce-0045",
+      "近端策略优化(ppo)__近端策略优化(ppo)-fc2d51ce-0046",
+      "近端策略优化(ppo)__近端策略优化(ppo)-fc2d51ce-0052",
+      "近端策略优化(ppo)__近端策略优化(ppo)-fc2d51ce-0053"
+    ]
   },
   {
     "id": "mh07_rag_eval",
-    "tier": "multihop",
+    "split": "dev",
+    "qtype": "multihop",
+    "difficulty": 3,
     "prompt": "RAG 系统常见的失败模式有哪些？应该用什么指标来评估？请把失败模式和对策/指标对应起来说。",
+    "reference_answer": "失败模式如内容缺失、错过排名靠前的文档、脱离上下文、未能提取答案、格式错误等；检索环节看命中率、MRR、NDCG，生成环节看忠实度、答案相关性、答案正确性。",
+    "reference_note": "v2：旧要点「评估」「指标」「答案」全在题面里，复述题目就能过。",
     "checks": [
       {
         "type": "predicate",
-        "name": "multi_doc",
-        "docs": [
-          "RAG_Failure",
-          "RAG_valuation"
-        ],
-        "min_docs": 2
+        "name": "not_refused"
       },
       {
         "type": "predicate",
         "name": "answer_covers",
         "must": [
-          "召回",
-          "上下文",
-          "答案",
-          "评估",
-          "指标"
+          [
+            "内容缺失"
+          ],
+          [
+            "排名靠前"
+          ],
+          [
+            "未能提取",
+            "格式错误",
+            "脱离上下文",
+            "特异性"
+          ],
+          [
+            "命中率",
+            "Hit Rate",
+            "MRR",
+            "NDCG"
+          ],
+          [
+            "忠实度",
+            "Faithfulness"
+          ]
         ],
         "min_hit": 3
       },
       {
         "type": "predicate",
-        "name": "citations_grounded"
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "内容缺失",
+            "错过排名靠前"
+          ],
+          [
+            "忠实度",
+            "Hit Rate",
+            "NDCG"
+          ]
+        ]
       },
       {
         "type": "predicate",
-        "name": "not_refused"
+        "name": "citations_grounded"
       }
     ],
-    "reference_answer": "常见失败分三阶段：①检索阶段——没召回相关文档、召回了不相关的；②上下文阶段——关键信息被截断、上下文里有多余干扰；③生成阶段——模型忽略上下文、编造内容、答案不完整。对应指标：检索看 recall@k、命中率；上下文看精度与噪声比例；生成看忠实度（faithfulness，答案是否被上下文支撑）、答案相关性。评估要分阶段做，不能只看最终答案对不对。",
-    "reference_note": "多跳：失败模式在一篇、评估指标在另一篇，需要对齐才能答好。",
     "stage_limits": {
       "steps": 9,
       "tokens": 72000
@@ -321,31 +705,281 @@
       "steps": 12,
       "tokens": 90000,
       "seconds": 300
-    }
+    },
+    "tier": "multihop",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "evidence_chunks": [
+      "RAG-fc11678e-0003",
+      "RAG-fc11678e-0004",
+      "RAG_Failure-57169d68-0000",
+      "RAG_Failure-57169d68-0002",
+      "RAG_Failure-57169d68-0003",
+      "RAG_Failure-57169d68-0004",
+      "RAG_valuation-208520a0-0035",
+      "RAG_valuation-208520a0-0036",
+      "RAG_valuation-208520a0-0038",
+      "RAG_valuation-208520a0-0039",
+      "RAG_valuation-208520a0-0040",
+      "R__recall_strategy-5106c676-0002"
+    ]
   },
   {
     "id": "mh08_cot_vs_react",
-    "tier": "multihop",
+    "split": "dev",
+    "qtype": "multihop",
+    "difficulty": 3,
     "prompt": "思维链（CoT）和 ReAct 在让模型推理上的差别是什么？为什么 Agent 更常用 ReAct？",
+    "reference_answer": "CoT 通过中间推理步骤在语言内部完成推理；ReAct 交错生成推理轨迹和任务特定操作，可以与外部源（工具）交互获取信息，再根据观察更新计划，所以适合 Agent。",
+    "reference_note": "",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "中间推理步骤",
+            "推理路径",
+            "逐步"
+          ],
+          [
+            "外部",
+            "工具",
+            "检索"
+          ],
+          [
+            "交错",
+            "交替"
+          ]
+        ],
+        "min_hit": 2
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "中间推理步骤",
+            "逐步思考",
+            "推理路径"
+          ],
+          [
+            "推理轨迹"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "stage_limits": {
+      "steps": 9,
+      "tokens": 72000
+    },
+    "budget": {
+      "steps": 12,
+      "tokens": 90000,
+      "seconds": 300
+    },
+    "tier": "multihop",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "evidence_chunks": [
+      "03-思维链-8867a383-0000",
+      "03-思维链-8867a383-0001",
+      "03-思维链-8867a383-0003",
+      "03-思维链-8867a383-0004",
+      "04-react-推理行动-828c5089-0000",
+      "04-react-推理行动-828c5089-0001",
+      "04-react-推理行动-828c5089-0002",
+      "1.思维链（cot）__1.思维链（cot）-bf563ed2-0000",
+      "1.思维链（cot）__1.思维链（cot）-bf563ed2-0001",
+      "1.思维链（cot）__1.思维链（cot）-bf563ed2-0002",
+      "1.思维链（cot）__1.思维链（cot）-bf563ed2-0006",
+      "10-art-81c4d9d2-0000",
+      "10-art-81c4d9d2-0001",
+      "RAG_Failure-57169d68-0036",
+      "RAG_Failure-57169d68-0037"
+    ]
+  },
+  {
+    "id": "mh09_hallucination",
+    "split": "dev",
+    "qtype": "multihop",
+    "difficulty": 3,
+    "prompt": "大模型幻觉是怎么定义的？它的主要来源有哪些，对应的缓解手段分别是什么？",
+    "reference_answer": "幻觉分事实性、忠诚度、自我矛盾等类型；来源包括数据源缺陷（压缩过程中错误模仿、重复偏差）、训练和推理阶段；缓解包括检索增强、Self-Reflection、忠诚度增强解码（Context-aware Decode）等。",
+    "reference_note": "v2：旧要点「来源」「缓解」题面就有。",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "事实性",
+            "Factuality"
+          ],
+          [
+            "数据源缺陷",
+            "错误模仿",
+            "重复偏差"
+          ],
+          [
+            "Self-Reflection",
+            "反思",
+            "Context-aware",
+            "检索增强",
+            "解码"
+          ]
+        ],
+        "min_hit": 2
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "事实性错误",
+            "忠诚度问题",
+            "数据源缺陷"
+          ],
+          [
+            "Self-Reflection",
+            "Context-aware Decode",
+            "检索增强"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "stage_limits": {
+      "steps": 9,
+      "tokens": 72000
+    },
+    "budget": {
+      "steps": 12,
+      "tokens": 90000,
+      "seconds": 300
+    },
+    "tier": "multihop",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "evidence_chunks": [
+      "05-检索增强生成-da1f7bba-0000",
+      "05-检索增强生成-da1f7bba-0001",
+      "07-思维树-e919a248-0004",
+      "10-art-81c4d9d2-0002",
+      "2.幻觉来源与缓解__2.幻觉来源与缓解-66183278-0000",
+      "2.幻觉来源与缓解__2.幻觉来源与缓解-66183278-0001",
+      "2.幻觉来源与缓解__2.幻觉来源与缓解-66183278-0003",
+      "2.幻觉来源与缓解__2.幻觉来源与缓解-66183278-0007",
+      "2.幻觉来源与缓解__2.幻觉来源与缓解-66183278-0008",
+      "2.幻觉来源与缓解__2.幻觉来源与缓解-66183278-0010",
+      "2.幻觉来源与缓解__2.幻觉来源与缓解-66183278-0011",
+      "KG-RAG__LLMs_Graph_RAG__readme-560b6a44-0000",
+      "KG-RAG__LLMs_Graph_RAG__readme-560b6a44-0001",
+      "KG-RAG__LLMs_Graph_RAG__readme-560b6a44-0002",
+      "KG-RAG__LLMs_Graph_RAG__readme-560b6a44-0014",
+      "KG-RAG__LLMs_Graph_RAG__readme-560b6a44-0015",
+      "RAG_Failure-57169d68-0002",
+      "RAG_Failure-57169d68-0005",
+      "RAG_fusion-244ea5dc-0012",
+      "RAG_optimization_strategy-777d22ec-0000",
+      "RAG_optimization_strategy-777d22ec-0021",
+      "RAG_optimization_strategy-777d22ec-0025",
+      "RAG_optimization_strategy-777d22ec-0044",
+      "RAG_valuation-208520a0-0000",
+      "RAG_valuation-208520a0-0001",
+      "RAG_valuation-208520a0-0038",
+      "RAG_valuation-208520a0-0040",
+      "RAG_valuation-208520a0-0041",
+      "R__recall_strategy-5106c676-0007",
+      "rag（检索增强生成）技术__rag（检索增强生成）技术-ca91068f-0000",
+      "rag（检索增强生成）技术__rag（检索增强生成）技术-ca91068f-0001",
+      "rag（检索增强生成）技术__rag（检索增强生成）技术-ca91068f-0006",
+      "readme-1a14eeb5-0002",
+      "readme-1a14eeb5-0020",
+      "readme-1a14eeb5-0021",
+      "readme-1a14eeb5-0022",
+      "readme-1a14eeb5-0023",
+      "self_rag-793f92fd-0000",
+      "self_rag-793f92fd-0003",
+      "self_rag-793f92fd-0004",
+      "self_rag-793f92fd-0021",
+      "检索增强llm__检索增强llm-271aff1c-0000",
+      "检索增强llm__检索增强llm-271aff1c-0001",
+      "检索增强llm__检索增强llm-271aff1c-0002",
+      "检索增强llm__检索增强llm-271aff1c-0003",
+      "检索增强llm__检索增强llm-271aff1c-0004",
+      "检索增强llm__检索增强llm-271aff1c-0014",
+      "检索增强llm__检索增强llm-271aff1c-0024",
+      "检索增强llm__检索增强llm-271aff1c-0025",
+      "检索增强llm__检索增强llm-271aff1c-0046",
+      "检索增强llm__检索增强llm-271aff1c-0048",
+      "检索增强llm__检索增强llm-271aff1c-0052",
+      "检索增强llm__检索增强llm-271aff1c-0053",
+      "检索增强llm__检索增强llm-271aff1c-0054",
+      "检索增强llm__检索增强llm-271aff1c-0055",
+      "检索增强llm__检索增强llm-271aff1c-0056"
+    ]
+  },
+  {
+    "id": "mh10_finetune_vs_prompt",
+    "split": "dev",
+    "qtype": "multihop",
+    "difficulty": 3,
+    "prompt": "微调和提示工程各自的成本和效果边界在哪？什么情况下应该选微调而不是写更好的 prompt？",
+    "reference_answer": "提示工程成本低、只改输入，但受上下文长度和模型已有能力限制；微调需要数据、显存和训练周期（PEFT 可降低成本），但能改变模型行为和领域知识。",
+    "reference_note": "v2：语料里没有一段直接对比两者，属于综合题——保留 multi_doc，不加证据锚点，要点改成同义组。",
     "checks": [
       {
         "type": "predicate",
         "name": "multi_doc",
-        "docs": [
-          "思维链（cot）",
-          "大模型agent技术"
-        ],
         "min_docs": 2
       },
       {
         "type": "predicate",
         "name": "answer_covers",
         "must": [
-          "推理",
-          "步骤",
-          "工具",
-          "行动",
-          "观察"
+          [
+            "显存",
+            "算力",
+            "GPU"
+          ],
+          [
+            "数据",
+            "标注",
+            "样本"
+          ],
+          [
+            "上下文",
+            "窗口",
+            "长度"
+          ]
         ],
         "min_hit": 2
       },
@@ -358,8 +992,6 @@
         "name": "not_refused"
       }
     ],
-    "reference_answer": "CoT 让模型把推理过程一步步写出来，全部在「语言空间」里完成，靠模型自身的知识；它的问题是推理链条可能在中途出错且无法校验。ReAct 把「思考（Reason）」和「行动（Act）」交替进行：先想一步，调用工具拿观察结果，再基于真实结果继续想。区别在于 CoT 是纯生成的推理，ReAct 是与外部环境交互的推理。Agent 更常用 ReAct，因为它需要工具返回的真实信息来支撑下一步决策，不能只靠模型记忆。",
-    "reference_note": "多跳：两个概念的差异体现在「是否与外部交互」，需要两篇。",
     "stage_limits": {
       "steps": 9,
       "tokens": 72000
@@ -368,45 +1000,72 @@
       "steps": 12,
       "tokens": 90000,
       "seconds": 300
-    }
+    },
+    "tier": "multihop",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ]
   },
   {
-    "id": "mh09_hallucination",
-    "tier": "multihop",
-    "prompt": "大模型幻觉是怎么定义的？它的主要来源有哪些，对应的缓解手段分别是什么？",
+    "id": "mh11_flash_vs_paged",
+    "split": "dev",
+    "qtype": "multihop",
+    "difficulty": 3,
+    "prompt": "FlashAttention 和 PagedAttention 都在优化大模型推理，它们分别优化的是什么资源？思路有什么差别？",
+    "reference_answer": "FlashAttention 优化的是 HBM 访存：标准 attention 要读写 HBM 各三次，它在一个循环里分块计算、重新计算中间结果来减少读写；PagedAttention 优化的是显存浪费：借鉴虚拟内存分页管理 KV cache，把浪费率降到 4% 以下。一个省访存带宽，一个省显存占用。",
+    "reference_note": "两个「Attention 优化」极易混为一谈：一个省访存、一个省显存，证据锚点分别锁到两篇文档。",
     "checks": [
       {
         "type": "predicate",
-        "name": "multi_doc",
-        "docs": [
-          "1.大模型幻觉",
-          "2.幻觉来源与缓解"
-        ],
-        "min_docs": 2
+        "name": "not_refused"
       },
       {
         "type": "predicate",
         "name": "answer_covers",
         "must": [
-          "来源",
-          "数据",
-          "训练",
-          "缓解",
-          "检索"
+          [
+            "HBM",
+            "访存",
+            "显存读写"
+          ],
+          [
+            "分块",
+            "重新计算",
+            "重计算"
+          ],
+          [
+            "分页",
+            "虚拟内存",
+            "block table",
+            "块表"
+          ],
+          [
+            "浪费",
+            "碎片"
+          ]
         ],
         "min_hit": 3
       },
       {
         "type": "predicate",
-        "name": "citations_grounded"
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "HBM读三次写三次"
+          ],
+          [
+            "虚拟内存"
+          ]
+        ]
       },
       {
         "type": "predicate",
-        "name": "not_refused"
+        "name": "citations_grounded"
       }
     ],
-    "reference_answer": "幻觉指模型生成的内容看起来合理但与事实不符、或与给定上下文不一致。来源分几层：①数据层——训练数据本身有噪声、有错误、有知识盲区；②训练层——最大似然目标鼓励「说点什么」而不是「说不知道」，SFT 数据可能引入错误事实；③推理层——解码策略（采样温度）会增加随机性。缓解手段对应：数据上做清洗和质量过滤；训练上引入 RLHF 让模型学会拒答、用检索增强把外部事实接进来；推理上降低温度、加约束解码、做自我一致性校验。",
-    "reference_note": "多跳：定义与来源分在两篇文档，需要串起来。",
     "stage_limits": {
       "steps": 9,
       "tokens": 72000
@@ -415,45 +1074,85 @@
       "steps": 12,
       "tokens": 90000,
       "seconds": 300
-    }
+    },
+    "tier": "multihop",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "evidence_chunks": [
+      "LLMs_inference_optimize-64d9ecd0-0021",
+      "LLMs_inference_optimize-64d9ecd0-0023",
+      "LLMs_inference_optimize-64d9ecd0-0028",
+      "LLMs_inference_optimize_compare_v240710_no-44ff85b4-0004",
+      "LLMs_inference_optimize_compare_v240710_no-44ff85b4-0005",
+      "LLMs_optimize_trick_no-3aa95a9d-0000",
+      "LLMs_optimize_trick_no-3aa95a9d-0001",
+      "PagedAttention__readme-34d1d63b-0001",
+      "PagedAttention__readme-34d1d63b-0002",
+      "PagedAttention__readme-34d1d63b-0003",
+      "vllm__readme-cc4286f6-0001"
+    ]
   },
   {
-    "id": "mh10_finetune_vs_prompt",
-    "tier": "multihop",
-    "prompt": "微调和提示工程各自的成本和效果边界在哪？什么情况下应该选微调而不是写更好的 prompt？",
+    "id": "mh12_lora_vs_qlora",
+    "split": "dev",
+    "qtype": "multihop",
+    "difficulty": 3,
+    "prompt": "QLoRA 和 LoRA 是什么关系？QLoRA 在 LoRA 基础上多做了哪些事，省下来的到底是什么？",
+    "reference_answer": "QLoRA 是在 LoRA 微调阶段做量化的版本：用 4bit NormalFloat（NF4）量化基座模型，配双量化进一步压缩量化常数，再用分页优化器防止显存峰值。LoRA 本身靠低秩分解减少可训练参数，QLoRA 在此之上把基座权重压到 4bit，省的是显存，让单卡微调超大模型可行。",
+    "reference_note": "和 h09（PTQ 例外是 QLoRA）呼应，但这里要求说出三项技术本身，不是只答「量化版 LoRA」。",
     "checks": [
       {
         "type": "predicate",
-        "name": "multi_doc",
-        "docs": [
-          "1.微调",
-          "2.prompting"
-        ],
-        "min_docs": 2
+        "name": "not_refused"
       },
       {
         "type": "predicate",
         "name": "answer_covers",
         "must": [
-          "数据",
-          "显存",
-          "成本",
-          "泛化",
-          "样本"
+          [
+            "NF4",
+            "NormalFloat",
+            "4bit",
+            "4 bit"
+          ],
+          [
+            "双量化",
+            "Double Quant"
+          ],
+          [
+            "分页优化器",
+            "Paged Optim"
+          ],
+          [
+            "显存",
+            "内存"
+          ]
         ],
-        "min_hit": 2
+        "min_hit": 3
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "双量化"
+          ],
+          [
+            "低秩分解来模拟参数的改变量",
+            "低秩分解模拟参数的改变量",
+            "本征秩"
+          ]
+        ]
       },
       {
         "type": "predicate",
         "name": "citations_grounded"
-      },
-      {
-        "type": "predicate",
-        "name": "not_refused"
       }
     ],
-    "reference_answer": "提示工程成本极低（只改输入），适合快速验证和格式控制，但受限于上下文长度和模型已有能力，复杂任务提升有限。微调成本高：需要标注数据、需要显存（全参微调对显存要求大，PEFT 可降低）、需要训练和评估周期，但它能改变模型的行为倾向和领域知识，效果上限更高。选择标准：如果任务能用清晰的指令和少量示例描述清楚，先做提示工程；如果提示工程已经到位但模型仍系统性犯错（格式、领域术语、风格），或者需要压缩成本（用小模型替代大模型），才值得微调。",
-    "reference_note": "多跳：成本数据在一篇、prompt 方法在另一篇，需要综合判断。",
     "stage_limits": {
       "steps": 9,
       "tokens": 72000
@@ -462,6 +1161,670 @@
       "steps": 12,
       "tokens": 90000,
       "seconds": 300
-    }
+    },
+    "tier": "multihop",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "evidence_chunks": [
+      "4.lora__4.lora-607a1a94-0000",
+      "4.lora__4.lora-607a1a94-0001",
+      "4.lora__4.lora-607a1a94-0006",
+      "4.lora__4.lora-607a1a94-0010",
+      "5.总结__5.总结-e803b718-0004"
+    ]
+  },
+  {
+    "id": "mh13_two_low_rank",
+    "split": "dev",
+    "qtype": "multihop",
+    "difficulty": 3,
+    "prompt": "资料里讲 Decoder-only 架构流行原因时提到的「低秩问题」，和 LoRA 的「低秩分解」是一回事吗？分别指什么？",
+    "reference_answer": "不是一回事。资料里说 encoder 存在低秩问题，指注意力矩阵表达能力受限，这是 decoder-only 流行的原因之一；LoRA 的低秩分解是主动用两个小矩阵模拟参数的改变量，用极少参数完成微调。一个是架构分析里发现的问题，一个是人为设计的微调方法。",
+    "reference_note": "同词异义陷阱：两个「低秩」散在两篇文档里，凭直觉答「都是低秩所以相关」不够，必须说清各自含义。",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "不是",
+            "不一样",
+            "不同"
+          ],
+          [
+            "encoder",
+            "编码器"
+          ],
+          [
+            "改变量",
+            "增量",
+            "微调"
+          ]
+        ],
+        "min_hit": 2
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "低秩"
+          ],
+          [
+            "低秩分解来模拟参数的改变量",
+            "低秩分解模拟参数的改变量",
+            "本征秩"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "stage_limits": {
+      "steps": 9,
+      "tokens": 72000
+    },
+    "budget": {
+      "steps": 12,
+      "tokens": 90000,
+      "seconds": 300
+    },
+    "tier": "multihop",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "evidence_chunks": [
+      "1.llm概念__1.llm概念-7445fdf3-0008",
+      "1.llm概念__1.llm概念-7445fdf3-0009",
+      "1.基本概念__1.基本概念-e99b0340-0008",
+      "4.lora__4.lora-607a1a94-0000",
+      "4.lora__4.lora-607a1a94-0001",
+      "4.lora__4.lora-607a1a94-0006",
+      "4.lora__4.lora-607a1a94-0009",
+      "5.总结__5.总结-e803b718-0004",
+      "5.总结__5.总结-e803b718-0005",
+      "LLM为什么Decoder only架构__LLM为什么Decoder only架构-d4773a70-0002",
+      "LLM为什么Decoder only架构__LLM为什么Decoder only架构-d4773a70-0003"
+    ]
+  },
+  {
+    "id": "mh14_jieba_two_mechanisms",
+    "split": "dev",
+    "qtype": "multihop",
+    "difficulty": 3,
+    "prompt": "jieba 对词典里有的词和词典里没有的新词，分别用什么机制切分？为什么两种机制要配合？",
+    "reference_answer": "词典范围内：基于前缀词典扫描词图，生成所有可能切法的有向无环图（DAG），再用动态规划找基于词频的最大概率路径。词典外的新词：靠基于汉字成词能力的 HMM 模型，用 Viterbi 算法切分。前者靠词典和词频统计，后者靠字与字的成词规律，两者配合才能既快又能识别没收录的词。",
+    "reference_note": "g25/g36 考未登录词、h01 考词典内切分，本题要求把两半拼成完整图景。",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "前缀词典",
+            "DAG",
+            "有向无环图"
+          ],
+          [
+            "动态规划",
+            "最大概率"
+          ],
+          [
+            "HMM",
+            "隐马尔科夫",
+            "隐马尔可夫"
+          ],
+          [
+            "Viterbi",
+            "维特比"
+          ]
+        ],
+        "min_hit": 3
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "前缀词典"
+          ],
+          [
+            "Viterbi",
+            "viterbi"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "stage_limits": {
+      "steps": 9,
+      "tokens": 72000
+    },
+    "budget": {
+      "steps": 12,
+      "tokens": 90000,
+      "seconds": 300
+    },
+    "tier": "multihop",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "evidence_chunks": [
+      "1.分词__1.分词-dc60a3be-0004",
+      "1.分词__1.分词-dc60a3be-0005",
+      "1.分词__1.分词-dc60a3be-0009",
+      "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0003",
+      "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0006",
+      "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0007",
+      "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0030",
+      "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0031",
+      "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0052",
+      "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0054",
+      "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0055",
+      "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0056",
+      "3.词性标注__3.词性标注-a3c64bef-0002",
+      "3.词性标注__3.词性标注-a3c64bef-0003",
+      "3.词性标注__3.词性标注-a3c64bef-0013",
+      "3.词性标注__3.词性标注-a3c64bef-0015",
+      "3.词性标注__3.词性标注-a3c64bef-0016"
+    ]
+  },
+  {
+    "id": "mh15_cot_vs_tot",
+    "split": "dev",
+    "qtype": "multihop",
+    "difficulty": 3,
+    "prompt": "zero-shot 思维链和思维树（ToT）在推理的组织方式上有什么差别？各自是怎么用的？只答基本组织方式和资料里的 24 点示例，不展开 CoT-SC、专家提示或控制器等外围内容。",
+    "reference_answer": "zero-shot CoT 是线性链式推理：只要在原始提示里加「让我们逐步思考」，模型就按一条推理链走到底。ToT 是树状搜索：把推理拆成多个思维步骤，每步保留多个候选继续探索，比如 24 游戏分 3 步、每步保留最优 5 个候选项。CoT 只有一条路径，ToT 能回溯和比较多条分支。",
+    "reference_note": "与 mh08（CoT vs ReAct）错开：这里比的是推理结构（链 vs 树），不是是否调工具。",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "逐步思考",
+            "step by step",
+            "一步一步"
+          ],
+          [
+            "树",
+            "搜索",
+            "分支",
+            "候选"
+          ],
+          [
+            "5个",
+            "五个",
+            "5 个",
+            "best5"
+          ]
+        ],
+        "min_hit": 2
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "让我们逐步思考"
+          ],
+          [
+            "5 个候选项"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "stage_limits": {
+      "steps": 9,
+      "tokens": 72000
+    },
+    "budget": {
+      "steps": 12,
+      "tokens": 90000,
+      "seconds": 300
+    },
+    "tier": "multihop",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "evidence_chunks": [
+      "03-思维链-8867a383-0003",
+      "03-思维链-8867a383-0004",
+      "07-思维树-e919a248-0001"
+    ]
+  },
+  {
+    "id": "mh16_parallel_strategies",
+    "split": "dev",
+    "qtype": "multihop",
+    "difficulty": 3,
+    "prompt": "资料里对增量预训练和 FasterTransformer 分别建议了哪些并行方式？张量并行在什么网络条件下才有正向作用？",
+    "reference_answer": "增量预训练只有少量节点时资料建议用张量并行，但它只有在 nvlink 环境下才起正向作用，提升也不会太明显。FasterTransformer 的核心则是张量并行（TP）加流水线并行（PP）两种技术一起用。前者是场景受限的选择，后者是推理框架的系统级组合。",
+    "reference_note": "g32 只考增量预训练、h05 只考 FasterTransformer，本题要求跨文档对照并答出 nvlink 条件。",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "张量并行",
+            "TP"
+          ],
+          [
+            "流水线并行",
+            "PP"
+          ],
+          [
+            "nvlink"
+          ]
+        ],
+        "min_hit": 3
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "nvlink"
+          ],
+          [
+            "流水线并行 (PP)"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "stage_limits": {
+      "steps": 9,
+      "tokens": 72000
+    },
+    "budget": {
+      "steps": 12,
+      "tokens": 90000,
+      "seconds": 300
+    },
+    "tier": "multihop",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "evidence_chunks": [
+      "2.预训练__2.预训练-04396d62-0001",
+      "FasterTransformer__readme-6bb21552-0001",
+      "readme-cd71f754-0007",
+      "readme-cd71f754-0008"
+    ]
+  },
+  {
+    "id": "mh17_memory_saving",
+    "split": "dev",
+    "qtype": "multihop",
+    "difficulty": 3,
+    "prompt": "gradient checkpointing 和量化都能省显存，它们各自在什么阶段起作用、省显存的机制有什么不同？",
+    "reference_answer": "gradient checkpointing 用在训练阶段：在计算图里插入检查点，把一部分计算推迟到后续步骤重新计算，用多算换更少的内存占用。量化是把权重压成低精度，大模型重新训练成本太高所以一般用训练后量化（PTQ），例外是 QLoRA 在 LoRA 微调阶段做量化。一个拿计算换显存，一个拿精度换显存，作用阶段和机制都不同。",
+    "reference_note": "一个「以时间换空间」、一个「以精度换空间」，h04 与 h09 的单跳知识在这里要求对照成体系。",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "重新计算",
+            "重计算",
+            "推迟"
+          ],
+          [
+            "内存",
+            "显存"
+          ],
+          [
+            "PTQ",
+            "量化",
+            "4bit",
+            "NF4"
+          ]
+        ],
+        "min_hit": 2
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "梯度检查点（Gradient Checkpointing）"
+          ],
+          [
+            "一个例外是QLora"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "stage_limits": {
+      "steps": 9,
+      "tokens": 72000
+    },
+    "budget": {
+      "steps": 12,
+      "tokens": 90000,
+      "seconds": 300
+    },
+    "tier": "multihop",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "evidence_chunks": [
+      "1.微调__1.微调-e0918691-0001",
+      "LLMs_inference_optimize-64d9ecd0-0013",
+      "LLMs_inference_optimize-64d9ecd0-0014",
+      "VRAM_optimize-b6784df4-0006",
+      "VRAM_optimize-b6784df4-0007"
+    ]
+  },
+  {
+    "id": "mh18_rag_eval_dataset",
+    "split": "dev",
+    "qtype": "multihop",
+    "difficulty": 3,
+    "prompt": "要给自己的 RAG 系统搭一套评测，合成数据集应该包含哪几列？判断模型有没有「照着资料瞎编」，重点看哪个指标？",
+    "reference_answer": "数据集需要四列：question（问题）、ground_truths（真实答案）、answer（答案）、contexts（上下文）。判断有没有照着资料瞎编，重点看忠实度（Faithfulness）：检查生成的答案在给定上下文中的事实准确性，把答案和检索到的上下文逐条比对。",
+    "reference_note": "g16 考列名、g33 考忠实度定义，本题把「备数据」和「看指标」串成完整评测流程。",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          "question",
+          [
+            "ground_truths",
+            "ground truth",
+            "真实答案"
+          ],
+          "answer",
+          [
+            "contexts",
+            "上下文"
+          ],
+          [
+            "忠实度",
+            "Faithfulness"
+          ]
+        ],
+        "min_hit": 4
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "ground_truths"
+          ],
+          [
+            "忠实度（Faithfulness）"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "stage_limits": {
+      "steps": 9,
+      "tokens": 72000
+    },
+    "budget": {
+      "steps": 12,
+      "tokens": 90000,
+      "seconds": 300
+    },
+    "tier": "multihop",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "evidence_chunks": [
+      "RAG_valuation-208520a0-0001",
+      "RAG_valuation-208520a0-0007",
+      "RAG_valuation-208520a0-0008",
+      "RAG_valuation-208520a0-0016",
+      "RAG_valuation-208520a0-0017",
+      "RAG_valuation-208520a0-0023",
+      "RAG_valuation-208520a0-0035"
+    ]
+  },
+  {
+    "id": "mh19_chunking_and_query",
+    "split": "dev",
+    "qtype": "multihop",
+    "difficulty": 3,
+    "prompt": "为什么 RAG 系统不能直接把整篇长文档丢给模型？文档分块和用户的提问方式分别通过什么环节影响最终答案质量？",
+    "reference_answer": "直接整篇嵌入有两个问题：一次性提取整个文档向量会忽略特定主题的重要信息（信息丢失），而且上下文窗口有限制（如 GPT-4 32K）。分块影响召回质量，召回不准会直接影响回答效果；用户问法太口语化、描述模糊也会拉低向量召回，间接让回答变差甚至产生幻觉。",
+    "reference_note": "g15 考分块必要性、g14 考模糊提问，本题要求把两者归到「召回质量」这条共同因果链上。",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "信息丢失",
+            "忽略",
+            "丢失"
+          ],
+          [
+            "窗口",
+            "上下文长度",
+            "长度限制",
+            "32K"
+          ],
+          [
+            "召回",
+            "检索"
+          ],
+          [
+            "幻觉",
+            "回答效果",
+            "回答质量"
+          ]
+        ],
+        "min_hit": 3
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "信息丢失的风险",
+            "上下文长度是有限制的"
+          ],
+          [
+            "十分口语化"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "stage_limits": {
+      "steps": 9,
+      "tokens": 72000
+    },
+    "budget": {
+      "steps": 12,
+      "tokens": 90000,
+      "seconds": 300
+    },
+    "tier": "multihop",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "evidence_chunks": [
+      "R__recall_strategy-5106c676-0000",
+      "R__recall_strategy-5106c676-0001",
+      "split_block-0afb8194-0001",
+      "检索增强llm__检索增强llm-271aff1c-0017"
+    ]
+  },
+  {
+    "id": "mh20_chaining_vs_cot",
+    "split": "dev",
+    "qtype": "multihop",
+    "difficulty": 3,
+    "prompt": "链式提示和思维链都强调「步骤」，两者的区别是什么？链式提示除了提升效果，还有什么工程上的好处？只比较基本形式和资料明确列出的工程好处，不展开其他推理方法或组合用法。",
+    "reference_answer": "CoT 的「步骤」是单次生成里的中间推理步骤，模型在一条回答内部完成推理；链式提示是把复杂任务拆成多个提示依次执行，每个提示是一个独立调用。除了提升效果，链式提示还能提高 LLM 应用的透明度，增加可控性和可靠性——每一步的输入输出都能单独检查和替换。",
+    "reference_note": "g28 考链式提示好处、g22 考 zero-shot CoT，本题区分「单次生成内的推理」与「多次调用间的编排」。",
+    "checks": [
+      {
+        "type": "predicate",
+        "name": "not_refused"
+      },
+      {
+        "type": "predicate",
+        "name": "answer_covers",
+        "must": [
+          [
+            "中间推理步骤",
+            "推理路径",
+            "逐步"
+          ],
+          [
+            "多个提示",
+            "依次执行",
+            "拆",
+            "链式"
+          ],
+          [
+            "透明"
+          ],
+          [
+            "控制",
+            "可控"
+          ],
+          [
+            "可靠"
+          ]
+        ],
+        "min_hit": 3
+      },
+      {
+        "type": "predicate",
+        "name": "evidence_hit",
+        "groups": [
+          [
+            "增加控制性和可靠性"
+          ],
+          [
+            "中间推理步骤",
+            "逐步思考",
+            "推理路径"
+          ]
+        ]
+      },
+      {
+        "type": "predicate",
+        "name": "citations_grounded"
+      }
+    ],
+    "stage_limits": {
+      "steps": 9,
+      "tokens": 72000
+    },
+    "budget": {
+      "steps": 12,
+      "tokens": 90000,
+      "seconds": 300
+    },
+    "tier": "multihop",
+    "workspace": "kb",
+    "require_explore": false,
+    "expects_json": true,
+    "expected_skills": [
+      "retrieval-qa"
+    ],
+    "evidence_chunks": [
+      "03-思维链-8867a383-0000",
+      "03-思维链-8867a383-0001",
+      "03-思维链-8867a383-0003",
+      "03-思维链-8867a383-0004",
+      "1.思维链（cot）__1.思维链（cot）-bf563ed2-0000",
+      "1.思维链（cot）__1.思维链（cot）-bf563ed2-0001",
+      "1.思维链（cot）__1.思维链（cot）-bf563ed2-0002",
+      "1.思维链（cot）__1.思维链（cot）-bf563ed2-0006",
+      "10-art-81c4d9d2-0000",
+      "10-art-81c4d9d2-0001",
+      "10-prompt_chaining-f241f731-0000",
+      "10-prompt_chaining-f241f731-0001",
+      "RAG_Failure-57169d68-0036",
+      "RAG_Failure-57169d68-0037"
+    ]
   }
 ]
