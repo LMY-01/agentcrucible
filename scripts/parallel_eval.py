@@ -60,6 +60,13 @@ def rebuild_verdicts(rows: list[dict]) -> list[list[Verdict]]:
     return out
 
 
+def read_chunk_rows(exit_code: int, output_path: Path) -> list[dict] | None:
+    if not output_path.exists():
+        return None
+    data = json.loads(output_path.read_text(encoding="utf-8"))
+    return data.get("rows") or []
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description="并行跑评测")
     ap.add_argument("--tasks", required=True, help="题集 json 路径")
@@ -120,11 +127,14 @@ def main() -> int:
         code = p.wait()
         log.close()
         print(f"  片 {i} 结束：退出码 {code}")
-        if code != 0 or not of.exists():
+        chunk_rows = read_chunk_rows(code, of)
+        if chunk_rows is None:
             failed_chunks.append(i)
             print(f"    ⚠️ 片段失败，日志：{tmpdir / f'log_{i}.txt'}")
             continue
-        rows.extend(json.loads(of.read_text(encoding="utf-8"))["rows"])
+        if code != 0:
+            print(f"    ⚠️ 片段退出码 {code}，但结果文件完整，保留；日志：{tmpdir / f'log_{i}.txt'}")
+        rows.extend(chunk_rows)
 
     elapsed = round(time.time() - started, 1)
     if not rows:
@@ -153,6 +163,10 @@ def main() -> int:
         "rows": rows,
         "stage_summary": aggregate(verdicts),
         "score": score,
+        "skill_attribution": [
+            row["id"] for row, detail in zip(scored, score["per_task"])
+            if detail["attribution"]
+        ],
         "parallel": {"jobs": jobs, "wall_s": elapsed, "failed_chunks": failed_chunks},
     }
     out = args.out or str(ROOT / "runs" / f"parallel_{int(time.time())}.json")
@@ -162,6 +176,11 @@ def main() -> int:
     print(f"\n{'=' * 56}")
     print(f"合并完成：{passed}/{total} 通过，质量分 {score['quality']:.3f}，"
           f"闸门 {score['gate']}")
+    loading = score["skill_loading"]
+    if loading["tasks"]:
+        print(f"技能加载率 {loading['loaded']}/{loading['tasks']} = {loading['rate']:.1%}")
+    if merged["skill_attribution"]:
+        print("待归因（技能未加载但答案正确）：" + "、".join(merged["skill_attribution"]))
     print(f"并发 {jobs} 路，总耗时 {elapsed}s（若串行约 {elapsed * jobs:.0f}s）")
     print(f"结果写入 {out}")
     if failed_chunks:
