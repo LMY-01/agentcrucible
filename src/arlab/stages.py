@@ -34,7 +34,8 @@ STAGES = [
     ("args", "参数合法性"),
     ("recovery", "错误恢复"),
     ("skill_recall", "技能召回"),
-    ("efficiency", "执行效率"),
+    ("efficiency_cost", "效率成本"),
+    ("efficiency_waste", "效率浪费"),
     ("termination", "终止决策"),
     ("format", "输出格式"),
     ("answer", "答案正确"),
@@ -96,6 +97,66 @@ def _load_skill_calls(tools: list[dict]) -> list[str]:
 def _same_call(a: dict, b: dict) -> bool:
     """两次调用是否是同一组参数。用来抓「同参数重试」这种坏习惯。"""
     return a.get("name") == b.get("name") and a.get("args") == b.get("args")
+
+
+def _kb_block_key(tool: dict) -> tuple | None:
+    if tool.get("name") != "kb_read" or not tool.get("ok", True):
+        return None
+    args = tool.get("args") or {}
+    chunk_id = args.get("chunk_id")
+    if not chunk_id:
+        return None
+    return (args.get("doc_id"), chunk_id)
+
+
+def _efficiency_waste_reasons(tools: list[dict]) -> tuple[list[str], str]:
+    repeated_calls = [
+        current for previous, current in zip(tools, tools[1:])
+        if _same_call(previous, current)
+    ]
+
+    seen_blocks: set[tuple] = set()
+    repeated_blocks: list[tuple] = []
+    for tool in tools:
+        key = _kb_block_key(tool)
+        if key is None:
+            continue
+        if key in seen_blocks:
+            repeated_blocks.append(key)
+        seen_blocks.add(key)
+
+    calls_by_step: dict[int, list[dict]] = defaultdict(list)
+    for tool in tools:
+        calls_by_step[int(tool.get("step", 0))].append(tool)
+    seen_progress_blocks: set[tuple] = set()
+    seen_tool_types: set[str] = set()
+    stale_steps = 0
+    no_progress: list[int] = []
+    for step in sorted(calls_by_step):
+        calls = calls_by_step[step]
+        blocks = {key for call in calls if (key := _kb_block_key(call)) is not None}
+        tool_types = {str(call.get("name")) for call in calls}
+        if blocks - seen_progress_blocks or tool_types - seen_tool_types:
+            stale_steps = 0
+        else:
+            stale_steps += 1
+            if stale_steps == 3:
+                no_progress.append(step)
+        seen_progress_blocks.update(blocks)
+        seen_tool_types.update(tool_types)
+
+    reasons: list[str] = []
+    evidence: list[str] = []
+    if repeated_calls:
+        reasons.append(f"{len(repeated_calls)} 次同参数重试")
+        evidence.append(f"重复调用 {repeated_calls[0].get('name')}")
+    if repeated_blocks:
+        reasons.append(f"{len(repeated_blocks)} 次重复读同一块")
+        evidence.append(f"重复块 {repeated_blocks[0]}")
+    if no_progress:
+        reasons.append(f"连续 3 步无新增块或工具类型（截至 step {no_progress[0]}）")
+        evidence.append(f"无进展步骤 {no_progress}")
+    return reasons, "；".join(evidence)
 
 
 def _missed_read(tools: list[dict]) -> list[dict]:
@@ -226,49 +287,69 @@ def judge(events: list[dict], task: dict, ctx: dict | None = None) -> list[Verdi
                                     f"{len(fails)} 次失败后都换了策略，没有同参数重试",
                                     evidence="失败后下一步参数均不同"))
 
-    # ---- 5. skill_recall：该想起的手册想起来了吗 ----
-    expected = task.get("expected_skills") or []
+    # ---- 5. skill_recall：必需技能缺失才扣，答案正确时先降为待归因 ----
+    required = task.get("required_skills")
+    if required is None:
+        required = task.get("expected_skills") or []
+    optional = task.get("optional_skills") or []
     loaded = _load_skill_calls(tools)
     available = ctx.get("available_tools")
-    if not expected:
+    if not required and not optional:
         verdicts.append(Verdict("skill_recall", "技能召回", NA, "任务未声明期望技能"))
     elif available is not None and "load_skill" not in available:
-        # A/B 实验里可能整组都不提供技能，这不是「忘了加载」
         verdicts.append(Verdict("skill_recall", "技能召回", NA,
                                 "本次运行未提供技能加载能力（技能目录为空）"))
     else:
-        hit = [s for s in expected if s in loaded]
-        if hit:
+        evidence = f"load_skill 调用: {loaded or '无'}"
+        missing_required = [skill for skill in required if skill not in loaded]
+        loaded_optional = [skill for skill in optional if skill in loaded]
+        if not missing_required:
+            hit = [skill for skill in required if skill in loaded] + loaded_optional
             verdicts.append(Verdict("skill_recall", "技能召回", PASS,
-                                    f"加载了 {', '.join(hit)}",
-                                    evidence=f"load_skill 调用: {loaded}"))
+                                    f"加载了 {', '.join(hit)}", evidence=evidence))
+        elif end.get("ok"):
+            verdicts.append(Verdict("skill_recall", "技能召回", WARN,
+                                    f"必需技能 {missing_required} 未加载，但答案正确，列入待归因",
+                                    evidence=evidence))
         else:
             verdicts.append(Verdict("skill_recall", "技能召回", FAIL,
-                                    f"应加载 {expected}，实际一次都没加载",
-                                    evidence=f"load_skill 调用: {loaded or '无'}"))
+                                    f"必需技能 {missing_required} 未加载，且答案错误",
+                                    evidence=evidence))
+        if not required and not loaded_optional:
+            verdicts[-1] = Verdict("skill_recall", "技能召回", NA,
+                                   "可选技能未加载，不扣分", evidence=evidence)
 
-    # ---- 6. efficiency：步数和 token 是否在预算内 ----
+    # ---- 6. efficiency_cost / efficiency_waste：成本只报告，浪费才扣分 ----
     max_steps = int(limits.get("steps", 6))
     max_tokens = int(limits.get("tokens", 12_000))
     steps = int(end.get("steps") or 0)
     tokens = int(end.get("total_tokens") or 0)
     over_steps = steps > max_steps
     over_tokens = tokens > max_tokens
-    if over_steps or over_tokens:
-        reasons = []
-        if over_steps:
-            reasons.append(f"步数 {steps} > {max_steps}")
-        if over_tokens:
-            reasons.append(f"token {tokens} > {max_tokens}")
-        verdicts.append(Verdict("efficiency", "执行效率", FAIL, "，".join(reasons),
-                                evidence=f"预算上限 {max_steps} 步 / {max_tokens} token"))
-    else:
-        # 用到上限 80% 以上算 warn：这次过得去，但没有余量
-        tight = steps / max_steps >= 0.8 or tokens / max_tokens >= 0.8
+    reasons = []
+    if over_steps:
+        reasons.append(f"步数 {steps} > {max_steps}")
+    if over_tokens:
+        reasons.append(f"token {tokens} > {max_tokens}")
+    tight = steps / max_steps >= 0.8 or tokens / max_tokens >= 0.8
+    cost_detail = "，".join(reasons) if reasons else (
+        f"{steps} 步 / {tokens} token" + ("，已接近上限没有余量" if tight else "，余量充足")
+    )
+    verdicts.append(Verdict(
+        "efficiency_cost", "效率成本", WARN if reasons or tight else PASS, cost_detail,
+        evidence=f"上限 {max_steps} 步 / {max_tokens} token",
+    ))
+
+    waste_reasons, waste_evidence = _efficiency_waste_reasons(tools)
+    if waste_reasons:
         verdicts.append(Verdict(
-            "efficiency", "执行效率", WARN if tight else PASS,
-            f"{steps} 步 / {tokens} token" + ("，已接近上限没有余量" if tight else "，余量充足"),
-            evidence=f"上限 {max_steps} 步 / {max_tokens} token",
+            "efficiency_waste", "效率浪费", FAIL, "；".join(waste_reasons),
+            evidence=waste_evidence,
+        ))
+    else:
+        verdicts.append(Verdict(
+            "efficiency_waste", "效率浪费", PASS, "无同参数重试、重复读块或无进展循环",
+            evidence=f"{len(tools)} 次工具调用",
         ))
 
     # ---- 7. termination：是正常收尾还是被预算逼停 ----

@@ -107,12 +107,12 @@ class TestScoring(unittest.TestCase):
     def test_answer_fail_costs_most(self):
         base = [V(s, PASS) for s in STAGE_WEIGHTS]
         only_answer = [V("answer", FAIL) if v.stage == "answer" else v for v in base]
-        only_eff = [V("efficiency", FAIL) if v.stage == "efficiency" else v for v in base]
+        only_eff = [V("efficiency_waste", FAIL) if v.stage == "efficiency_waste" else v for v in base]
         self.assertLess(task_score(only_answer)[0], task_score(only_eff)[0],
                         "答案错应该比效率超预算扣得多")
 
     def test_na_is_excluded_and_weight_renormalised(self):
-        vs = [V("answer", PASS), V("explore", NA), V("efficiency", NA)]
+        vs = [V("answer", PASS), V("explore", NA), V("efficiency_waste", NA)]
         score, _ = task_score(vs)
         self.assertEqual(score, 1.0, "不考察的阶段不该扣分")
 
@@ -120,8 +120,30 @@ class TestScoring(unittest.TestCase):
         vs = [V("answer", WARN)]
         self.assertEqual(task_score(vs)[0], 0.5)
 
+    def test_cost_warn_does_not_affect_score_or_drag(self):
+        verdicts = [V(s, PASS) for s in STAGE_WEIGHTS]
+        verdicts = [V("efficiency_cost", WARN) if v.stage == "efficiency_cost" else v
+                    for v in verdicts]
+        score, drag = task_score(verdicts)
+        self.assertEqual(score, 1.0)
+        self.assertEqual(drag, [])
+
+    def test_skill_loading_and_attribution(self):
+        loaded = Verdict("skill_recall", "技能召回", PASS, "加载了 retrieval-qa",
+                         "load_skill 调用: ['retrieval-qa']")
+        missing = Verdict("skill_recall", "技能召回", WARN,
+                          "必需技能 ['retrieval-qa'] 未加载，但答案正确，列入待归因",
+                          "load_skill 调用: 无")
+        optional = Verdict("skill_recall", "技能召回", NA, "可选技能未加载，不扣分",
+                           "load_skill 调用: 无")
+        undeclared = Verdict("skill_recall", "技能召回", NA, "任务未声明期望技能")
+        result = run_score([[loaded], [missing], [optional], [undeclared]])
+        self.assertEqual(result["skill_loading"], {"loaded": 1, "tasks": 3, "rate": 0.333})
+        self.assertEqual(result["per_task"][0]["attribution"], [])
+        self.assertEqual(result["per_task"][1]["attribution"], ["技能召回"])
+
     def test_drag_lists_offenders(self):
-        vs = [V("answer", FAIL), V("efficiency", PASS)]
+        vs = [V("answer", FAIL), V("efficiency_waste", PASS)]
         _, drag = task_score(vs)
         self.assertEqual(drag, ["答案正确"])
 

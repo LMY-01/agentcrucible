@@ -18,9 +18,10 @@ import sys
 from collections import defaultdict
 
 STAGES = ["explore", "tool_valid", "args", "recovery",
-          "skill_recall", "efficiency", "termination", "answer"]
+          "skill_recall", "efficiency_cost", "efficiency_waste", "termination", "answer"]
 NAMES = {"explore": "探查", "tool_valid": "工具有效性", "args": "参数合法性",
-         "recovery": "错误恢复", "skill_recall": "技能召回", "efficiency": "执行效率",
+         "recovery": "错误恢复", "skill_recall": "技能召回",
+         "efficiency_cost": "效率成本", "efficiency_waste": "效率浪费",
          "termination": "终止决策", "answer": "答案正确"}
 ORDER = {"pass": 0, "warn": 1, "fail": 2, "na": -1}
 

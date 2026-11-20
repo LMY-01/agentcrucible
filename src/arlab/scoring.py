@@ -22,7 +22,8 @@ STAGE_WEIGHTS: dict[str, float] = {
     "explore": 0.10,       # 盲猜路径是可靠性问题，线上会放大
     "recovery": 0.10,      # 失败能不能自己爬出来
     "skill_recall": 0.05,  # 有手册却想不起来，属于能力上限问题
-    "efficiency": 0.05,    # 花钱，但不是正确性问题
+    "efficiency_cost": 0.0,  # 成本只在三硬指标和阶段报告里展示，不进质量分
+    "efficiency_waste": 0.05,  # 只有真实浪费才扣分
     "termination": 0.05,   # 会不会被预算逼停
 }
 
@@ -49,6 +50,8 @@ def task_score(verdicts: list[Verdict]) -> tuple[float, list[str]]:
         if v.level == NA:
             continue
         w = STAGE_WEIGHTS.get(v.stage, 0.05)
+        if w <= 0:
+            continue
         total_w += w
         got = LEVEL_SCORE[v.level]
         acc += w * got
@@ -61,6 +64,23 @@ def task_score(verdicts: list[Verdict]) -> tuple[float, list[str]]:
     return round(acc / total_w, 3), [name for _, name in drag]
 
 
+def _skill_loading(per_task: list[list[Verdict]]) -> dict:
+    loaded = 0
+    eligible = 0
+    for verdicts in per_task:
+        verdict = next((v for v in verdicts if v.stage == "skill_recall"), None)
+        if verdict is None or not verdict.evidence.startswith("load_skill 调用:"):
+            continue
+        eligible += 1
+        if verdict.detail.startswith("加载了"):
+            loaded += 1
+    return {
+        "loaded": loaded,
+        "tasks": eligible,
+        "rate": round(loaded / eligible, 3) if eligible else None,
+    }
+
+
 def run_score(per_task: list[list[Verdict]], threshold: float = DEFAULT_THRESHOLD) -> dict:
     """整轮的分。per_task 是每条任务的判定列表。"""
     scores = []
@@ -69,7 +89,8 @@ def run_score(per_task: list[list[Verdict]], threshold: float = DEFAULT_THRESHOL
     for verdicts in per_task:
         s, drag = task_score(verdicts)
         scores.append(s)
-        details.append({"score": s, "drag": drag})
+        attribution = [v.name for v in verdicts if v.stage == "skill_recall" and v.level == WARN]
+        details.append({"score": s, "drag": drag, "attribution": attribution})
         for name in drag:
             all_drag[name] = all_drag.get(name, 0) + 1
 
@@ -82,4 +103,5 @@ def run_score(per_task: list[list[Verdict]], threshold: float = DEFAULT_THRESHOL
         "gate": "pass" if quality >= threshold else "fail",
         "per_task": details,
         "drag_counter": dict(sorted(all_drag.items(), key=lambda kv: -kv[1])),
+        "skill_loading": _skill_loading(per_task),
     }

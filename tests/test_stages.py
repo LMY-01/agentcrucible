@@ -127,33 +127,81 @@ class TestSkillRecall(unittest.TestCase):
         v = pick(judge([ev_tool(1, "read_file"), ev_end()], {}), "skill_recall")
         self.assertEqual(v.level, NA)
 
-    def test_loaded_passes(self):
+    def test_loaded_required_passes(self):
         events = [ev_tool(1, "load_skill", args={"name": "csv-profiling"}),
                   ev_tool(2, "run_python"), ev_end()]
-        v = pick(judge(events, {"expected_skills": ["csv-profiling"]}), "skill_recall")
+        v = pick(judge(events, {"required_skills": ["csv-profiling"]}), "skill_recall")
         self.assertEqual(v.level, PASS)
 
-    def test_not_loaded_fails(self):
-        events = [ev_tool(1, "read_file"), ev_end()]
+    def test_missing_required_with_wrong_answer_fails(self):
+        events = [ev_tool(1, "read_file"), ev_end(ok=False, failures=["答案错误"])]
         v = pick(judge(events, {"expected_skills": ["csv-profiling"]}), "skill_recall")
         self.assertEqual(v.level, FAIL)
+
+    def test_missing_required_with_correct_answer_warns(self):
+        events = [ev_tool(1, "read_file"), ev_end()]
+        v = pick(judge(events, {"required_skills": ["csv-profiling"]}), "skill_recall")
+        self.assertEqual(v.level, WARN)
+        self.assertIn("待归因", v.detail)
+
+    def test_missing_optional_is_na(self):
+        events = [ev_tool(1, "read_file"), ev_end()]
+        v = pick(judge(events, {"optional_skills": ["csv-profiling"]}), "skill_recall")
+        self.assertEqual(v.level, NA)
+
+    def test_loaded_optional_passes(self):
+        events = [ev_tool(1, "load_skill", args={"name": "csv-profiling"}), ev_end()]
+        v = pick(judge(events, {"optional_skills": ["csv-profiling"]}), "skill_recall")
+        self.assertEqual(v.level, PASS)
 
 
 class TestEfficiencyAndTermination(unittest.TestCase):
-    def test_over_limit_fails(self):
+    def test_over_limit_warns_cost_without_waste_fail(self):
         task = {"stage_limits": {"steps": 3, "tokens": 1000}}
-        v = pick(judge([ev_end(steps=4, total_tokens=900)], task), "efficiency")
-        self.assertEqual(v.level, FAIL)
+        verdicts = judge([ev_end(steps=4, total_tokens=900)], task)
+        self.assertEqual(pick(verdicts, "efficiency_cost").level, WARN)
+        self.assertEqual(pick(verdicts, "efficiency_waste").level, PASS)
 
-    def test_near_limit_warns(self):
+    def test_near_limit_warns_cost(self):
         task = {"stage_limits": {"steps": 5, "tokens": 10000}}
-        v = pick(judge([ev_end(steps=4, total_tokens=5000)], task), "efficiency")
+        v = pick(judge([ev_end(steps=4, total_tokens=5000)], task), "efficiency_cost")
         self.assertEqual(v.level, WARN)
 
-    def test_roomy_passes(self):
+    def test_roomy_passes_cost(self):
         task = {"stage_limits": {"steps": 10, "tokens": 20000}}
-        v = pick(judge([ev_end(steps=3, total_tokens=3000)], task), "efficiency")
+        v = pick(judge([ev_end(steps=3, total_tokens=3000)], task), "efficiency_cost")
         self.assertEqual(v.level, PASS)
+
+    def test_same_args_retry_fails_waste(self):
+        events = [ev_tool(1, "read_file", args={"path": "a"}),
+                  ev_tool(2, "read_file", args={"path": "a"}), ev_end()]
+        v = pick(judge(events, {}), "efficiency_waste")
+        self.assertEqual(v.level, FAIL)
+        self.assertIn("同参数重试", v.detail)
+
+    def test_repeated_kb_read_fails_waste(self):
+        events = [ev_tool(1, "kb_read", args={"chunk_id": "c1"}),
+                  ev_tool(2, "kb_search", args={"query": "x"}),
+                  ev_tool(3, "kb_read", args={"chunk_id": "c1"}), ev_end()]
+        v = pick(judge(events, {}), "efficiency_waste")
+        self.assertEqual(v.level, FAIL)
+        self.assertIn("重复读同一块", v.detail)
+
+    def test_no_progress_loop_fails_waste(self):
+        events = [ev_tool(step, "kb_search", args={"query": f"q{step}"})
+                  for step in range(1, 5)]
+        events.append(ev_end(steps=4))
+        v = pick(judge(events, {}), "efficiency_waste")
+        self.assertEqual(v.level, FAIL)
+        self.assertIn("无新增块", v.detail)
+
+    def test_new_blocks_and_tool_types_reset_no_progress(self):
+        events = [ev_tool(1, "kb_search", args={"query": "q1"}),
+                  ev_tool(2, "kb_read", args={"chunk_id": "c1"}),
+                  ev_tool(3, "kb_search", args={"query": "q2"}),
+                  ev_tool(4, "kb_read", args={"chunk_id": "c2"}),
+                  ev_tool(5, "submit_answer"), ev_end(steps=5)]
+        self.assertEqual(pick(judge(events, {}), "efficiency_waste").level, PASS)
 
     def test_budget_exhausted_fails_termination(self):
         v = pick(judge([ev_end(status="budget_exhausted", reason="steps")], {}), "termination")

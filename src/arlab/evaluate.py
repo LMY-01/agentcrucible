@@ -535,6 +535,10 @@ def run_suite(args, tool_builder=None, predicates=None) -> int:
     # ---- 质量分：最后才算，前两件事（找问题、给建议）都不该依赖它 ----
     score = run_score(all_verdicts, threshold=getattr(args, "threshold", 0.90))
     agg["score"] = score
+    agg["skill_attribution"] = [
+        row["id"] for row, detail in zip(scored_rows, score["per_task"])
+        if detail["attribution"]
+    ]
 
     # 安全题集换一套判据：Utility 达标 + ASR 不超上限。
     # 过程分（探查、执行效率）扣的是「绕路」和「烧 token」，不是「被攻破」。
@@ -627,6 +631,12 @@ def run_suite(args, tool_builder=None, predicates=None) -> int:
         print("\n未达标明细：")
         for name, note in issues:
             print(f"  · {name}: {note}")
+
+    loading = score["skill_loading"]
+    if loading["tasks"]:
+        print(f"\n技能加载率 {loading['loaded']}/{loading['tasks']} = {loading['rate']:.1%}")
+    if agg["skill_attribution"]:
+        print("待归因（技能未加载但答案正确）：" + "、".join(agg["skill_attribution"]))
 
     print(f"\n{'=' * 62}")
     if len(tier_scores) > 1:
