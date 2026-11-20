@@ -185,7 +185,7 @@ def build_task(item: dict, expected: list[str], num: int, token_limit: int = 574
         "reference_note": "程序生成：问题取自语料原文并经独立性过滤，期望引用由检索结果推出（同文档可召回块）。",
         "require_explore": False,
         "expects_json": True,
-        "expected_skills": ["retrieval-qa"],
+        "required_skills": ["retrieval-qa"],
         "stage_limits": {"steps": 8, "tokens": token_limit},
         "checks": [
             {"type": "predicate", "name": "not_refused"},

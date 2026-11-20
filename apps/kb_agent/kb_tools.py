@@ -22,6 +22,10 @@ KB_ROOT = Path(os.environ.get("KB_LAB_ROOT", "/mnt/d/kb-lab"))
 DB_PATH = KB_ROOT / "data" / "chroma"
 SUMMARY_CHARS = 160
 
+
+def _summary_chars() -> int:
+    return int(os.environ.get("KB_SEARCH_SUMMARY_CHARS", str(SUMMARY_CHARS)))
+
 # 必须在 sentence_transformers 首次 import 之前设好：它加载权重前会向 HF Hub
 # 查 revision，WSL 里不通就阻塞到超时。权重本地有缓存，离线跑完全够。
 os.environ.setdefault("HF_HUB_OFFLINE", "1")
@@ -47,7 +51,7 @@ def kb_search(query: str, k: int = 5, mode: str = "hybrid") -> str:
         return "没有检索到任何内容。换个问法，或者考虑这题资料里确实没有答案。"
     lines = []
     for rank, (chunk, score) in enumerate(hits, 1):
-        head = " ".join(chunk.text.split())[:SUMMARY_CHARS]
+        head = " ".join(chunk.text.split())[:_summary_chars()]
         lines.append(
             f"[{rank}] chunk_id={chunk.id}\n"
             f"    来源={chunk.source}  第{chunk.idx}块  相关度={score:.4f}\n"

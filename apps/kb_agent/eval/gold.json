@@ -46,12 +46,12 @@
     "workspace": "kb",
     "require_explore": false,
     "expects_json": true,
-    "expected_skills": [
+    "required_skills": [
       "retrieval-qa"
     ],
     "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
+      "steps": 7,
+      "tokens": 38869
     },
     "evidence_chunks": [
       "rag（检索增强生成）技术__rag（检索增强生成）技术-ca91068f-0004",
@@ -110,12 +110,12 @@
     "workspace": "kb",
     "require_explore": false,
     "expects_json": true,
-    "expected_skills": [
+    "required_skills": [
       "retrieval-qa"
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 65058
     },
     "evidence_chunks": [
       "R__recall_strategy-5106c676-0001",
@@ -172,12 +172,13 @@
     "workspace": "kb",
     "require_explore": false,
     "expects_json": true,
-    "expected_skills": [
+    "required_skills": [],
+    "optional_skills": [
       "retrieval-qa"
     ],
     "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
+      "steps": 7,
+      "tokens": 40215
     },
     "evidence_chunks": [
       "R__recall_strategy-5106c676-0003"
@@ -232,12 +233,12 @@
     "workspace": "kb",
     "require_explore": false,
     "expects_json": true,
-    "expected_skills": [
+    "required_skills": [
       "retrieval-qa"
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 65058
     },
     "evidence_chunks": [
       "4.lora__4.lora-607a1a94-0000",
@@ -301,12 +302,12 @@
     "workspace": "kb",
     "require_explore": false,
     "expects_json": true,
-    "expected_skills": [
+    "required_skills": [
       "retrieval-qa"
     ],
     "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
+      "steps": 7,
+      "tokens": 40215
     },
     "evidence_chunks": [
       "4.lora__4.lora-607a1a94-0001",
@@ -362,12 +363,12 @@
     "workspace": "kb",
     "require_explore": false,
     "expects_json": true,
-    "expected_skills": [
+    "required_skills": [
       "retrieval-qa"
     ],
     "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
+      "steps": 7,
+      "tokens": 40215
     },
     "evidence_chunks": [
       "1.llm概念__1.llm概念-7445fdf3-0008",
@@ -423,12 +424,13 @@
     "workspace": "kb",
     "require_explore": false,
     "expects_json": true,
-    "expected_skills": [
+    "required_skills": [],
+    "optional_skills": [
       "retrieval-qa"
     ],
     "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
+      "steps": 7,
+      "tokens": 38869
     },
     "evidence_chunks": [
       "LLMs_optimize_trick_no-3aa95a9d-0001",
@@ -485,12 +487,12 @@
     "workspace": "kb",
     "require_explore": false,
     "expects_json": true,
-    "expected_skills": [
+    "required_skills": [
       "retrieval-qa"
     ],
     "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
+      "steps": 7,
+      "tokens": 38869
     },
     "evidence_chunks": [
       "04-react-推理行动-828c5089-0000",
@@ -521,12 +523,12 @@
     "workspace": "kb",
     "require_explore": false,
     "expects_json": true,
-    "expected_skills": [
+    "required_skills": [
       "retrieval-qa"
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 65058
     }
   },
   {
@@ -554,12 +556,12 @@
     "workspace": "kb",
     "require_explore": false,
     "expects_json": true,
-    "expected_skills": [
+    "required_skills": [
       "retrieval-qa"
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 65058
     }
   },
   {
@@ -584,12 +586,13 @@
     "workspace": "kb",
     "require_explore": false,
     "expects_json": true,
-    "expected_skills": [
+    "required_skills": [],
+    "optional_skills": [
       "retrieval-qa"
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 65058
     }
   },
   {
@@ -620,12 +623,13 @@
     "workspace": "kb",
     "require_explore": false,
     "expects_json": true,
-    "expected_skills": [
+    "required_skills": [],
+    "optional_skills": [
       "retrieval-qa"
     ],
     "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
+      "steps": 7,
+      "tokens": 38869
     }
   },
   {
@@ -653,12 +657,12 @@
     "workspace": "kb",
     "require_explore": false,
     "expects_json": true,
-    "expected_skills": [
+    "required_skills": [
       "retrieval-qa"
     ],
     "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
+      "steps": 7,
+      "tokens": 38869
     }
   },
   {
@@ -708,12 +712,12 @@
     "workspace": "kb",
     "require_explore": false,
     "expects_json": true,
-    "expected_skills": [
+    "required_skills": [
       "retrieval-qa"
     ],
     "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
+      "steps": 7,
+      "tokens": 40215
     },
     "evidence_chunks": [
       "R__recall_strategy-5106c676-0000",
@@ -770,12 +774,12 @@
     "workspace": "kb",
     "require_explore": false,
     "expects_json": true,
-    "expected_skills": [
+    "required_skills": [
       "retrieval-qa"
     ],
     "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
+      "steps": 7,
+      "tokens": 40215
     },
     "evidence_chunks": [
       "split_block-0afb8194-0001",
@@ -831,12 +835,12 @@
     "workspace": "kb",
     "require_explore": false,
     "expects_json": true,
-    "expected_skills": [
+    "required_skills": [
       "retrieval-qa"
     ],
     "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
+      "steps": 7,
+      "tokens": 38869
     },
     "evidence_chunks": [
       "RAG_valuation-208520a0-0001",
@@ -902,12 +906,12 @@
     "workspace": "kb",
     "require_explore": false,
     "expects_json": true,
-    "expected_skills": [
+    "required_skills": [
       "retrieval-qa"
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 65058
     },
     "evidence_chunks": [
       "4.lora__4.lora-607a1a94-0002",
@@ -963,12 +967,12 @@
     "workspace": "kb",
     "require_explore": false,
     "expects_json": true,
-    "expected_skills": [
+    "required_skills": [
       "retrieval-qa"
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 65058
     },
     "evidence_chunks": [
       "LLMs_inference_optimize-64d9ecd0-0023",
@@ -1031,12 +1035,12 @@
     "workspace": "kb",
     "require_explore": false,
     "expects_json": true,
-    "expected_skills": [
+    "required_skills": [
       "retrieval-qa"
     ],
     "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
+      "steps": 7,
+      "tokens": 38869
     },
     "evidence_chunks": [
       "LLMs_inference_optimize-64d9ecd0-0000",
@@ -1103,12 +1107,12 @@
     "workspace": "kb",
     "require_explore": false,
     "expects_json": true,
-    "expected_skills": [
+    "required_skills": [
       "retrieval-qa"
     ],
     "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
+      "steps": 7,
+      "tokens": 38869
     },
     "evidence_chunks": [
       "2.幻觉来源与缓解__2.幻觉来源与缓解-66183278-0001",
@@ -1167,12 +1171,12 @@
     "workspace": "kb",
     "require_explore": false,
     "expects_json": true,
-    "expected_skills": [
+    "required_skills": [
       "retrieval-qa"
     ],
     "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
+      "steps": 7,
+      "tokens": 40215
     },
     "evidence_chunks": [
       "2.幻觉来源与缓解__2.幻觉来源与缓解-66183278-0003"
@@ -1221,12 +1225,12 @@
     "workspace": "kb",
     "require_explore": false,
     "expects_json": true,
-    "expected_skills": [
+    "required_skills": [
       "retrieval-qa"
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 65058
     },
     "evidence_chunks": [
       "03-思维链-8867a383-0003",
@@ -1277,12 +1281,12 @@
     "workspace": "kb",
     "require_explore": false,
     "expects_json": true,
-    "expected_skills": [
+    "required_skills": [
       "retrieval-qa"
     ],
     "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
+      "steps": 7,
+      "tokens": 38869
     },
     "evidence_chunks": [
       "07-思维树-e919a248-0001"
@@ -1340,12 +1344,12 @@
     "workspace": "kb",
     "require_explore": false,
     "expects_json": true,
-    "expected_skills": [
+    "required_skills": [
       "retrieval-qa"
     ],
     "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
+      "steps": 7,
+      "tokens": 40215
     },
     "evidence_chunks": [
       "StreamingLLM__readme-0b6a856d-0007",
@@ -1406,12 +1410,12 @@
     "workspace": "kb",
     "require_explore": false,
     "expects_json": true,
-    "expected_skills": [
+    "required_skills": [
       "retrieval-qa"
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 65058
     },
     "evidence_chunks": [
       "1.分词__1.分词-dc60a3be-0004",
@@ -1474,12 +1478,12 @@
     "workspace": "kb",
     "require_explore": false,
     "expects_json": true,
-    "expected_skills": [
+    "required_skills": [
       "retrieval-qa"
     ],
     "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
+      "steps": 7,
+      "tokens": 38869
     },
     "evidence_chunks": [
       "2.jieba分词用法及原理__2.jieba分词用法及原理-1509e9f6-0001",
@@ -1531,12 +1535,12 @@
     "workspace": "kb",
     "require_explore": false,
     "expects_json": true,
-    "expected_skills": [
+    "required_skills": [
       "retrieval-qa"
     ],
     "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
+      "steps": 7,
+      "tokens": 40215
     },
     "evidence_chunks": [
       "R_hard_neg_strategy-a0dead9d-0002",
@@ -1591,12 +1595,12 @@
     "workspace": "kb",
     "require_explore": false,
     "expects_json": true,
-    "expected_skills": [
+    "required_skills": [
       "retrieval-qa"
     ],
     "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
+      "steps": 7,
+      "tokens": 38869
     },
     "evidence_chunks": [
       "10-prompt_chaining-f241f731-0000",
@@ -1643,12 +1647,12 @@
     "workspace": "kb",
     "require_explore": false,
     "expects_json": true,
-    "expected_skills": [
+    "required_skills": [
       "retrieval-qa"
     ],
     "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
+      "steps": 7,
+      "tokens": 38869
     },
     "evidence_chunks": [
       "大模型RLHF：PPO原理与源码解读__大模型RLHF：PPO原理与源码解读-fe3e440b-0029"
@@ -1718,12 +1722,12 @@
     "workspace": "kb",
     "require_explore": false,
     "expects_json": true,
-    "expected_skills": [
+    "required_skills": [
       "retrieval-qa"
     ],
     "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
+      "steps": 7,
+      "tokens": 38869
     },
     "evidence_chunks": [
       "1.langchain__1.langchain-4efe4da3-0001",
@@ -1780,12 +1784,12 @@
     "workspace": "kb",
     "require_explore": false,
     "expects_json": true,
-    "expected_skills": [
+    "required_skills": [
       "retrieval-qa"
     ],
     "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
+      "steps": 7,
+      "tokens": 38869
     },
     "evidence_chunks": [
       "4.lora__4.lora-607a1a94-0010"
@@ -1833,12 +1837,12 @@
     "workspace": "kb",
     "require_explore": false,
     "expects_json": true,
-    "expected_skills": [
+    "required_skills": [
       "retrieval-qa"
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 65058
     },
     "evidence_chunks": [
       "2.预训练__2.预训练-04396d62-0001",
@@ -1892,12 +1896,12 @@
     "workspace": "kb",
     "require_explore": false,
     "expects_json": true,
-    "expected_skills": [
+    "required_skills": [
       "retrieval-qa"
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 65058
     },
     "evidence_chunks": [
       "RAG_valuation-208520a0-0035"
@@ -1957,12 +1961,12 @@
     "workspace": "kb",
     "require_explore": false,
     "expects_json": true,
-    "expected_skills": [
+    "required_skills": [
       "retrieval-qa"
     ],
     "stage_limits": {
-      "steps": 8,
-      "tokens": 25000
+      "steps": 7,
+      "tokens": 40215
     },
     "evidence_chunks": [
       "LLMs_inference_optimize-64d9ecd0-0021"
@@ -2025,12 +2029,12 @@
     "workspace": "kb",
     "require_explore": false,
     "expects_json": true,
-    "expected_skills": [
+    "required_skills": [
       "retrieval-qa"
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 65058
     },
     "evidence_chunks": [
       "4.lora__4.lora-607a1a94-0002",
@@ -2091,12 +2095,12 @@
     "workspace": "kb",
     "require_explore": false,
     "expects_json": true,
-    "expected_skills": [
+    "required_skills": [
       "retrieval-qa"
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 65058
     },
     "evidence_chunks": [
       "1.分词__1.分词-dc60a3be-0004",
@@ -2142,12 +2146,12 @@
     "workspace": "kb",
     "require_explore": false,
     "expects_json": true,
-    "expected_skills": [
+    "required_skills": [
       "retrieval-qa"
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 65058
     }
   },
   {
@@ -2173,12 +2177,12 @@
     "workspace": "kb",
     "require_explore": false,
     "expects_json": true,
-    "expected_skills": [
+    "required_skills": [
       "retrieval-qa"
     ],
     "stage_limits": {
       "steps": 8,
-      "tokens": 25000
+      "tokens": 65058
     }
   }
 ]

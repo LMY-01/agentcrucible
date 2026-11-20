@@ -25,6 +25,12 @@ EVAL = ROOT / "apps" / "kb_agent" / "eval"
 SINGLE_LIMITS = {"steps": 8, "tokens": 25000}
 MULTI_LIMITS = {"steps": 9, "tokens": 72000}
 MULTI_BUDGET = {"steps": 12, "tokens": 90000, "seconds": 300}
+OPTIONAL_RETRIEVAL = {
+    "g03_hyde_weak",
+    "g07_paged_attention",
+    "g11_refuse_aime",
+    "g12_refuse_count",
+}
 
 
 def P(name: str, **kw) -> dict:
@@ -551,7 +557,11 @@ def finalize(tasks: list[dict], tier: str) -> list[dict]:
         t.setdefault("workspace", "kb")
         t.setdefault("require_explore", False)
         t.setdefault("expects_json", True)
-        t.setdefault("expected_skills", ["retrieval-qa"])
+        if t["id"] in OPTIONAL_RETRIEVAL:
+            t["required_skills"] = []
+            t["optional_skills"] = ["retrieval-qa"]
+        else:
+            t.setdefault("required_skills", ["retrieval-qa"])
         t.setdefault("stage_limits", dict(SINGLE_LIMITS))
         out.append(t)
     return out

@@ -12,6 +12,7 @@ import unittest
 from types import SimpleNamespace
 from unittest.mock import patch
 
+from apps.kb_agent import kb_tools
 from apps.kb_agent.app import (
     pred_answer_covers,
     pred_chunk_hit,
@@ -237,6 +238,21 @@ class TestRefusalPredicates(GroundedBase):
         reason = pred_states_missing(ans, {"forbid": ["1024"]})
         self.assertIsNotNone(reason)
         self.assertIn("1024", reason)
+
+
+class TestSearchSummaryBudget(unittest.TestCase):
+    def test_summary_chars_env_controls_preview_only(self):
+        class SearchFakeStore(FakeStore):
+            def search(self, query, k=5, mode="hybrid"):
+                return [(self.chunk("c1"), 0.9)]
+
+        with patch.dict(kb_tools.os.environ, {"KB_SEARCH_SUMMARY_CHARS": "40"}):
+            with patch.object(kb_tools, "_store", return_value=SearchFakeStore()):
+                out = kb_tools.kb_search("任意查询")
+        expected = " ".join(DOCS["c1"].split())[:40]
+        self.assertIn(f"摘要: {expected}…", out)
+        self.assertIn("chunk_id=c1", out)
+        self.assertIn("要看全文用 kb_read", out)
 
 
 class TestSubmissionGate(GroundedBase):
