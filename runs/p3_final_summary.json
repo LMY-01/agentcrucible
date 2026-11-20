@@ -1,0 +1,307 @@
+{
+  "overall": {
+    "quality_median": 0.964,
+    "quality_range": [
+      0.96,
+      0.975
+    ],
+    "round_quality": [
+      0.96,
+      0.964,
+      0.975
+    ],
+    "pass_rate_median": 0.9231,
+    "pass_rate_range": [
+      0.9231,
+      0.9573
+    ],
+    "round_pass_rates": [
+      0.9231,
+      0.9231,
+      0.9573
+    ],
+    "token_median_of_rounds": 34260,
+    "token_median_range": [
+      32407,
+      34614
+    ],
+    "pooled_token_median": 33962,
+    "total_tokens": 13470971
+  },
+  "by_tier": {
+    "gold": {
+      "quality_median": 0.968,
+      "quality_range": [
+        0.968,
+        0.981
+      ],
+      "round_quality": [
+        0.968,
+        0.968,
+        0.981
+      ],
+      "pass_rate_median": 0.9474,
+      "pass_rate_range": [
+        0.9474,
+        0.9737
+      ],
+      "round_pass_rates": [
+        0.9474,
+        0.9474,
+        0.9737
+      ],
+      "token_median_of_rounds": 26899.5,
+      "token_median_range": [
+        25948.5,
+        29842.0
+      ],
+      "pooled_token_median": 33962,
+      "total_tokens": 3736307,
+      "rounds": [
+        {
+          "tasks": 38,
+          "passed": 36,
+          "pass_rate": 0.9474,
+          "quality": 0.968,
+          "token_median": 29842.0,
+          "token_mean": 33910,
+          "step_median": 6.0,
+          "total_tokens": 1288586
+        },
+        {
+          "tasks": 38,
+          "passed": 36,
+          "pass_rate": 0.9474,
+          "quality": 0.968,
+          "token_median": 25948.5,
+          "token_mean": 32542,
+          "step_median": 5.5,
+          "total_tokens": 1236590
+        },
+        {
+          "tasks": 38,
+          "passed": 37,
+          "pass_rate": 0.9737,
+          "quality": 0.981,
+          "token_median": 26899.5,
+          "token_mean": 31872,
+          "step_median": 5.0,
+          "total_tokens": 1211131
+        }
+      ]
+    },
+    "gold_holdout": {
+      "quality_median": 0.924,
+      "quality_range": [
+        0.901,
+        0.927
+      ],
+      "round_quality": [
+        0.901,
+        0.927,
+        0.924
+      ],
+      "pass_rate_median": 0.8421,
+      "pass_rate_range": [
+        0.7895,
+        0.8421
+      ],
+      "round_pass_rates": [
+        0.7895,
+        0.8421,
+        0.8421
+      ],
+      "token_median_of_rounds": 31916,
+      "token_median_range": [
+        27507,
+        34432
+      ],
+      "pooled_token_median": 33962,
+      "total_tokens": 1850992,
+      "rounds": [
+        {
+          "tasks": 19,
+          "passed": 15,
+          "pass_rate": 0.7895,
+          "quality": 0.901,
+          "token_median": 34432,
+          "token_mean": 33234,
+          "step_median": 6,
+          "total_tokens": 631450
+        },
+        {
+          "tasks": 19,
+          "passed": 16,
+          "pass_rate": 0.8421,
+          "quality": 0.927,
+          "token_median": 27507,
+          "token_mean": 31002,
+          "step_median": 6,
+          "total_tokens": 589044
+        },
+        {
+          "tasks": 19,
+          "passed": 16,
+          "pass_rate": 0.8421,
+          "quality": 0.924,
+          "token_median": 31916,
+          "token_mean": 33184,
+          "step_median": 6,
+          "total_tokens": 630498
+        }
+      ]
+    },
+    "multihop": {
+      "quality_median": 0.954,
+      "quality_range": [
+        0.945,
+        0.971
+      ],
+      "round_quality": [
+        0.954,
+        0.945,
+        0.971
+      ],
+      "pass_rate_median": 0.9,
+      "pass_rate_range": [
+        0.85,
+        0.95
+      ],
+      "round_pass_rates": [
+        0.9,
+        0.85,
+        0.95
+      ],
+      "token_median_of_rounds": 54881.0,
+      "token_median_range": [
+        52415.5,
+        58192.0
+      ],
+      "pooled_token_median": 33962,
+      "total_tokens": 3720564,
+      "rounds": [
+        {
+          "tasks": 20,
+          "passed": 18,
+          "pass_rate": 0.9,
+          "quality": 0.954,
+          "token_median": 58192.0,
+          "token_mean": 62415,
+          "step_median": 7.0,
+          "total_tokens": 1248305
+        },
+        {
+          "tasks": 20,
+          "passed": 17,
+          "pass_rate": 0.85,
+          "quality": 0.945,
+          "token_median": 52415.5,
+          "token_mean": 61689,
+          "step_median": 7.0,
+          "total_tokens": 1233785
+        },
+        {
+          "tasks": 20,
+          "passed": 19,
+          "pass_rate": 0.95,
+          "quality": 0.971,
+          "token_median": 54881.0,
+          "token_mean": 61924,
+          "step_median": 7.0,
+          "total_tokens": 1238474
+        }
+      ]
+    },
+    "silver": {
+      "quality_median": 0.986,
+      "quality_range": [
+        0.984,
+        0.996
+      ],
+      "round_quality": [
+        0.984,
+        0.986,
+        0.996
+      ],
+      "pass_rate_median": 0.975,
+      "pass_rate_range": [
+        0.975,
+        1.0
+      ],
+      "round_pass_rates": [
+        0.975,
+        0.975,
+        1.0
+      ],
+      "token_median_of_rounds": 31784.5,
+      "token_median_range": [
+        31082.5,
+        34556.0
+      ],
+      "pooled_token_median": 33962,
+      "total_tokens": 4163108,
+      "rounds": [
+        {
+          "tasks": 40,
+          "passed": 39,
+          "pass_rate": 0.975,
+          "quality": 0.984,
+          "token_median": 31082.5,
+          "token_mean": 33424,
+          "step_median": 6.0,
+          "total_tokens": 1336958
+        },
+        {
+          "tasks": 40,
+          "passed": 39,
+          "pass_rate": 0.975,
+          "quality": 0.986,
+          "token_median": 31784.5,
+          "token_mean": 35471,
+          "step_median": 6.0,
+          "total_tokens": 1418843
+        },
+        {
+          "tasks": 40,
+          "passed": 40,
+          "pass_rate": 1.0,
+          "quality": 0.996,
+          "token_median": 34556.0,
+          "token_mean": 35183,
+          "step_median": 6.0,
+          "total_tokens": 1407307
+        }
+      ]
+    }
+  },
+  "failed_ids_by_tier": {
+    "gold": [
+      "g10_refuse_dim",
+      "g32_tensor_parallel",
+      "g37_refuse_leiden"
+    ],
+    "gold_holdout": [
+      "h01_jieba_dag",
+      "h05_fastertransformer",
+      "h08_mqa_gqa",
+      "h10_rlhf_stages",
+      "h15_false_premise_jieba"
+    ],
+    "multihop": [
+      "mh03_peft_compare",
+      "mh06_advanced_rag",
+      "mh14_jieba_two_mechanisms",
+      "mh16_parallel_strategies",
+      "mh19_chunking_and_query"
+    ],
+    "silver": [
+      "silver_008",
+      "silver_030"
+    ]
+  },
+  "runs": [
+    "D:\\agent-runtime-lab\\runs\\p3_full_r1.json",
+    "D:\\agent-runtime-lab\\runs\\p3_full_r2.json",
+    "D:\\agent-runtime-lab\\runs\\p3_full_r3.json"
+  ]
+}

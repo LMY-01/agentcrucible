@@ -1,0 +1,313 @@
+{
+  "tasks": 20,
+  "grand_total": 1222758,
+  "buckets": {
+    "system": {
+      "tokens": 210813,
+      "share": 0.1724
+    },
+    "tool_results": {
+      "tokens": 789548,
+      "share": 0.6457
+    },
+    "model_output": {
+      "tokens": 222397,
+      "share": 0.1819
+    }
+  },
+  "tool_by_type_estimated": {
+    "kb_search": 456725,
+    "kb_read": 210073,
+    "load_skill": 103307,
+    "cite_check": 19443,
+    "other": 0
+  },
+  "steps": [
+    {
+      "step": 1,
+      "calls": 20,
+      "tokens": 31151,
+      "share": 0.0255,
+      "avg_tokens": 1558,
+      "new_tool": 0,
+      "completion": 3027
+    },
+    {
+      "step": 2,
+      "calls": 20,
+      "tokens": 83779,
+      "share": 0.0685,
+      "avg_tokens": 4189,
+      "new_tool": 48329,
+      "completion": 5380
+    },
+    {
+      "step": 3,
+      "calls": 20,
+      "tokens": 117440,
+      "share": 0.096,
+      "avg_tokens": 5872,
+      "new_tool": 30251,
+      "completion": 5157
+    },
+    {
+      "step": 4,
+      "calls": 20,
+      "tokens": 153119,
+      "share": 0.1252,
+      "avg_tokens": 7656,
+      "new_tool": 29954,
+      "completion": 7740
+    },
+    {
+      "step": 5,
+      "calls": 20,
+      "tokens": 190655,
+      "share": 0.1559,
+      "avg_tokens": 9533,
+      "new_tool": 19188,
+      "completion": 22175
+    },
+    {
+      "step": 6,
+      "calls": 18,
+      "tokens": 197579,
+      "share": 0.1616,
+      "avg_tokens": 10977,
+      "new_tool": 14581,
+      "completion": 23476
+    },
+    {
+      "step": 7,
+      "calls": 14,
+      "tokens": 172761,
+      "share": 0.1413,
+      "avg_tokens": 12340,
+      "new_tool": 7153,
+      "completion": 18493
+    },
+    {
+      "step": 8,
+      "calls": 8,
+      "tokens": 118649,
+      "share": 0.097,
+      "avg_tokens": 14831,
+      "new_tool": 4995,
+      "completion": 18190
+    },
+    {
+      "step": 9,
+      "calls": 5,
+      "tokens": 73669,
+      "share": 0.0602,
+      "avg_tokens": 14734,
+      "new_tool": 2125,
+      "completion": 3183
+    },
+    {
+      "step": 10,
+      "calls": 5,
+      "tokens": 83956,
+      "share": 0.0687,
+      "avg_tokens": 16791,
+      "new_tool": -407,
+      "completion": 12942
+    }
+  ],
+  "most_expensive_steps": [
+    {
+      "task": "mh07_rag_eval",
+      "step": 10,
+      "tokens": 20750,
+      "prompt": 17699,
+      "completion": 3051,
+      "new_tool": -329,
+      "previous_tools": {
+        "cite_check": 3
+      },
+      "trace": "D:\\agent-runtime-lab\\apps\\kb_agent\\runs\\20261119T165138__eval-mh07_rag_eval\\trace.jsonl"
+    },
+    {
+      "task": "mh10_finetune_vs_prompt",
+      "step": 10,
+      "tokens": 20165,
+      "prompt": 18079,
+      "completion": 2086,
+      "new_tool": -363,
+      "previous_tools": {
+        "cite_check": 2
+      },
+      "trace": "D:\\agent-runtime-lab\\apps\\kb_agent\\runs\\20261119T231839__eval-mh10_finetune_vs_prompt\\trace.jsonl"
+    },
+    {
+      "task": "mh07_rag_eval",
+      "step": 8,
+      "tokens": 19702,
+      "prompt": 15394,
+      "completion": 4308,
+      "new_tool": 1538,
+      "previous_tools": {
+        "kb_read": 6
+      },
+      "trace": "D:\\agent-runtime-lab\\apps\\kb_agent\\runs\\20261119T165138__eval-mh07_rag_eval\\trace.jsonl"
+    },
+    {
+      "task": "mh10_finetune_vs_prompt",
+      "step": 8,
+      "tokens": 19427,
+      "prompt": 16908,
+      "completion": 2519,
+      "new_tool": 1249,
+      "previous_tools": {
+        "kb_read": 4
+      },
+      "trace": "D:\\agent-runtime-lab\\apps\\kb_agent\\runs\\20261119T231839__eval-mh10_finetune_vs_prompt\\trace.jsonl"
+    },
+    {
+      "task": "mh10_finetune_vs_prompt",
+      "step": 9,
+      "tokens": 18611,
+      "prompt": 18271,
+      "completion": 340,
+      "new_tool": 452,
+      "previous_tools": {
+        "cite_check": 10
+      },
+      "trace": "D:\\agent-runtime-lab\\apps\\kb_agent\\runs\\20261119T231839__eval-mh10_finetune_vs_prompt\\trace.jsonl"
+    }
+  ],
+  "task_totals": [
+    {
+      "task": "mh10_finetune_vs_prompt",
+      "tokens": 122474,
+      "steps": 10,
+      "trace": "D:\\agent-runtime-lab\\apps\\kb_agent\\runs\\20261119T231839__eval-mh10_finetune_vs_prompt\\trace.jsonl"
+    },
+    {
+      "task": "mh07_rag_eval",
+      "tokens": 117203,
+      "steps": 10,
+      "trace": "D:\\agent-runtime-lab\\apps\\kb_agent\\runs\\20261119T165138__eval-mh07_rag_eval\\trace.jsonl"
+    },
+    {
+      "task": "mh03_peft_compare",
+      "tokens": 100339,
+      "steps": 10,
+      "trace": "D:\\agent-runtime-lab\\apps\\kb_agent\\runs\\20261119T164916__eval-mh03_peft_compare\\trace.jsonl"
+    },
+    {
+      "task": "mh04_ppo_vs_dpo",
+      "tokens": 87643,
+      "steps": 10,
+      "trace": "D:\\agent-runtime-lab\\apps\\kb_agent\\runs\\20261119T164916__eval-mh04_ppo_vs_dpo\\trace.jsonl"
+    },
+    {
+      "task": "mh17_memory_saving",
+      "tokens": 75026,
+      "steps": 10,
+      "trace": "D:\\agent-runtime-lab\\apps\\kb_agent\\runs\\20261119T165702__eval-mh17_memory_saving\\trace.jsonl"
+    },
+    {
+      "task": "mh06_advanced_rag",
+      "tokens": 75014,
+      "steps": 8,
+      "trace": "D:\\agent-runtime-lab\\apps\\kb_agent\\runs\\20261119T231843__eval-mh06_advanced_rag\\trace.jsonl"
+    },
+    {
+      "task": "mh09_hallucination",
+      "tokens": 64067,
+      "steps": 8,
+      "trace": "D:\\agent-runtime-lab\\apps\\kb_agent\\runs\\20261119T231849__eval-mh09_hallucination\\trace.jsonl"
+    },
+    {
+      "task": "mh01_inference_frameworks",
+      "tokens": 60871,
+      "steps": 7,
+      "trace": "D:\\agent-runtime-lab\\apps\\kb_agent\\runs\\20261119T231727__eval-mh01_inference_frameworks\\trace.jsonl"
+    },
+    {
+      "task": "mh15_cot_vs_tot",
+      "tokens": 59606,
+      "steps": 7,
+      "trace": "D:\\agent-runtime-lab\\apps\\kb_agent\\runs\\20261119T232045__eval-mh15_cot_vs_tot\\trace.jsonl"
+    },
+    {
+      "task": "mh12_lora_vs_qlora",
+      "tokens": 58086,
+      "steps": 8,
+      "trace": "D:\\agent-runtime-lab\\apps\\kb_agent\\runs\\20261119T165552__eval-mh12_lora_vs_qlora\\trace.jsonl"
+    },
+    {
+      "task": "mh19_chunking_and_query",
+      "tokens": 54092,
+      "steps": 7,
+      "trace": "D:\\agent-runtime-lab\\apps\\kb_agent\\runs\\20261119T232020__eval-mh19_chunking_and_query\\trace.jsonl"
+    },
+    {
+      "task": "mh16_parallel_strategies",
+      "tokens": 46721,
+      "steps": 7,
+      "trace": "D:\\agent-runtime-lab\\apps\\kb_agent\\runs\\20261119T165719__eval-mh16_parallel_strategies\\trace.jsonl"
+    },
+    {
+      "task": "mh11_flash_vs_paged",
+      "tokens": 45478,
+      "steps": 6,
+      "trace": "D:\\agent-runtime-lab\\apps\\kb_agent\\runs\\20261119T232009__eval-mh11_flash_vs_paged\\trace.jsonl"
+    },
+    {
+      "task": "mh08_cot_vs_react",
+      "tokens": 44796,
+      "steps": 7,
+      "trace": "D:\\agent-runtime-lab\\apps\\kb_agent\\runs\\20261119T165142__eval-mh08_cot_vs_react\\trace.jsonl"
+    },
+    {
+      "task": "mh05_rag_recall",
+      "tokens": 40956,
+      "steps": 6,
+      "trace": "D:\\agent-runtime-lab\\apps\\kb_agent\\runs\\20261119T231727__eval-mh05_rag_recall\\trace.jsonl"
+    },
+    {
+      "task": "mh18_rag_eval_dataset",
+      "tokens": 38947,
+      "steps": 7,
+      "trace": "D:\\agent-runtime-lab\\apps\\kb_agent\\runs\\20261119T165717__eval-mh18_rag_eval_dataset\\trace.jsonl"
+    },
+    {
+      "task": "mh14_jieba_two_mechanisms",
+      "tokens": 36118,
+      "steps": 6,
+      "trace": "D:\\agent-runtime-lab\\apps\\kb_agent\\runs\\20261119T165552__eval-mh14_jieba_two_mechanisms\\trace.jsonl"
+    },
+    {
+      "task": "mh20_chaining_vs_cot",
+      "tokens": 33164,
+      "steps": 6,
+      "trace": "D:\\agent-runtime-lab\\apps\\kb_agent\\runs\\20261119T165819__eval-mh20_chaining_vs_cot\\trace.jsonl"
+    },
+    {
+      "task": "mh02_kv_memory",
+      "tokens": 32389,
+      "steps": 5,
+      "trace": "D:\\agent-runtime-lab\\apps\\kb_agent\\runs\\20261119T231727__eval-mh02_kv_memory\\trace.jsonl"
+    },
+    {
+      "task": "mh13_two_low_rank",
+      "tokens": 29768,
+      "steps": 5,
+      "trace": "D:\\agent-runtime-lab\\apps\\kb_agent\\runs\\20261119T165552__eval-mh13_two_low_rank\\trace.jsonl"
+    }
+  ],
+  "negative_deltas": [
+    {
+      "task": "mh07_rag_eval",
+      "step": 10,
+      "delta": -329
+    },
+    {
+      "task": "mh10_finetune_vs_prompt",
+      "step": 10,
+      "delta": -363
+    }
+  ]
+}
